@@ -6,6 +6,12 @@
 <script src="./support.js"></script>
 </head>
 <body>
+<svg style="position: absolute; width: 0; height: 0; pointer-events: none;" aria-hidden="true">
+  <filter id="fluffy-filter">
+    <feTurbulence type="fractalNoise" baseFrequency="0.14" numOctaves="3" result="noise" />
+    <feDisplacementMap in="SourceGraphic" in2="noise" scale="3" xChannelSelector="R" yChannelSelector="G" />
+  </filter>
+</svg>
 <x-dc>
 <helmet>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
@@ -14,7 +20,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   *{box-sizing:border-box;}
-  body{margin:0;font-family:'Pretendard',-apple-system,sans-serif;-webkit-font-smoothing:antialiased;background:#0e0e1c;}
+  body{margin:0;font-family:'Pretendard',-apple-system,sans-serif;-webkit-font-smoothing:antialiased;background:#f0f2f9;}
   ::-webkit-scrollbar{width:0;height:0;}
   .fl-sc{overflow-y:auto;}
   .fl-sc::-webkit-scrollbar{width:0;height:0;}
@@ -24,15 +30,367 @@
   @keyframes flRec{from{opacity:0;transform:translateY(-8px);}to{opacity:1;transform:translateY(0);}}
   @keyframes flModal{from{opacity:0;transform:scale(0.92);}to{opacity:1;transform:scale(1);}}
   @keyframes flFade{from{opacity:0;}to{opacity:1;}}
+
+  /* 캐릭터 동기화 레버 버튼 및 캘린더 애니메이션 */
+  .lever-sync-wrap {
+    position: relative;
+    display: inline-flex;
+    align-items: flex-end;
+    gap: 7px;
+    cursor: pointer;
+    padding: 6px 10px;
+    background: rgba(255,255,255,0.08);
+    border: 1.5px solid rgba(255,255,255,0.18);
+    border-radius: 18px;
+    user-select: none;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  }
+  .lever-sync-wrap:hover {
+    background: rgba(255,255,255,0.14);
+    border-color: rgba(255,255,255,0.28);
+    transform: translateY(-1px);
+  }
+  .lever-sync-wrap:active {
+    transform: translateY(1px);
+  }
+  .character-body {
+    position: relative;
+    width: 32px;
+    height: 28px;
+    background: radial-gradient(circle at 35% 35%, #FFB677 0%, #FF7A6B 100%);
+    border-radius: 50% 50% 48% 48%;
+    box-shadow: 0 0 8px rgba(255, 122, 107, 0.5), inset 0 1px 1px rgba(255,255,255,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    filter: url(#fluffy-filter);
+  }
+  .star-deco {
+    position: absolute;
+    top: -6px;
+    right: -4px;
+    font-size: 9px;
+    animation: starFloat 1.8s ease-in-out infinite;
+  }
+  .eyes {
+    position: absolute;
+    top: 11px;
+    width: 14px;
+    display: flex;
+    justify-content: space-between;
+  }
+  .eye {
+    width: 2.5px;
+    height: 2.5px;
+    background: #331A12;
+    border-radius: 50%;
+  }
+  .mouth {
+    position: absolute;
+    top: 15px;
+    width: 5px;
+    height: 2.5px;
+    border: 1px solid #331A12;
+    border-top: 0;
+    border-radius: 0 0 5px 5px;
+  }
+  .blush {
+    position: absolute;
+    width: 5px;
+    height: 3px;
+    background: #FF4E3E;
+    border-radius: 50%;
+    opacity: 0.5;
+    filter: blur(0.5px);
+  }
+  .left-blush {
+    left: 6px;
+    top: 13px;
+  }
+  .right-blush {
+    right: 6px;
+    top: 13px;
+  }
+  .hand {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    background: #FF8D7B;
+    border-radius: 50%;
+  }
+  .left-hand {
+    left: -2px;
+    top: 13px;
+  }
+  .right-hand {
+    right: -2px;
+    top: 13px;
+    transform-origin: left center;
+    transition: transform 0.2s;
+  }
+  .lever-machine {
+    position: relative;
+    width: 12px;
+    height: 26px;
+  }
+  .lever-base {
+    position: absolute;
+    bottom: 0;
+    width: 12px;
+    height: 6px;
+    background: #4A4A5A;
+    border-radius: 2px;
+  }
+  .lever-stick-wrap {
+    position: absolute;
+    bottom: 3px;
+    left: 4px;
+    width: 3px;
+    height: 20px;
+    transform-origin: bottom center;
+    transform: rotate(-25deg);
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  .lever-stick {
+    width: 100%;
+    height: 100%;
+    background: #A0A0B0;
+    border-radius: 1px;
+  }
+  .lever-knob {
+    position: absolute;
+    top: -4px;
+    left: -3px;
+    width: 9px;
+    height: 9px;
+    background: #FF4A4A;
+    border-radius: 50%;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+  }
+  
+  .lever-sync-wrap.pulling .lever-stick-wrap {
+    transform: rotate(45deg);
+  }
+  .lever-sync-wrap.pulling .right-hand {
+    transform: translate(6px, 4px) scaleX(1.8);
+  }
+
+  /* 캘린더 날짜 롤링 애니메이션 */
+  .cal-day-cell {
+    transition: transform 0.15s, box-shadow 0.15s, background-color 0.15s;
+  }
+  .cal-day-cell.rolling-out {
+    animation: rollOut 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    animation-delay: var(--delay);
+    pointer-events: none;
+  }
+  .cal-day-cell.rolling-in {
+    animation: rollIn 0.75s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    animation-delay: var(--delay);
+    pointer-events: none;
+  }
+
+  /* 동기화 전용 입출구 (인사이드아웃 느낌) */
+  .calendar-dispenser {
+    position: absolute;
+    top: -8px;
+    left: 10%;
+    width: 32px;
+    height: 16px;
+    background: linear-gradient(180deg, #5B8DEF, #3b6bbf);
+    border: 1.5px solid rgba(255, 255, 255, 0.2);
+    border-top: 0;
+    border-radius: 0 0 16px 16px;
+    box-shadow: 0 4px 10px rgba(91, 141, 239, 0.4);
+    opacity: 0;
+    transform: scale(0.6);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    z-index: 5;
+  }
+  .calendar-collector {
+    position: absolute;
+    bottom: -10px;
+    right: 10%;
+    width: 36px;
+    height: 20px;
+    background: radial-gradient(circle, #221d3b 30%, #f0f2f9 100%);
+    border: 2px solid #FF7A6B;
+    border-radius: 0 0 18px 18px;
+    box-shadow: 0 0 12px #FF7A6B, inset 0 2px 4px rgba(0,0,0,0.8);
+    opacity: 0;
+    transform: scale(0.6);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    z-index: 5;
+  }
+  .calendar-container.syncing-active .calendar-dispenser,
+  .calendar-container.syncing-active .calendar-collector {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  @keyframes starFloat {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-3px) scale(1.1); }
+  }
+  @keyframes rollOut {
+    0% { transform: translate(0, 0) rotate(0deg) scale(1); opacity: 1; }
+    30% { transform: translate(calc(var(--x-out) * 0.2), calc(var(--y-out) * 0.1 - 10px)) rotate(calc(var(--r-out) * 0.2)) scale(0.9); opacity: 1; }
+    100% { transform: translate(var(--x-out), var(--y-out)) rotate(var(--r-out)) scale(0.05); opacity: 0; }
+  }
+  @keyframes rollIn {
+    0% { transform: translate(var(--x-in), var(--y-in)) rotate(var(--r-in)) scale(0.05); opacity: 0; }
+    70% { transform: translate(calc(var(--x-in) * 0.15), calc(var(--y-in) * 0.1)) rotate(calc(var(--r-in) * 0.15)) scale(1.05); opacity: 1; }
+    100% { transform: translate(0, 0) rotate(0deg) scale(1); opacity: 1; }
+  }
+
+  /* Sweat drop animation for blue character */
+  .sweat-drop {
+    position: absolute;
+    width: 4px;
+    height: 8px;
+    background: #7fe6d2;
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    opacity: 0.8;
+    box-shadow: 0 0 4px rgba(127, 230, 210, 0.6);
+    animation: sweatTrickle 2.2s infinite ease-in-out;
+  }
+  @keyframes sweatTrickle {
+    0% { transform: translateY(-4px) scaleY(0.7); opacity: 0; }
+    20% { transform: translateY(0) scaleY(1); opacity: 1; }
+    75% { transform: translateY(12px) scaleY(1.1); opacity: 0.9; }
+    100% { transform: translateY(18px) scaleY(0.6); opacity: 0; }
+  }
+
+  /* Light Theme glassmorphic overrides */
+  .glass-card,
+  [style*="background:rgba(255,255,255,0.10)"],
+  [style*="background:rgba(255,255,255,0.08)"],
+  [style*="background:rgba(255,255,255,0.07)"],
+  [style*="background:rgba(255,255,255,0.06)"],
+  [style*="background:rgba(255,255,255,0.05)"],
+  [style*="background:rgba(91,141,239,0.16)"],
+  [style*="background:rgba(245,166,35,0.14)"],
+  [style*="background:rgba(47,191,166,0.14)"],
+  [style*="background:rgba(255,122,107,0.16)"] {
+    background: rgba(255, 255, 255, 0.68) !important;
+    backdrop-filter: blur(24px) saturate(160%) !important;
+    -webkit-backdrop-filter: blur(24px) saturate(160%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.8) !important;
+    box-shadow: 0 10px 32px -8px rgba(28, 39, 76, 0.07), 0 4px 10px -4px rgba(28, 39, 76, 0.03) !important;
+  }
+
+  /* Text color overrides */
+  body, x-dc, div, span, p, h1, h2, h3, b {
+    color: #1e1e36;
+  }
+  
+  [style*="color:#fff"], [style*="color: #fff"], [style*="color:#FFFFFF"] {
+    color: #1e1e36 !important;
+  }
+  [style*="color:rgba(255,255,255,0.8)"], 
+  [style*="color:rgba(255,255,255,0.85)"], 
+  [style*="color:rgba(255,255,255,0.86)"], 
+  [style*="color:rgba(255,255,255,0.88)"],
+  [style*="color:rgba(255,255,255,0.84)"] {
+    color: #2b2b4d !important;
+  }
+  [style*="color:rgba(255,255,255,0.6)"], 
+  [style*="color:rgba(255,255,255,0.7)"], 
+  [style*="color:rgba(255,255,255,0.65)"], 
+  [style*="color:rgba(255,255,255,0.55)"], 
+  [style*="color:rgba(255,255,255,0.5)"] {
+    color: #555770 !important;
+  }
+  [style*="color:rgba(255,255,255,0.4)"], 
+  [style*="color:rgba(255,255,255,0.45)"], 
+  [style*="color:rgba(255,255,255,0.32)"] {
+    color: #9295b3 !important;
+  }
+
+  /* Keep white color for buttons and items with gradient backgrounds */
+  [style*="background:linear-gradient"] *,
+  [style*="background:linear-gradient"],
+  .lever-sync-wrap *,
+  .character-body * {
+    color: #fff !important;
+  }
+  
+  /* Sidebar active navigations */
+  [style*="background:rgba(255,255,255,0.16)"] {
+    background: rgba(0, 0, 0, 0.05) !important;
+    border: 1px solid rgba(0, 0, 0, 0.07) !important;
+  }
+  [style*="background:rgba(255,255,255,0.16)"] * {
+    color: #1e1e36 !important;
+  }
+
+  /* Desktop segmentation control (Desktop/Mobile toggle) */
+  [style*="background:rgba(255,255,255,0.10)"] div {
+    color: #555770;
+  }
+  
+  /* Inputs */
+  input {
+    background: rgba(0,0,0,0.03) !important;
+    border: 1px solid rgba(0,0,0,0.08) !important;
+    color: #1e1e36 !important;
+  }
+  input::placeholder {
+    color: #9295b3 !important;
+  }
+
+  /* Custom toast and keypad modal */
+  #custom-toast {
+    background: rgba(255,255,255,0.92) !important;
+    border: 1.5px solid rgba(255,255,255,1) !important;
+    box-shadow: 0 16px 40px -16px rgba(28, 39, 76, 0.2) !important;
+  }
+  #custom-toast-text {
+    color: #1e1e36 !important;
+  }
+
+  /* Keypad button adjustments */
+  [style*="background:rgba(255,255,255,0.16);border:1px solid rgba(255,255,255,0.24)"] {
+    background: rgba(0,0,0,0.04) !important;
+    border: 1px solid rgba(0,0,0,0.08) !important;
+    color: #1e1e36 !important;
+    box-shadow: 0 4px 10px -4px rgba(0,0,0,0.08) !important;
+  }
+
+  /* Sheet adjustments */
+  [style*="background:rgba(22,20,38,0.78)"] {
+    background: rgba(255, 255, 255, 0.88) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.9) !important;
+  }
+  
+  /* Sync machine elements */
+  .lever-base {
+    background: #b0b0c0 !important;
+  }
+  .lever-stick {
+    background: #606070 !important;
+  }
+
+  /* AI blue character text container and chart lines */
+  [style*="border-top:1px solid rgba(255,255,255,0.06)"] {
+    border-top: 1px solid rgba(0,0,0,0.06) !important;
+  }
+
+  /* Flat colored background cells override (Calendar slots) */
+  .cal-day-cell {
+    color: #fff !important; /* Keep date text white on colored beads */
+  }
 </style>
 </helmet>
 
-<div style="position:relative;width:100%;min-height:100vh;overflow:hidden;background:#0e0e1c;">
+<div style="position:relative;width:100%;min-height:100vh;overflow:hidden;background:#f0f2f9;">
 
-  <div style="position:fixed;width:46vw;height:46vw;max-width:640px;max-height:640px;left:-6vw;top:-8vw;background:radial-gradient(circle,#5B8DEF 0%,transparent 68%);filter:blur(72px);opacity:0.8;animation:auroraFloat 16s ease-in-out infinite;pointer-events:none;"></div>
-  <div style="position:fixed;width:44vw;height:44vw;max-width:600px;max-height:600px;right:-8vw;top:16vh;background:radial-gradient(circle,#2FBFA6 0%,transparent 68%);filter:blur(82px);opacity:0.55;animation:auroraFloat 20s ease-in-out infinite reverse;pointer-events:none;"></div>
-  <div style="position:fixed;width:42vw;height:42vw;max-width:560px;max-height:560px;left:30vw;bottom:-14vh;background:radial-gradient(circle,#FF7A6B 0%,transparent 70%);filter:blur(82px);opacity:0.42;animation:auroraFloat 22s ease-in-out infinite;pointer-events:none;"></div>
-  <div style="position:fixed;inset:0;background:linear-gradient(180deg,rgba(10,10,26,0.16),rgba(10,10,26,0.4));pointer-events:none;"></div>
+  <div style="position:fixed;width:46vw;height:46vw;max-width:640px;max-height:640px;left:-6vw;top:-8vw;background:radial-gradient(circle,#89B0FF 0%,transparent 68%);filter:blur(72px);opacity:0.9;animation:auroraFloat 16s ease-in-out infinite;pointer-events:none;"></div>
+  <div style="position:fixed;width:44vw;height:44vw;max-width:600px;max-height:600px;right:-8vw;top:16vh;background:radial-gradient(circle,#70EBD5 0%,transparent 68%);filter:blur(82px);opacity:0.65;animation:auroraFloat 20s ease-in-out infinite reverse;pointer-events:none;"></div>
+  <div style="position:fixed;width:42vw;height:42vw;max-width:560px;max-height:560px;left:30vw;bottom:-14vh;background:radial-gradient(circle,#FFA89E 0%,transparent 70%);filter:blur(82px);opacity:0.5;animation:auroraFloat 22s ease-in-out infinite;pointer-events:none;"></div>
+  <div style="position:fixed;inset:0;background:linear-gradient(180deg,rgba(20,20,40,0.10),rgba(20,20,40,0.25));pointer-events:none;"></div>
 
   <div style="position:fixed;top:16px;right:16px;z-index:60;display:flex;gap:3px;padding:4px;border-radius:13px;background:rgba(255,255,255,0.10);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.2);box-shadow:0 10px 24px -12px rgba(0,0,0,0.6);">
     <div onClick="{{ setDesktop }}" style="{{ segDesktopStyle }}">데스크톱</div>
@@ -94,16 +452,37 @@
 
         <sc-if value="{{ tabCal }}" hint-placeholder-val="{{ false }}">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-            <div style="font-family:'Fredoka';font-weight:600;font-size:24px;color:#fff;letter-spacing:-0.3px;">2026년 6월</div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <div style="font-family:'Fredoka';font-weight:600;font-size:24px;color:#fff;letter-spacing:-0.3px;">2026년 6월</div>
+              <div onClick="{{ triggerSync }}" class="lever-sync-wrap {{ leverClass }}">
+                <div class="character-body">
+                  <div class="star-deco">⭐</div>
+                  <div class="eyes"><span class="eye"></span><span class="eye"></span></div>
+                  <div class="mouth"></div>
+                  <div class="blush left-blush"></div>
+                  <div class="blush right-blush"></div>
+                  <div class="hand left-hand"></div>
+                  <div class="hand right-hand"></div>
+                </div>
+                <div class="lever-machine">
+                  <div class="lever-base"></div>
+                  <div class="lever-stick-wrap"><div class="lever-stick"></div><div class="lever-knob"></div></div>
+                </div>
+              </div>
+            </div>
             <div onClick="{{ openAddSheet }}" style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:#fff;background:linear-gradient(135deg,#5B8DEF,#FF7A6B);padding:8px 14px;border-radius:99px;cursor:pointer;box-shadow:0 10px 22px -10px rgba(91,141,239,0.9);">＋ 기록</div>
           </div>
-          <div style="font-size:12px;color:rgba(255,255,255,0.6);margin:6px 2px 14px;">날짜를 누르면 그날의 입·출금을 관리할 수 있어요.</div>
+          <div style="font-size:12px;color:rgba(255,255,255,0.6);margin:0 2px 14px;">날짜를 누르면 그날의 입·출금을 관리할 수 있어요.</div>
 
-          <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:6px;">
-            <sc-for list="{{ weekdays }}" as="w" hint-placeholder-count="7"><div style="text-align:center;font-size:11px;color:rgba(255,255,255,0.45);">{{ w }}</div></sc-for>
-          </div>
-          <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:16px;">
-            <sc-for list="{{ calCells }}" as="d" hint-placeholder-count="35"><div onClick="{{ d.onClick }}" style="{{ d.style }}">{{ d.day }}</div></sc-for>
+          <div class="calendar-container {{ calendarClass }}" style="position:relative;background:rgba(255,255,255,0.06);backdrop-filter:blur(30px) saturate(160%);-webkit-backdrop-filter:blur(30px) saturate(160%);border-radius:36px;padding:18px 16px;box-shadow:0 18px 40px -20px rgba(0,0,0,0.6);margin-bottom:16px;">
+            <div class="calendar-dispenser"></div>
+            <div class="calendar-collector"></div>
+            <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:10px;">
+              <sc-for list="{{ weekdays }}" as="w" hint-placeholder-count="7"><div style="text-align:center;font-size:11px;color:rgba(255,255,255,0.45);">{{ w }}</div></sc-for>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px;">
+              <sc-for list="{{ calCells }}" as="d" hint-placeholder-count="35"><div class="cal-day-cell" onClick="{{ d.onClick }}" style="{{ d.style }}">{{ d.day }}</div></sc-for>
+            </div>
           </div>
 
           <div style="background:rgba(255,255,255,0.10);backdrop-filter:blur(30px) saturate(160%);-webkit-backdrop-filter:blur(30px) saturate(160%);border:1px solid rgba(255,255,255,0.22);border-radius:24px;padding:16px 18px;box-shadow:0 18px 40px -20px rgba(0,0,0,0.6);">
@@ -126,6 +505,95 @@
 
         <sc-if value="{{ tabContent }}" hint-placeholder-val="{{ false }}">
           <div style="margin-bottom:16px;"><div style="font-family:'Fredoka';font-weight:600;font-size:24px;color:#fff;letter-spacing:-0.3px;">콘텐츠</div><div style="font-size:12px;color:rgba(255,255,255,0.6);margin-top:2px;">이번 달, 너의 감정소비 이야기</div></div>
+          
+          <!-- 이번 달 감정 분석 카드 -->
+          <div style="background:rgba(255,255,255,0.10);backdrop-filter:blur(30px) saturate(160%);-webkit-backdrop-filter:blur(30px) saturate(160%);border:1px solid rgba(255,255,255,0.22);border-radius:24px;padding:20px 16px;box-shadow:0 18px 40px -20px rgba(0,0,0,0.6);margin-bottom:14px;">
+            <div style="font-size:15px;font-weight:600;color:#fff;margin-bottom:14px;">이번 달 감정 분석</div>
+            
+            <div style="position:relative;width:320px;height:250px;margin:0 auto;overflow:hidden;">
+              <sc-for list="{{ bubbles }}" as="b">
+                <sc-if value="{{ b.visible }}">
+                  <div style="{{ b.style }}">
+                    <span style="{{ b.labelStyle }}">{{ b.name }}</span>
+                    <span style="{{ b.pctStyle }}">{{ b.pct }}%</span>
+                  </div>
+                </sc-if>
+              </sc-for>
+            </div>
+
+            <div style="margin-top:16px;border-top:1px solid rgba(255,255,255,0.08);padding-top:14px;">
+              <div style="font-size:12px;font-weight:600;color:rgba(255,255,255,0.5);margin-bottom:10px;letter-spacing:0.5px;">Top 감정</div>
+              <div style="display:flex;flex-direction:column;gap:8px;">
+                <sc-for list="{{ topEmotions }}" as="te">
+                  <div style="display:flex;align-items:center;justify-content:space-between;font-size:13px;color:#fff;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span style="font-weight:700;color:rgba(255,255,255,0.4);font-family:'Fredoka';">{{ te.rank }}</span>
+                      <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:{{ te.color }};"></span>
+                      <span>{{ te.name }}</span>
+                    </div>
+                    <span style="font-family:'Fredoka';font-weight:600;">{{ te.pct }}%</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+
+          <!-- 시간대별 소비 패턴 카드 -->
+          <div style="background:rgba(255,255,255,0.10);backdrop-filter:blur(30px) saturate(160%);-webkit-backdrop-filter:blur(30px) saturate(160%);border:1px solid rgba(255,255,255,0.22);border-radius:24px;padding:16px 18px;box-shadow:0 18px 40px -20px rgba(0,0,0,0.6);margin-bottom:14px;">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px;">
+              <span style="font-size:15px;font-weight:600;color:#fff;">시간대별 소비 패턴</span>
+              <div style="display:flex;gap:8px;font-size:10px;color:rgba(255,255,255,0.55);">
+                <div style="display:flex;align-items:center;gap:4px;"><span style="width:5px;height:5px;border-radius:50%;background:#FF7A6B;"></span>지출</div>
+                <div style="display:flex;align-items:center;gap:4px;"><span style="width:5px;height:5px;border-radius:50%;background:#5B8DEF;"></span>수입</div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:flex-end;justify-content:space-between;height:90px;padding:10px 2px 0;position:relative;">
+              <sc-for list="{{ hourlyBars }}" as="b">
+                <div style="display:flex;flex-direction:column;align-items:center;flex:1;height:100%;justify-content:flex-end;">
+                  <div style="display:flex;align-items:flex-end;gap:1.5px;height:95%;width:100%;justify-content:center;">
+                    <div style="width:3px;height:{{ b.spentH }};background:linear-gradient(180deg,#FF7A6B,rgba(255,122,107,0.3));border-radius:1px 1px 0 0;box-shadow:0 0 4px rgba(255,122,107,0.35);"></div>
+                    <div style="width:3px;height:{{ b.incomeH }};background:linear-gradient(180deg,#5B8DEF,rgba(91,141,239,0.3));border-radius:1px 1px 0 0;box-shadow:0 0 4px rgba(91,141,239,0.35);"></div>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:6px 6px 0;border-top:1px solid rgba(255,255,255,0.06);margin-top:6px;">
+              <sc-for list="{{ hourlyLabels }}" as="l">
+                <div style="font-size:9px;color:rgba(255,255,255,0.4);width:calc(100% / 24);text-align:center;">{{ l.text }}</div>
+              </sc-for>
+            </div>
+          </div>
+
+          <!-- AI 캐릭터 분석 카드 -->
+          <div style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.18);border-radius:24px;padding:20px 16px;box-shadow:0 18px 40px -20px rgba(0,0,0,0.6);margin-bottom:14px;text-align:center;display:flex;flex-direction:column;align-items:center;">
+            <div style="position:relative;width:70px;height:62px;margin-bottom:8px;display:flex;justify-content:center;">
+              <div style="position:absolute;bottom:-4px;width:52px;height:5px;background:rgba(0,0,0,0.4);filter:blur(3px);border-radius:50%;"></div>
+              <div class="blue-character-body" style="position:relative;width:60px;height:50px;background:radial-gradient(circle at 35% 35%, #5B8DEF 0%, #355EB3 100%);border-radius:50% 50% 46% 46%;box-shadow:0 0 12px rgba(91,141,239,0.35), inset 0 1px 1px rgba(255,255,255,0.25);display:flex;align-items:center;justify-content:center;filter:url(#fluffy-filter);">
+                <div style="position:absolute;top:20px;width:22px;display:flex;justify-content:space-between;">
+                  <div style="position:relative;width:3.5px;height:3.5px;background:#1A1D24;border-radius:50%;">
+                    <div style="position:absolute;top:-4px;left:-2px;width:7px;height:1.5px;background:#1A1D24;transform:rotate(15deg);border-radius:1px;"></div>
+                  </div>
+                  <div style="position:relative;width:3.5px;height:3.5px;background:#1A1D24;border-radius:50%;">
+                    <div style="position:absolute;top:-4px;left:-2px;width:7px;height:1.5px;background:#1A1D24;transform:rotate(-15deg);border-radius:1px;"></div>
+                  </div>
+                </div>
+                <div style="position:absolute;top:26px;width:7px;height:3.5px;border:1.5px solid #1A1D24;border-top:0;border-radius:0 0 7px 7px;"></div>
+                <div style="position:absolute;left:8px;top:22px;width:5px;height:3px;background:#FF7A6B;border-radius:50%;opacity:0.4;filter:blur(0.5px);"></div>
+                <div style="position:absolute;right:8px;top:22px;width:5px;height:3px;background:#FF7A6B;border-radius:50%;opacity:0.4;filter:blur(0.5px);"></div>
+                <div style="position:absolute;left:-2px;top:24px;width:7px;height:7px;background:#4472D4;border-radius:50%;"></div>
+                <div style="position:absolute;right:-2px;top:24px;width:7px;height:7px;background:#4472D4;border-radius:50%;"></div>
+              </div>
+              <div class="sweat-drop" style="top:10px;left:10px;"></div>
+              <div class="sweat-drop" style="top:6px;right:8px;animation-delay:0.7s;"></div>
+            </div>
+            <div style="font-size:13px;line-height:1.55;color:rgba(255,255,255,0.85);margin-top:6px;">
+              외로운 밤 시간대 소비가 지난달보다 <span style="color:#FF7A6B;font-weight:700;">20% 증가</span>했어요.
+            </div>
+          </div>
+
+          <!-- 기존 상세 분석 리포트 구분선 및 카드 유지 -->
+          <div style="display:flex;align-items:center;gap:10px;margin:24px 0 14px;"><div style="flex:1;height:1px;background:rgba(255,255,255,0.08);"></div><span style="font-size:11px;color:rgba(255,255,255,0.4);font-weight:600;letter-spacing:1.2px;">상세 분석 리포트</span><div style="flex:1;height:1px;background:rgba(255,255,255,0.08);"></div></div>
+
           <div style="background:rgba(255,255,255,0.10);backdrop-filter:blur(30px) saturate(160%);-webkit-backdrop-filter:blur(30px) saturate(160%);border:1px solid rgba(255,255,255,0.22);border-radius:24px;padding:16px;box-shadow:0 18px 40px -20px rgba(0,0,0,0.6);margin-bottom:14px;">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;"><span style="font-size:12px;font-weight:600;letter-spacing:1px;color:rgba(255,255,255,0.6);">평행우주 · 2029년</span><span style="font-size:11px;color:rgba(255,255,255,0.5);">같은 출발선, 다른 도착</span></div>
             <div style="display:flex;gap:10px;align-items:stretch;">
@@ -137,7 +605,7 @@
           </div>
           <div style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.18);border-radius:22px;padding:16px;margin-bottom:14px;">
             <div style="display:flex;align-items:center;gap:9px;margin-bottom:10px;"><div style="width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,#5B8DEF,#FF7A6B);display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;">✦</div><div><div style="font-size:14px;font-weight:600;color:#fff;">6월 감정소비 리포트</div><div style="font-size:11px;color:rgba(255,255,255,0.55);">AI가 정리한 한 달</div></div></div>
-            <div style="font-size:13px;line-height:1.55;color:rgba(255,255,255,0.84);">이번 달 감정소비 <b style="color:#fff;">28만 4천 원</b>. 그중 <b style="color:#fff;">61%</b>가 ‘외로움’에서 나왔어요. 가장 위험한 시간대는 금요일 밤이었어요.</div>
+            <div style="font-size:13px;line-height:1.55;color:rgba(255,255,255,0.84);">이번 달 감정소비는 <b style="color:#fff;">28만 4천 원</b>입니다. 그중 대부분이 ‘외로움’과 ‘스트레스’에서 유발되었어요.</div>
           </div>
           <div style="display:flex;flex-direction:column;gap:10px;">
             <div style="background:rgba(91,141,239,0.16);border:1px solid rgba(91,141,239,0.4);border-radius:18px;padding:14px 16px;"><div style="font-size:14px;font-weight:600;color:#fff;margin-bottom:4px;">새벽 1시, 외로우면 지갑이 샌다</div><div style="font-size:12px;color:rgba(255,255,255,0.7);">자정~새벽 소비의 78%가 ‘외로움’ 태그</div></div>
@@ -156,11 +624,13 @@
   </sc-if>
 
   <sc-if value="{{ isDesktop }}" hint-placeholder-val="{{ true }}">
-    <div style="position:relative;z-index:1;display:flex;height:100vh;">
-      <div style="flex:none;width:248px;height:100%;background:rgba(255,255,255,0.07);backdrop-filter:blur(34px) saturate(160%);-webkit-backdrop-filter:blur(34px) saturate(160%);border-right:1px solid rgba(255,255,255,0.14);padding:28px 18px;display:flex;flex-direction:column;">
+    <div style="position:relative;z-index:1;display:flex;width:100%;height:100vh;background:#f0f2f9;overflow:hidden;">
+      <div style="flex:none;width:300px;height:100%;background:linear-gradient(180deg,rgba(255,255,255,0.85) 0%,rgba(240,242,249,0.95) 100%);border-right:1.5px solid rgba(0,0,0,0.06);padding:28px 18px;display:flex;flex-direction:column;box-shadow:4px 0 15px rgba(0,0,0,0.02);">
         <div style="display:flex;align-items:center;gap:11px;padding:0 8px 30px;">
-          <div style="width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,#6F7DFF 0%,#8A6CFF 48%,#F35FA8 100%);display:flex;align-items:center;justify-content:center;box-shadow:0 10px 22px -8px rgba(120,105,255,0.8);"><svg width="24" height="24" viewBox="0 0 100 100" fill="none"><circle cx="50" cy="50" r="34" fill="#F1EDFF"/><circle cx="50" cy="50" r="22" fill="none" stroke="#9B7CFF" stroke-width="5"/><text x="50" y="63" text-anchor="middle" font-family="Pretendard, sans-serif" font-size="40" font-weight="900" fill="#6A58D5">₩</text></svg></div>
-          <span style="font-family:'Fredoka';font-weight:700;font-size:23px;color:#fff;letter-spacing:-0.4px;">Feelio</span>
+          <div style="width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,#FF7A6B 0%,#8A6CFF 50%,#5B8DEF 100%);display:flex;align-items:center;justify-content:center;box-shadow:0 10px 22px -8px rgba(120,105,255,0.8);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          </div>
+          <span style="font-family:'Pretendard',sans-serif;font-weight:800;font-size:23px;color:#fff;letter-spacing:-0.5px;">무드</span>
         </div>
         <div onClick="{{ goHome }}" style="{{ navHomeD }}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20h14V9.5"/><path d="M9.5 20v-5h5v5"/></svg><span style="font-size:15px;font-weight:600;">홈</span></div>
         <div onClick="{{ goCal }}" style="{{ navCalD }}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16" rx="3"/><path d="M3 9h18M8 2.5v4M16 2.5v4"/></svg><span style="font-size:15px;font-weight:600;">캘린더</span></div>
@@ -168,7 +638,8 @@
         <div style="margin-top:auto;display:flex;align-items:center;gap:11px;padding:11px;border-radius:16px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);"><div style="width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#FF7A6B,#F5A623);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:15px;">서</div><div><div style="font-size:13px;font-weight:600;color:#fff;">김서연</div><div style="font-size:11px;color:rgba(255,255,255,0.55);">목표 D-218</div></div></div>
       </div>
 
-      <div class="fl-sc" style="flex:1;padding:34px 40px;overflow-y:auto;">
+      <div class="fl-sc" style="flex:1;padding:34px 40px;overflow-y:auto;background:rgba(14,14,28,0.1);">
+        <div style="max-width:1200px;margin:0 auto;width:100%;">
 
         <sc-if value="{{ tabHome }}" hint-placeholder-val="{{ true }}">
           <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:26px;"><div><div style="font-size:14px;color:rgba(255,255,255,0.6);">6월 23일 화요일</div><div style="font-family:'Fredoka';font-weight:600;font-size:32px;color:#fff;letter-spacing:-0.6px;margin-top:3px;">안녕하세요, 서연님</div></div></div>
@@ -209,13 +680,32 @@
 
         <sc-if value="{{ tabCal }}" hint-placeholder-val="{{ false }}">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;">
-            <div style="font-family:'Fredoka';font-weight:600;font-size:30px;color:#fff;letter-spacing:-0.5px;">2026년 6월</div>
+            <div style="display:flex;align-items:center;gap:12px;">
+              <div style="font-family:'Fredoka';font-weight:600;font-size:30px;color:#fff;letter-spacing:-0.5px;">2026년 6월</div>
+              <div onClick="{{ triggerSync }}" class="lever-sync-wrap {{ leverClass }}">
+                <div class="character-body">
+                  <div class="star-deco">⭐</div>
+                  <div class="eyes"><span class="eye"></span><span class="eye"></span></div>
+                  <div class="mouth"></div>
+                  <div class="blush left-blush"></div>
+                  <div class="blush right-blush"></div>
+                  <div class="hand left-hand"></div>
+                  <div class="hand right-hand"></div>
+                </div>
+                <div class="lever-machine">
+                  <div class="lever-base"></div>
+                  <div class="lever-stick-wrap"><div class="lever-stick"></div><div class="lever-knob"></div></div>
+                </div>
+              </div>
+            </div>
             <div onClick="{{ openAddSheet }}" style="display:flex;align-items:center;gap:8px;background:linear-gradient(135deg,#5B8DEF,#FF7A6B);border-radius:14px;padding:11px 18px;color:#fff;font-size:14px;font-weight:600;cursor:pointer;box-shadow:0 12px 26px -12px rgba(91,141,239,0.9);">＋ 기록 추가</div>
           </div>
           <div style="display:grid;grid-template-columns:1.7fr 1fr;gap:24px;align-items:start;">
-            <div style="background:rgba(255,255,255,0.08);backdrop-filter:blur(30px) saturate(160%);-webkit-backdrop-filter:blur(30px) saturate(160%);border:1px solid rgba(255,255,255,0.2);border-radius:28px;padding:24px;box-shadow:0 24px 60px -28px rgba(0,0,0,0.6);">
+            <div class="calendar-container {{ calendarClass }}" style="position:relative;background:rgba(255,255,255,0.06);backdrop-filter:blur(30px) saturate(160%);-webkit-backdrop-filter:blur(30px) saturate(160%);border-radius:40px;padding:24px;box-shadow:0 24px 60px -28px rgba(0,0,0,0.6);">
+              <div class="calendar-dispenser"></div>
+              <div class="calendar-collector"></div>
               <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-bottom:10px;"><sc-for list="{{ weekdays }}" as="w" hint-placeholder-count="7"><div style="text-align:center;font-size:12px;color:rgba(255,255,255,0.45);">{{ w }}</div></sc-for></div>
-              <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:8px;"><sc-for list="{{ calCellsD }}" as="d" hint-placeholder-count="35"><div onClick="{{ d.onClick }}" style="{{ d.style }}">{{ d.day }}</div></sc-for></div>
+              <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:8px;"><sc-for list="{{ calCellsD }}" as="d" hint-placeholder-count="35"><div class="cal-day-cell" onClick="{{ d.onClick }}" style="{{ d.style }}">{{ d.day }}</div></sc-for></div>
             </div>
             <div style="background:rgba(255,255,255,0.10);backdrop-filter:blur(30px) saturate(160%);-webkit-backdrop-filter:blur(30px) saturate(160%);border:1px solid rgba(255,255,255,0.22);border-radius:28px;padding:24px;box-shadow:0 24px 60px -28px rgba(0,0,0,0.6);">
               <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;"><div><div style="font-size:13px;color:rgba(255,255,255,0.6);">선택한 날</div><div style="font-family:'Fredoka';font-weight:600;font-size:22px;color:#fff;margin-top:2px;">{{ selDayLabel }}</div></div><div onClick="{{ openAddSheet }}" style="width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;cursor:pointer;">＋</div></div>
@@ -237,6 +727,100 @@
 
         <sc-if value="{{ tabContent }}" hint-placeholder-val="{{ false }}">
           <div style="margin-bottom:22px;"><div style="font-family:'Fredoka';font-weight:600;font-size:30px;color:#fff;letter-spacing:-0.5px;">콘텐츠</div><div style="font-size:14px;color:rgba(255,255,255,0.6);margin-top:3px;">이번 달, 너의 감정소비 이야기</div></div>
+          
+          <!-- 이번 달 감정 분석 카드 (Venn Diagram + Top 감정 리스트) -->
+          <div style="background:rgba(255,255,255,0.10);backdrop-filter:blur(30px) saturate(160%);-webkit-backdrop-filter:blur(30px) saturate(160%);border:1px solid rgba(255,255,255,0.22);border-radius:28px;padding:28px;box-shadow:0 24px 60px -28px rgba(0,0,0,0.6);margin-bottom:20px;display:grid;grid-template-columns:1.3fr 1fr;gap:24px;align-items:center;">
+            <!-- 좌측: 오버랩 구슬 차트 -->
+            <div>
+              <div style="font-size:16px;font-weight:700;color:#fff;margin-bottom:12px;">이번 달 감정 분석</div>
+              <div style="position:relative;width:320px;height:250px;margin:0 auto;overflow:hidden;">
+                <sc-for list="{{ bubbles }}" as="b">
+                  <sc-if value="{{ b.visible }}">
+                    <div style="{{ b.style }}">
+                      <span style="{{ b.labelStyle }}">{{ b.name }}</span>
+                      <span style="{{ b.pctStyle }}">{{ b.pct }}%</span>
+                    </div>
+                  </sc-if>
+                </sc-for>
+              </div>
+            </div>
+            <!-- 우측: Top 감정 순위 리스트 -->
+            <div style="border-left:1px solid rgba(255,255,255,0.08);padding-left:28px;height:85%;display:flex;flex-direction:column;justify-content:center;">
+              <div style="font-size:14px;font-weight:700;color:rgba(255,255,255,0.5);margin-bottom:16px;letter-spacing:1px;">Top 감정</div>
+              <div style="display:flex;flex-direction:column;gap:14px;">
+                <sc-for list="{{ topEmotions }}" as="te">
+                  <div style="display:flex;align-items:center;justify-content:space-between;font-size:15px;color:#fff;">
+                    <div style="display:flex;align-items:center;gap:12px;">
+                      <span style="font-weight:700;color:rgba(255,255,255,0.4);font-family:'Fredoka';font-size:16px;">{{ te.rank }}</span>
+                      <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:{{ te.color }};"></span>
+                      <span style="font-weight:500;">{{ te.name }}</span>
+                    </div>
+                    <span style="font-family:'Fredoka';font-weight:600;font-size:16px;">{{ te.pct }}%</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+
+          <!-- 하단 2열 레이아웃: 시간대별 소비 패턴 + AI Insight 캐릭터 -->
+          <div style="display:grid;grid-template-columns:1.3fr 1fr;gap:20px;margin-bottom:20px;">
+            <!-- 좌측: 시간대별 소비 패턴 -->
+            <div style="background:rgba(255,255,255,0.10);backdrop-filter:blur(30px) saturate(160%);-webkit-backdrop-filter:blur(30px) saturate(160%);border:1px solid rgba(255,255,255,0.22);border-radius:28px;padding:24px 28px;box-shadow:0 24px 60px -28px rgba(0,0,0,0.6);display:flex;flex-direction:column;justify-content:space-between;">
+              <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:16px;">
+                <span style="font-size:16px;font-weight:700;color:#fff;">시간대별 소비 패턴</span>
+                <div style="display:flex;gap:10px;font-size:11px;color:rgba(255,255,255,0.55);">
+                  <div style="display:flex;align-items:center;gap:4px;"><span style="width:6px;height:6px;border-radius:50%;background:#FF7A6B;"></span>지출</div>
+                  <div style="display:flex;align-items:center;gap:4px;"><span style="width:6px;height:6px;border-radius:50%;background:#5B8DEF;"></span>수입</div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:flex-end;justify-content:space-between;height:100px;padding:10px 4px 0;position:relative;">
+                <sc-for list="{{ hourlyBars }}" as="b">
+                  <div style="display:flex;flex-direction:column;align-items:center;flex:1;height:100%;justify-content:flex-end;">
+                    <div style="display:flex;align-items:flex-end;gap:2px;height:95%;width:100%;justify-content:center;">
+                      <div style="width:4px;height:{{ b.spentH }};background:linear-gradient(180deg,#FF7A6B,rgba(255,122,107,0.3));border-radius:1.5px 1.5px 0 0;box-shadow:0 0 5px rgba(255,122,107,0.4);"></div>
+                      <div style="width:4px;height:{{ b.incomeH }};background:linear-gradient(180deg,#5B8DEF,rgba(91,141,239,0.3));border-radius:1.5px 1.5px 0 0;box-shadow:0 0 5px rgba(91,141,239,0.4);"></div>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="display:flex;justify-content:space-between;padding:8px 8px 0;border-top:1px solid rgba(255,255,255,0.06);margin-top:8px;">
+                <sc-for list="{{ hourlyLabels }}" as="l">
+                  <div style="font-size:10px;color:rgba(255,255,255,0.45);width:calc(100% / 24);text-align:center;">{{ l.text }}</div>
+                </sc-for>
+              </div>
+            </div>
+
+            <!-- 우측: AI 캐릭터 분석 카드 -->
+            <div style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.18);border-radius:28px;padding:26px 24px;box-shadow:0 24px 60px -28px rgba(0,0,0,0.6);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;">
+              <div style="position:relative;width:80px;height:70px;margin-bottom:12px;display:flex;justify-content:center;">
+                <div style="position:absolute;bottom:-4px;width:60px;height:6px;background:rgba(0,0,0,0.4);filter:blur(3.5px);border-radius:50%;"></div>
+                <div class="blue-character-body" style="position:relative;width:68px;height:56px;background:radial-gradient(circle at 35% 35%, #5B8DEF 0%, #355EB3 100%);border-radius:50% 50% 46% 46%;box-shadow:0 0 14px rgba(91,141,239,0.45), inset 0 1px 1px rgba(255,255,255,0.25);display:flex;align-items:center;justify-content:center;filter:url(#fluffy-filter);">
+                  <div style="position:absolute;top:22px;width:24px;display:flex;justify-content:space-between;">
+                    <div style="position:relative;width:4px;height:4px;background:#1A1D24;border-radius:50%;">
+                      <div style="position:absolute;top:-4px;left:-2px;width:8px;height:1.5px;background:#1A1D24;transform:rotate(15deg);border-radius:1px;"></div>
+                    </div>
+                    <div style="position:relative;width:4px;height:4px;background:#1A1D24;border-radius:50%;">
+                      <div style="position:absolute;top:-4px;left:-2px;width:8px;height:1.5px;background:#1A1D24;transform:rotate(-15deg);border-radius:1px;"></div>
+                    </div>
+                  </div>
+                  <div style="position:absolute;top:29px;width:8px;height:4px;border:1.5px solid #1A1D24;border-top:0;border-radius:0 0 8px 8px;"></div>
+                  <div style="position:absolute;left:10px;top:24px;width:6px;height:3.5px;background:#FF7A6B;border-radius:50%;opacity:0.4;filter:blur(0.5px);"></div>
+                  <div style="position:absolute;right:10px;top:24px;width:6px;height:3.5px;background:#FF7A6B;border-radius:50%;opacity:0.4;filter:blur(0.5px);"></div>
+                  <div style="position:absolute;left:-2px;top:26px;width:8px;height:8px;background:#4472D4;border-radius:50%;"></div>
+                  <div style="position:absolute;right:-2px;top:26px;width:8px;height:8px;background:#4472D4;border-radius:50%;"></div>
+                </div>
+                <div class="sweat-drop" style="top:12px;left:12px;"></div>
+                <div class="sweat-drop" style="top:8px;right:10px;animation-delay:0.7s;"></div>
+              </div>
+              <div style="font-size:14px;line-height:1.6;color:rgba(255,255,255,0.85);margin-top:8px;">
+                외로운 밤 시간대 소비가 지난달보다 <span style="color:#FF7A6B;font-weight:700;">20% 증가</span>했어요.
+              </div>
+            </div>
+          </div>
+
+          <!-- 기존 상세 분석 리포트 구분선 및 카드 유지 -->
+          <div style="display:flex;align-items:center;gap:12px;margin:32px 0 20px;"><div style="flex:1;height:1px;background:rgba(255,255,255,0.08);"></div><span style="font-size:13px;color:rgba(255,255,255,0.45);font-weight:600;letter-spacing:1.5px;">상세 분석 리포트</span><div style="flex:1;height:1px;background:rgba(255,255,255,0.08);"></div></div>
+          
           <div style="background:rgba(255,255,255,0.10);backdrop-filter:blur(30px) saturate(160%);-webkit-backdrop-filter:blur(30px) saturate(160%);border:1px solid rgba(255,255,255,0.22);border-radius:28px;padding:24px 28px;box-shadow:0 24px 60px -28px rgba(0,0,0,0.6);margin-bottom:20px;">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;"><span style="font-size:13px;font-weight:600;letter-spacing:1.2px;color:rgba(255,255,255,0.65);">평행우주 · 2029년의 나</span><span style="font-size:13px;color:rgba(255,255,255,0.55);">같은 출발선에서 시작한 두 사람</span></div>
             <div style="display:flex;gap:18px;align-items:stretch;">
@@ -249,8 +833,7 @@
           <div style="display:grid;grid-template-columns:1.2fr 1fr;gap:20px;">
             <div style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.18);border-radius:24px;padding:22px 24px;">
               <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;"><div style="width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#5B8DEF,#FF7A6B);display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;">✦</div><div><div style="font-size:16px;font-weight:600;color:#fff;">6월 감정소비 리포트</div><div style="font-size:12px;color:rgba(255,255,255,0.55);">AI가 정리한 한 달</div></div></div>
-              <div style="font-size:14px;line-height:1.6;color:rgba(255,255,255,0.85);margin-bottom:16px;">이번 달 감정소비는 <b style="color:#fff;">28만 4천 원</b>. 그중 <b style="color:#fff;">61%</b>가 ‘외로움’에서 나왔어요.</div>
-              <div style="display:flex;gap:10px;"><div style="flex:1;background:rgba(91,141,239,0.18);border:1px solid rgba(91,141,239,0.35);border-radius:16px;padding:12px 14px;"><div style="font-size:11px;color:rgba(255,255,255,0.6);">외로움</div><div style="font-family:'Fredoka';font-weight:600;font-size:20px;color:#fff;">61%</div></div><div style="flex:1;background:rgba(245,166,35,0.16);border:1px solid rgba(245,166,35,0.35);border-radius:16px;padding:12px 14px;"><div style="font-size:11px;color:rgba(255,255,255,0.6);">불안</div><div style="font-family:'Fredoka';font-weight:600;font-size:20px;color:#fff;">22%</div></div><div style="flex:1;background:rgba(255,122,107,0.16);border:1px solid rgba(255,122,107,0.35);border-radius:16px;padding:12px 14px;"><div style="font-size:11px;color:rgba(255,255,255,0.6);">신남</div><div style="font-family:'Fredoka';font-weight:600;font-size:20px;color:#fff;">17%</div></div></div>
+              <div style="font-size:14px;line-height:1.6;color:rgba(255,255,255,0.85);margin-bottom:16px;">이번 달 감정소비는 <b style="color:#fff;">28만 4천 원</b>입니다. 그중 대부분이 ‘외로움’과 ‘스트레스’에서 유발되었어요.</div>
             </div>
             <div style="display:flex;flex-direction:column;gap:14px;">
               <div style="background:rgba(91,141,239,0.16);border:1px solid rgba(91,141,239,0.4);border-radius:20px;padding:16px 18px;"><div style="font-size:15px;font-weight:600;color:#fff;margin-bottom:5px;">새벽 1시, 외로우면 지갑이 샌다</div><div style="font-size:13px;color:rgba(255,255,255,0.72);">자정~새벽 소비의 78%가 ‘외로움’ 태그</div></div>
@@ -260,6 +843,7 @@
           </div>
         </sc-if>
 
+        </div>
       </div>
     </div>
   </sc-if>
@@ -310,12 +894,10 @@
     </div>
   </sc-if>
 
-  <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
-    <div style="position:fixed;left:50%;bottom:100px;z-index:90;display:flex;align-items:center;gap:11px;padding:14px 18px;border-radius:18px;background:rgba(24,22,40,0.82);backdrop-filter:blur(30px) saturate(160%);-webkit-backdrop-filter:blur(30px) saturate(160%);border:1px solid rgba(255,255,255,0.24);box-shadow:0 18px 40px -16px rgba(0,0,0,0.75);animation:flToast 0.4s cubic-bezier(0.16,1,0.3,1);">
-      <div style="width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#5B8DEF,#FF7A6B);display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;flex:none;">✓</div>
-      <span style="font-size:13px;color:#fff;line-height:1.4;">{{ toastText }}</span>
-    </div>
-  </sc-if>
+  <div id="custom-toast" style="position:fixed;left:50%;bottom:100px;z-index:90;display:flex;align-items:center;gap:11px;padding:14px 18px;border-radius:18px;background:rgba(24,22,40,0.82);backdrop-filter:blur(30px) saturate(160%);-webkit-backdrop-filter:blur(30px) saturate(160%);border:1px solid rgba(255,255,255,0.24);box-shadow:0 18px 40px -16px rgba(0,0,0,0.75);transition:transform 0.4s cubic-bezier(0.16,1,0.3,1), opacity 0.4s;opacity:0;transform:translate(-50%, 20px);pointer-events:none;">
+    <div style="width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#5B8DEF,#FF7A6B);display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;flex:none;">✓</div>
+    <span id="custom-toast-text" style="font-size:13px;color:#fff;line-height:1.4;"></span>
+  </div>
 
 </div>
 </x-dc>
@@ -333,8 +915,22 @@ class Component extends DCLogic {
       { id:5, day:23, type:'expense', cat:'편의점', emotion:'불안', amount:8400, time:'14:30', memo:'' },
       { id:6, day:3, type:'expense', cat:'쇼핑', emotion:'불안', amount:48000, time:'20:10', memo:'' },
       { id:7, day:4, type:'expense', cat:'카페', emotion:'신남', amount:6200, time:'15:00', memo:'' },
-      { id:8, day:12, type:'expense', cat:'택시', emotion:'화남', amount:14300, time:'23:50', memo:'' },
+      { id:8, day:12, type:'expense', cat:'택시', emotion:'스트레스', amount:14300, time:'23:50', memo:'' },
       { id:9, day:6, type:'expense', cat:'배달', emotion:'외로움', amount:19000, time:'22:40', memo:'' },
+      { id:10, day:7, type:'expense', cat:'구독', emotion:'스트레스', amount:14900, time:'18:30', memo:'OTT 결제' },
+      { id:11, day:18, type:'expense', cat:'쇼핑', emotion:'스트레스', amount:38000, time:'21:15', memo:'옷 구매' },
+      { id:12, day:20, type:'expense', cat:'택시', emotion:'불안', amount:12000, time:'08:45', memo:'' },
+      { id:13, day:22, type:'expense', cat:'배달', emotion:'신남', amount:26000, time:'19:30', memo:'친구들과 치킨' },
+      { id:14, day:1, type:'expense', cat:'배달', emotion:'외로움', amount:21000, time:'23:10', memo:'' },
+      { id:15, day:5, type:'expense', cat:'편의점', emotion:'외로움', amount:12500, time:'22:50', memo:'' },
+      { id:16, day:8, type:'expense', cat:'택시', emotion:'스트레스', amount:9800, time:'19:10', memo:'' },
+      { id:17, day:10, type:'expense', cat:'카페', emotion:'평온', amount:5400, time:'14:20', memo:'' },
+      { id:18, day:11, type:'expense', cat:'쇼핑', emotion:'외로움', amount:45000, time:'21:00', memo:'' },
+      { id:19, day:15, type:'expense', cat:'배달', emotion:'외로움', amount:22000, time:'23:30', memo:'' },
+      { id:20, day:17, type:'expense', cat:'카페', emotion:'신남', amount:6000, time:'16:15', memo:'' },
+      { id:21, day:19, type:'expense', cat:'편의점', emotion:'스트레스', amount:7200, time:'22:10', memo:'' },
+      { id:22, day:21, type:'expense', cat:'쇼핑', emotion:'불안', amount:52000, time:'20:45', memo:'' },
+      { id:23, day:24, type:'expense', cat:'배달', emotion:'외로움', amount:18500, time:'23:05', memo:'' },
     ],
     // home composer
     hAmount:'', hCat:'배달', hEmotion:null,
@@ -346,13 +942,15 @@ class Component extends DCLogic {
     sheet:false, editId:null,
     sType:'expense', sAmount:'', sCat:'배달', sIncCat:'월급', sEmotion:null, sMemo:'',
     toast:false, toastText:'',
+    leverPulling: false,
+    syncingActive: false,
   };
 
   TODAY = 23;
 
   emotions = [
-    {name:'외로움', color:'#5B8DEF'}, {name:'신남', color:'#FF7A6B'}, {name:'불안', color:'#F5A623'},
-    {name:'평온', color:'#2FBFA6'}, {name:'화남', color:'#F25555'}, {name:'무덤덤', color:'#9AA0B4'},
+    {name:'외로움', color:'#5B8DEF'}, {name:'스트레스', color:'#8A6CFF'}, {name:'불안', color:'#F5A623'},
+    {name:'신남', color:'#FF7A6B'}, {name:'평온', color:'#2FBFA6'}, {name:'무덤덤', color:'#9AA0B4'},
   ];
   expenseCats = [
     {name:'배달', icon:'🍜'}, {name:'카페', icon:'☕'}, {name:'쇼핑', icon:'🛍️'},
@@ -396,7 +994,218 @@ class Component extends DCLogic {
   goCal=()=>this.setState({tab:'calendar'});
   goContent=()=>this.setState({tab:'content'});
 
-  flash(t){ this.setState({toast:true,toastText:t}); clearTimeout(this._t); this._t=setTimeout(()=>this.setState({toast:false}),2600); }
+  isSyncing = false;
+  triggerSync = () => {
+    if (this.isSyncing) return;
+    this.isSyncing = true;
+    this.setState({ syncingActive: true });
+    this.flash('캘린더를 동기화하고 있습니다...');
+
+    // 레버 당김 모션 적용 (JS로 직접 클래스 제어하여 리렌더링 방지)
+    const levers = document.querySelectorAll('.lever-sync-wrap');
+    levers.forEach(l => l.classList.add('pulling'));
+
+    const cells = document.querySelectorAll('.cal-day-cell');
+    
+    // Find container and calculate exact positions
+    const firstCell = document.querySelector('.cal-day-cell');
+    const container = firstCell ? firstCell.parentNode : null;
+    if (!container) {
+      this.isSyncing = false;
+      this.setState({ syncingActive: false });
+      levers.forEach(l => l.classList.remove('pulling'));
+      return;
+    }
+    const containerRect = container.getBoundingClientRect();
+    
+    const stepTimeOut = 70; // 70ms per step (slower rollout)
+    const stepTimeIn = 45;  // 45ms per step (slower rollin)
+    const dispenseDelay = 30; // 30ms delay per step (slower dispense)
+    
+    let styles = '';
+    
+    cells.forEach((cell, index) => {
+      if (!cell.textContent.trim()) return;
+      
+      const row = Math.floor(index / 7);
+      const col = index % 7;
+      const startStep = row * 7 + (row % 2 === 0 ? col : 6 - col);
+      
+      // 1. Roll-Out Keyframes (from startStep to 35)
+      const keyframePointsOut = [];
+      const totalStepsOut = 35 - startStep;
+      
+      for (let s = startStep; s <= 35; s++) {
+        const pct = ((s - startStep) / totalStepsOut) * 100;
+        
+        let cx, cy;
+        if (s === 35) {
+          // Exit point: off-screen to the right of the last row
+          cx = containerRect.width * (8 / 7);
+          cy = containerRect.height * (4.5 / 5);
+        } else {
+          const r = Math.floor(s / 7);
+          const c_temp = s % 7;
+          const c = (r % 2 === 0) ? c_temp : 6 - c_temp;
+          cx = containerRect.width * ((c + 0.5) / 7);
+          cy = containerRect.height * ((r + 0.5) / 5);
+        }
+        
+        const startX = containerRect.width * ((col + 0.5) / 7);
+        const startY = containerRect.height * ((row + 0.5) / 5);
+        
+        const dx = cx - startX;
+        const dy = cy - startY;
+        const rot = (s - startStep) * 90;
+        const scale = s === 35 ? 0.05 : 1;
+        const opacity = s === 35 ? 0 : 1;
+        
+        keyframePointsOut.push(`${pct.toFixed(1)}% { transform: translate(${dx.toFixed(1)}px, ${dy.toFixed(1)}px) rotate(${rot}deg) scale(${scale}); opacity: ${opacity}; }`);
+      }
+      
+      const animNameOut = `rollOutSerpentine-${index}`;
+      styles += `
+        @keyframes ${animNameOut} {
+          ${keyframePointsOut.join('\n')}
+        }
+        .cal-day-cell.rolling-out-${index} {
+          animation: ${animNameOut} ${totalStepsOut * stepTimeOut}ms linear forwards;
+          pointer-events: none;
+        }
+      `;
+      
+      // 2. Roll-In Keyframes (from -1 to startStep)
+      const keyframePointsIn = [];
+      const totalStepsIn = startStep + 1;
+      
+      for (let s = -1; s <= startStep; s++) {
+        const pct = ((s + 1) / totalStepsIn) * 100;
+        
+        let cx, cy;
+        if (s === -1) {
+          // Dispenser point: off-screen to the left of the first row
+          cx = containerRect.width * (-1.5 / 7);
+          cy = containerRect.height * (0.5 / 5);
+        } else {
+          const r = Math.floor(s / 7);
+          const c_temp = s % 7;
+          const c = (r % 2 === 0) ? c_temp : 6 - c_temp;
+          cx = containerRect.width * ((c + 0.5) / 7);
+          cy = containerRect.height * ((r + 0.5) / 5);
+        }
+        
+        const startX = containerRect.width * ((col + 0.5) / 7);
+        const startY = containerRect.height * ((row + 0.5) / 5);
+        
+        const dx = cx - startX;
+        const dy = cy - startY;
+        const rot = (s - startStep) * 90;
+        const scale = s === -1 ? 0.05 : 1;
+        const opacity = s === -1 ? 0 : 1;
+        
+        if (s === startStep) {
+          keyframePointsIn.push(`${pct.toFixed(1)}% { transform: translate(0, 0) rotate(0deg) scale(1); opacity: 1; }`);
+        } else {
+          keyframePointsIn.push(`${pct.toFixed(1)}% { transform: translate(${dx.toFixed(1)}px, ${dy.toFixed(1)}px) rotate(${rot}deg) scale(${scale}); opacity: ${opacity}; }`);
+        }
+      }
+      
+      const animNameIn = `rollInSerpentine-${index}`;
+      styles += `
+        @keyframes ${animNameIn} {
+          ${keyframePointsIn.join('\n')}
+        }
+        .cal-day-cell.rolling-in-${index} {
+          animation: ${animNameIn} ${totalStepsIn * stepTimeIn}ms linear forwards;
+          pointer-events: none;
+        }
+      `;
+    });
+
+    // Inject styles
+    let styleEl = document.getElementById('dynamic-sync-styles');
+    if (!styleEl) {
+      styleEl = document.createElement('style');
+      styleEl.id = 'dynamic-sync-styles';
+      document.head.appendChild(styleEl);
+    }
+    styleEl.innerHTML = styles;
+
+    // Start Roll-Out in sequence
+    cells.forEach((cell, index) => {
+      if (!cell.textContent.trim()) return;
+      
+      const row = Math.floor(index / 7);
+      const col = index % 7;
+      const startStep = row * 7 + (row % 2 === 0 ? col : 6 - col);
+      
+      const delay = startStep * stepTimeOut;
+      
+      setTimeout(() => {
+        cell.classList.remove('rolling-in');
+        for (let i = 0; i < 35; i++) {
+          cell.classList.remove(`rolling-in-${i}`);
+          cell.classList.remove(`rolling-out-${i}`);
+        }
+        cell.classList.add(`rolling-out-${index}`);
+      }, delay);
+    });
+
+    // 레버 복귀 (JS로 직접 클래스 제거)
+    setTimeout(() => {
+      levers.forEach(l => l.classList.remove('pulling'));
+    }, 600);
+
+    // 캘린더가 비워진 후 (약 2.6초 시점) 복귀 시작
+    setTimeout(() => {
+      this.flash('동기화 완료! 데이터를 다시 채웁니다.');
+      
+      cells.forEach((cell, index) => {
+        if (!cell.textContent.trim()) return;
+        
+        const row = Math.floor(index / 7);
+        const col = index % 7;
+        const startStep = row * 7 + (row % 2 === 0 ? col : 6 - col);
+        
+        const delay = startStep * dispenseDelay;
+        
+        setTimeout(() => {
+          for (let i = 0; i < 35; i++) {
+            cell.classList.remove(`rolling-in-${i}`);
+            cell.classList.remove(`rolling-out-${i}`);
+          }
+          cell.classList.add(`rolling-in-${index}`);
+        }, delay);
+      });
+    }, 2600);
+
+    // 정리
+    setTimeout(() => {
+      cells.forEach(cell => {
+        for (let i = 0; i < 35; i++) {
+          cell.classList.remove(`rolling-in-${i}`);
+          cell.classList.remove(`rolling-out-${i}`);
+        }
+      });
+      this.isSyncing = false;
+      this.setState({ syncingActive: false });
+    }, 5700);
+  };
+
+  flash(t){
+    const toast = document.getElementById('custom-toast');
+    const toastText = document.getElementById('custom-toast-text');
+    if (toast && toastText) {
+      toastText.textContent = t;
+      toast.style.opacity = '1';
+      toast.style.transform = 'translate(-50%, 0)';
+      clearTimeout(this._t);
+      this._t = setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translate(-50%, 20px)';
+      }, 2600);
+    }
+  }
 
   // ---- keypad ----
   openKeypadHome=()=>this.setState({keypad:true,keypadFor:'home'});
@@ -484,8 +1293,8 @@ class Component extends DCLogic {
       const onPick = (kind==='hcat') ? this.setHCat : this.setSCat;
       return cats.map(c=>{
         const sel=cur===c.name;
-        const base=`display:inline-flex;align-items:center;gap:6px;border-radius:99px;cursor:pointer;user-select:none;transition:all .15s;color:#fff;${padC}font-weight:${sel?'600':'500'};`;
-        const skin=sel?'background:rgba(255,255,255,0.2);border:1.5px solid rgba(255,255,255,0.7);':'background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.82);';
+        const base=`display:inline-flex;align-items:center;gap:6px;border-radius:99px;cursor:pointer;user-select:none;transition:all .15s;color:#1e1e36;${padC}font-weight:${sel?'600':'500'};`;
+        const skin=sel?'background:rgba(0,0,0,0.07);border:1.5px solid rgba(30,30,54,0.6);':'background:rgba(0,0,0,0.04);border:1px solid rgba(0,0,0,0.08);color:#555770;';
         return { label:c.name, icon:c.icon, onClick:()=>onPick(c.name), style:base+skin };
       });
     } else {
@@ -493,8 +1302,8 @@ class Component extends DCLogic {
       const onPick = (kind==='hemo') ? this.setHEmotion : this.setSEmotion;
       return this.emotions.map((e,i)=>{
         const sel=cur===e.name;
-        const base=`display:inline-flex;align-items:center;gap:7px;border-radius:99px;cursor:pointer;user-select:none;transition:all .15s;color:#fff;${padC}font-weight:${sel?'600':'500'};`;
-        const skin=sel?`background:${this.hexToRgba(e.color,0.36)};border:1.5px solid rgba(255,255,255,0.78);box-shadow:0 8px 20px -10px ${this.hexToRgba(e.color,0.8)};`:'background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.82);';
+        const base=`display:inline-flex;align-items:center;gap:7px;border-radius:99px;cursor:pointer;user-select:none;transition:all .15s;color:#1e1e36;${padC}font-weight:${sel?'600':'500'};`;
+        const skin=sel?`background:${this.hexToRgba(e.color,0.38)};border:1.5px solid rgba(30,30,54,0.6);box-shadow:0 6px 15px -8px ${this.hexToRgba(e.color,0.8)};`:'background:rgba(0,0,0,0.04);border:1px solid rgba(0,0,0,0.08);color:#555770;';
         const anim=`animation:flPop .3s cubic-bezier(0.16,1,0.3,1) both;animation-delay:${(i*0.03).toFixed(2)}s;`;
         return { label:'#'+e.name, onClick:()=>onPick(e.name), style:base+skin+anim, dot:`width:${dotPx};height:${dotPx};border-radius:50%;background:${e.color};flex:none;` };
       });
@@ -511,10 +1320,10 @@ class Component extends DCLogic {
       icon:this.catIcon(r.cat), place,
       meta: metaBits.join(' · '),
       amtText:(isInc?'+₩':'₩')+this.fmt(r.amount),
-      amtColor: isInc?'#7fe6d2':'#fff',
-      iconWrap:`width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:17px;flex:none;background:${this.hexToRgba(col,0.28)};`,
+      amtColor: isInc?'#1ea689':'#1e1e36',
+      iconWrap:`width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:17px;flex:none;background:${this.hexToRgba(col,0.22)};`,
       dot:`width:7px;height:7px;border-radius:50%;flex:none;background:${col};`,
-      rowStyle:'display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.08);'+(r._new?'animation:flRec .45s cubic-bezier(0.16,1,0.3,1);':''),
+      rowStyle:'display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid rgba(0,0,0,0.06);'+(r._new?'animation:flRec .45s cubic-bezier(0.16,1,0.3,1);':''),
       onDelete:(ev)=>{ if(ev&&ev.stopPropagation)ev.stopPropagation(); this.deleteRecord(r.id); },
       onEdit:()=>this.openEditSheet(r.id),
     };
@@ -523,21 +1332,161 @@ class Component extends DCLogic {
   renderVals(){
     const st=this.state;
 
+    // --- Emotion Dashboard calculations ---
+    const expRecs = st.records.filter(r => r.type === 'expense' && r.emotion);
+    const totalExp = expRecs.length;
+    const emoList = ['외로움', '스트레스', '불안', '신남', '평온'];
+    const emoCounts = {};
+    emoList.forEach(e => emoCounts[e] = 0);
+    expRecs.forEach(r => {
+      if (emoCounts[r.emotion] !== undefined) emoCounts[r.emotion]++;
+    });
+
+    let emoStats = emoList.map(name => {
+      const count = emoCounts[name] || 0;
+      const pct = totalExp > 0 ? Math.round((count / totalExp) * 100) : 0;
+      return { name, pct, count };
+    });
+
+    // Fallback to screenshot default distribution if no entries exist
+    if (totalExp === 0) {
+      emoStats = [
+        { name: '외로움', pct: 38, count: 0 },
+        { name: '스트레스', pct: 23, count: 0 },
+        { name: '불안', pct: 18, count: 0 },
+        { name: '신남', pct: 12, count: 0 },
+        { name: '평온', pct: 9, count: 0 }
+      ];
+    }
+
+    // Overlapping bubbles positioning (centers inside 320x250 container)
+    const centers = [
+      { x: 90, y: 85 },   // Blue (외로움)
+      { x: 220, y: 85 },  // Purple (스트레스)
+      { x: 155, y: 175 }, // Orange (불안)
+      { x: 255, y: 190 }, // Pink (신남)
+      { x: 55, y: 190 }   // Mint (평온)
+    ];
+
+    const colorsRgb = {
+      '외로움': '91, 141, 239',
+      '스트레스': '138, 108, 255',
+      '불안': '245, 166, 35',
+      '신남': '255, 122, 107',
+      '평온': '47, 191, 166'
+    };
+
+    const bubbles = emoStats.map((stat, idx) => {
+      const size = Math.max(50, Math.min(145, 50 + stat.pct * 2.2));
+      const center = centers[idx] || { x: 150, y: 120 };
+      const left = center.x - size / 2;
+      const top = center.y - size / 2;
+      const rgb = colorsRgb[stat.name] || '154, 160, 180';
+      const labelSize = size < 70 ? '10px' : '12px';
+      const pctSize = size < 70 ? '13px' : (size > 110 ? '20px' : '16px');
+      return {
+        name: stat.name,
+        pct: stat.pct,
+        size,
+        left,
+        top,
+        visible: stat.pct > 0,
+        style: `position:absolute;width:${size}px;height:${size}px;left:${left}px;top:${top}px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);background:rgba(${rgb}, 0.55);border:1px solid rgba(255,255,255,0.4);box-shadow:0 8px 24px rgba(28,39,76,0.06), 0 0 20px rgba(${rgb}, 0.2);transition:all 0.3s ease;`,
+        labelStyle: `font-size:${labelSize};color:rgba(255,255,255,0.85);font-weight:500;margin-bottom:2px;`,
+        pctStyle: `font-size:${pctSize};font-weight:700;color:#fff;font-family:'Fredoka',sans-serif;`
+      };
+    });
+
+    // Top emotions ranked list
+    const sortedStats = [...emoStats].sort((a, b) => b.pct - a.pct);
+    const topEmotions = sortedStats.map((stat, index) => ({
+      rank: index + 1,
+      name: stat.name,
+      pct: stat.pct,
+      color: this.emoColor(stat.name)
+    }));
+
+    // Hourly spending pattern bars
+    const hourlyData = [];
+    for (let h = 0; h < 24; h++) {
+      let baseSpent = 0;
+      let baseIncome = 0;
+      // Setup beautiful realistic baseline patterns
+      if (h === 23 || h === 0 || h === 1) {
+        baseSpent = 15000 + Math.sin(h) * 5000;
+      } else if (h === 8 || h === 9) {
+        baseSpent = 5000 + Math.cos(h) * 1500;
+      } else if (h === 12 || h === 13) {
+        baseSpent = 12000;
+        if (h === 12) baseIncome = 10000;
+      } else if (h === 18 || h === 19 || h === 20) {
+        baseSpent = 25000 + Math.sin(h) * 8000;
+      } else if (h === 15) {
+        baseSpent = 4000;
+      }
+      hourlyData.push({ hour: h, spent: baseSpent, income: baseIncome });
+    }
+
+    // Add user's real transaction records to hourly data
+    st.records.forEach(r => {
+      let hr = 12;
+      if (r.time === '방금') {
+        hr = new Date().getHours();
+      } else if (r.time) {
+        const parts = r.time.split(':');
+        if (parts.length > 0) {
+          const p0 = parseInt(parts[0], 10);
+          if (!isNaN(p0)) hr = p0;
+        }
+      }
+      if (r.type === 'expense') {
+        hourlyData[hr].spent += r.amount;
+      } else {
+        hourlyData[hr].income += r.amount;
+      }
+    });
+
+    const maxVal = Math.max(...hourlyData.map(d => Math.max(d.spent, d.income)), 1000);
+    const hourlyBars = hourlyData.map(d => {
+      const spentPct = Math.min(95, Math.max(5, Math.round((d.spent / maxVal) * 90)));
+      const incomePct = Math.min(95, Math.max(5, Math.round((d.income / maxVal) * 90)));
+      return {
+        hour: d.hour,
+        spentH: d.spent > 0 ? `${spentPct}%` : '2%',
+        incomeH: d.income > 0 ? `${incomePct}%` : '2%'
+      };
+    });
+
+    const hourlyLabels = [];
+    for (let h = 0; h < 24; h++) {
+      let text = '';
+      if (h % 4 === 0) text = String(h).padStart(2, '0') + '시';
+      hourlyLabels.push({ text });
+    }
+
     // calendar cells (June 2026: 1 leading empty)
     const buildCells=(size)=>{
       const cells=[]; const dim=size;
       const baseCell = size==='d'
-        ? 'aspect-ratio:1;border-radius:14px;display:flex;align-items:flex-start;justify-content:flex-start;padding:8px 10px;font-family:Fredoka,sans-serif;font-size:15px;cursor:pointer;'
-        : 'aspect-ratio:1;border-radius:11px;display:flex;align-items:center;justify-content:center;font-family:Fredoka,sans-serif;font-size:13px;cursor:pointer;';
+        ? 'aspect-ratio:1;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:Fredoka,sans-serif;font-size:15px;cursor:pointer;'
+        : 'aspect-ratio:1;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:Fredoka,sans-serif;font-size:13px;cursor:pointer;';
       cells.push({day:'', style:'aspect-ratio:1;', onClick:()=>{}});
       for(let d=1; d<=30; d++){
         const col=this.dayColor(d);
         const sel=d===st.selDay;
         let style;
         if(col){
-          style=baseCell+`color:#fff;background:${this.hexToRgba(col, sel?0.62:0.42)};`+(sel?'box-shadow:0 0 0 2px #fff;font-weight:600;':'border:1px solid rgba(255,255,255,0.12);');
+          const bg = this.hexToRgba(col, 0.55);
+          const sh = sel
+            ? `box-shadow: 0 0 0 2.5px #1e1e36; font-weight:700;`
+            : ``;
+          style=baseCell+`color:#1e1e36;background:${bg};${sh}`;
         } else {
-          style=baseCell+(sel?'color:#fff;background:rgba(255,255,255,0.14);box-shadow:0 0 0 2px rgba(255,255,255,0.6);':'color:rgba(255,255,255,0.32);background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.05);');
+          const bg = sel ? `rgba(0, 0, 0, 0.08)` : `rgba(0, 0, 0, 0.04)`;
+          const sh = sel
+            ? `box-shadow: 0 0 0 2.5px rgba(30,30,54,0.7); font-weight:700;`
+            : ``;
+          style=baseCell+`color:${sel?'#1e1e36':'rgba(30,30,54,0.45)'};background:${bg};${sh}`;
         }
         cells.push({day:String(d), style, onClick:()=>this.selectDay(d)});
       }
@@ -582,6 +1531,10 @@ class Component extends DCLogic {
       setMobile:this.setMobile, setDesktop:this.setDesktop,
       segMobileStyle: st.isMobile?segOn:segOff,
       segDesktopStyle: st.isMobile?segOff:segOn,
+
+      leverClass: st.leverPulling ? 'pulling' : '',
+      calendarClass: st.syncingActive ? 'syncing-active' : '',
+      triggerSync: this.triggerSync,
 
       tabHome: st.tab==='home', tabCal: st.tab==='calendar', tabContent: st.tab==='content',
       goHome:this.goHome, goCal:this.goCal, goContent:this.goContent,
@@ -640,6 +1593,12 @@ class Component extends DCLogic {
       // keypad
       keypad:st.keypad, closeKeypad:this.closeKeypad, keypadKeys,
       keypadAmount: keypadCur===''?'0':this.fmt(parseInt(keypadCur,10)),
+
+      // Dashboard fields
+      bubbles,
+      topEmotions,
+      hourlyBars,
+      hourlyLabels,
 
       toast:st.toast, toastText:st.toastText,
     };
