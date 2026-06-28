@@ -1,0 +1,76 @@
+import { useMemo, useState } from 'react';
+import LoginPage from './components/auth/LoginPage.jsx';
+import BottomNav from './components/common/BottomNav.jsx';
+import Sidebar from './components/common/Sidebar.jsx';
+import ProfileModal from './components/profile/ProfileModal.jsx';
+import HomePage from './pages/HomePage.jsx';
+import CalendarPage from './pages/CalendarPage.jsx';
+import ContentPage from './pages/ContentPage.jsx';
+import { useAppStore } from './stores/useAppStore.js';
+
+const auroraThemes = {
+  blue: ['rgba(91, 141, 239, .82)', 'rgba(47, 191, 166, .55)', 'rgba(255, 122, 107, .42)'],
+  mint: ['rgba(47, 191, 166, .78)', 'rgba(91, 141, 239, .46)', 'rgba(245, 166, 35, .34)'],
+  pink: ['rgba(243, 95, 168, .70)', 'rgba(138, 108, 255, .52)', 'rgba(91, 141, 239, .36)'],
+  gold: ['rgba(245, 166, 35, .64)', 'rgba(255, 122, 107, .44)', 'rgba(47, 191, 166, .36)'],
+  lavender: ['rgba(190, 170, 255, .62)', 'rgba(136, 210, 255, .42)', 'rgba(255, 188, 232, .36)'],
+  sky: ['rgba(126, 205, 255, .62)', 'rgba(178, 235, 255, .42)', 'rgba(157, 180, 255, .34)'],
+  peach: ['rgba(255, 190, 170, .58)', 'rgba(255, 221, 150, .40)', 'rgba(255, 157, 202, .34)'],
+  lime: ['rgba(180, 235, 150, .56)', 'rgba(92, 216, 196, .42)', 'rgba(255, 230, 140, .32)']
+};
+export default function App() {
+  const { state, actions } = useAppStore();
+  const [currentTab, setCurrentTab] = useState('home');
+  const [profileOpen, setProfileOpen] = useState(false);
+
+  const mainGoal = useMemo(() => state.goals.find(goal => goal.isMain) || state.goals[0], [state.goals]);
+  const auroraColors = auroraThemes[state.user.auroraTheme || 'blue'] || auroraThemes.blue;
+  const auroraStyle = {
+    '--aurora-1': auroraColors[0],
+    '--aurora-2': auroraColors[1],
+    '--aurora-3': auroraColors[2]
+  };
+
+  if (!state.isLoggedIn) {
+    return <LoginPage onLogin={actions.login} />;
+  }
+
+  return (
+    <div className="appShell" style={auroraStyle}>
+      <div className="aurora a1" />
+      <div className="aurora a2" />
+      <div className="aurora a3" />
+      <div className="moodMascot" aria-hidden="true">
+        <span className="mascotEye left" />
+        <span className="mascotEye right" />
+        <span className="mascotMouth" />
+      </div>
+      <Sidebar currentTab={currentTab} onChange={setCurrentTab} user={state.user} onProfile={() => setProfileOpen(true)} />
+      <main className="mainSurface">
+        {currentTab === 'home' && (
+          <HomePage state={state} onAddTransaction={actions.addTransaction} onProfile={() => setProfileOpen(true)} />
+        )}
+        {currentTab === 'calendar' && (
+          <CalendarPage state={state} onAddTransaction={actions.addTransaction} />
+        )}
+        {currentTab === 'content' && (
+          <ContentPage state={state} />
+        )}
+      </main>
+      <BottomNav currentTab={currentTab} onChange={setCurrentTab} />
+      {profileOpen && (
+        <ProfileModal
+          user={state.user}
+          goal={mainGoal}
+          onClose={() => setProfileOpen(false)}
+          onUserSave={actions.updateUser}
+          onGoalSave={actions.updateGoal}
+          onLogout={() => {
+            actions.logout();
+            setProfileOpen(false);
+          }}
+        />
+      )}
+    </div>
+  );
+}
