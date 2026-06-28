@@ -1,0 +1,2307 @@
+* { box-sizing: border-box; }
+
+:root {
+  --ink: #f8f5ee;
+  --muted: rgba(248, 245, 238, .64);
+  --soft: rgba(248, 245, 238, .78);
+  --glass: rgba(255, 255, 255, .105);
+  --glass-strong: rgba(255, 255, 255, .16);
+  --line: rgba(255, 255, 255, .18);
+  --blue: #5b8def;
+  --mint: #2fbfa6;
+  --coral: #ff7a6b;
+  --gold: #f5a623;
+  --pink: #f35fa8;
+  --violet: #8a6cff;
+  --danger: #f25555;
+  --shadow: 0 28px 90px -38px rgba(0, 0, 0, .82);
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  font-family: Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: var(--ink);
+  background: #0e0e1c;
+  -webkit-font-smoothing: antialiased;
+}
+
+::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+button, input, textarea { font: inherit; }
+button { cursor: pointer; }
+button, input, textarea { color: inherit; }
+
+.aurora {
+  position: fixed;
+  pointer-events: none;
+  border-radius: 50%;
+  filter: blur(82px);
+  animation: auroraFloat 18s ease-in-out infinite;
+  z-index: 0;
+}
+
+.aurora.a1 {
+  width: 46vw;
+  height: 46vw;
+  max-width: 640px;
+  max-height: 640px;
+  left: -6vw;
+  top: -8vw;
+  background: radial-gradient(circle, rgba(91, 141, 239, .82), transparent 68%);
+}
+.aurora.a2 {
+  width: 44vw;
+  height: 44vw;
+  max-width: 600px;
+  max-height: 600px;
+  right: -8vw;
+  top: 16vh;
+  background: radial-gradient(circle, rgba(47, 191, 166, .55), transparent 68%);
+  animation-direction: reverse;
+}
+.aurora.a3 {
+  width: 42vw;
+  height: 42vw;
+  max-width: 560px;
+  max-height: 560px;
+  left: 30vw;
+  bottom: -14vh;
+  background: radial-gradient(circle, rgba(255, 122, 107, .42), transparent 70%);
+}
+
+@keyframes auroraFloat {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(20px, -24px) scale(1.08); }
+}
+
+.moodMascot {
+  position: fixed;
+  top: 26px;
+  left: 42%;
+  width: 58px;
+  height: 44px;
+  border-radius: 58% 58% 46% 46%;
+  background:
+    radial-gradient(circle at 32% 28%, rgba(255, 255, 255, .64), transparent 24%),
+    linear-gradient(135deg, rgba(91, 141, 239, .9), rgba(138, 108, 255, .82) 52%, rgba(243, 95, 168, .72));
+  border: 1px solid rgba(255, 255, 255, .22);
+  box-shadow: 0 18px 34px -20px rgba(91, 141, 239, .85);
+  filter: saturate(112%);
+  opacity: .74;
+  pointer-events: none;
+  z-index: 2;
+  animation: mascotDrift 18s ease-in-out infinite;
+}
+.moodMascot::before,
+.moodMascot::after {
+  content: "";
+  position: absolute;
+  top: 8px;
+  width: 15px;
+  height: 18px;
+  border-radius: 50%;
+  background: inherit;
+  opacity: .72;
+}
+.moodMascot::before { left: -7px; transform: rotate(-18deg); }
+.moodMascot::after { right: -7px; transform: rotate(18deg); }
+.mascotEye,
+.mascotMouth {
+  position: absolute;
+  z-index: 1;
+  display: block;
+  background: rgba(28, 28, 50, .58);
+}
+.mascotEye {
+  top: 18px;
+  width: 4px;
+  height: 6px;
+  border-radius: 50%;
+}
+.mascotEye.left { left: 18px; }
+.mascotEye.right { right: 18px; }
+.mascotMouth {
+  left: 50%;
+  bottom: 10px;
+  width: 12px;
+  height: 5px;
+  border-radius: 0 0 10px 10px;
+  transform: translateX(-50%);
+}
+
+@keyframes mascotDrift {
+  0%, 100% { transform: translate3d(-28px, 0, 0) rotate(-3deg); }
+  35% { transform: translate3d(92px, 10px, 0) rotate(4deg); }
+  68% { transform: translate3d(176px, -2px, 0) rotate(-1deg); }
+}
+
+.appShell,
+.loginPage {
+  position: relative;
+  min-height: 100vh;
+  background: linear-gradient(180deg, rgba(10, 10, 26, .16), rgba(10, 10, 26, .42));
+  overflow: hidden;
+}
+
+.appShell {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+}
+
+.mainSurface {
+  position: relative;
+  z-index: 1;
+  height: 100vh;
+  overflow-y: auto;
+  padding: 34px 36px 44px;
+}
+.mainSurface::-webkit-scrollbar,
+.modalPanel::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+.loginPage {
+  display: grid;
+  grid-template-columns: minmax(320px, 1.1fr) minmax(320px, 440px);
+  gap: 32px;
+  align-items: center;
+  padding: 48px;
+}
+
+.loginHero,
+.loginCard,
+.sidebar,
+.bottomNav,
+.glassCard,
+.modalPanel {
+  position: relative;
+  z-index: 1;
+}
+
+.loginHero h1 {
+  max-width: 720px;
+  margin: 42px 0 18px;
+  font-family: Fredoka, Pretendard, sans-serif;
+  font-size: clamp(42px, 6vw, 78px);
+  line-height: .98;
+  letter-spacing: 0;
+}
+
+.loginHero p {
+  max-width: 620px;
+  margin: 0;
+  color: var(--soft);
+  font-size: 17px;
+  line-height: 1.75;
+}
+
+.logoRow { display: flex; align-items: center; gap: 12px; }
+.logoMark {
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, #6F7DFF 0%, #8A6CFF 48%, #F35FA8 100%);
+  border: 1px solid rgba(255, 255, 255, .28);
+  box-shadow: 0 16px 30px -18px rgba(138, 108, 255, .9);
+}
+.brandName { font-family: Fredoka, sans-serif; font-weight: 700; font-size: 24px; }
+.brandCaption { color: var(--muted); font-size: 12px; margin-top: 1px; }
+
+.glassCard,
+.loginCard {
+  background: var(--glass);
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(30px) saturate(160%);
+  -webkit-backdrop-filter: blur(30px) saturate(160%);
+}
+
+.loginCard { padding: 26px; }
+.loginCardIntro span,
+.sectionTitle span,
+.pageLead p {
+  display: block;
+  color: var(--muted);
+  font-size: 13px;
+}
+.loginCardIntro strong,
+.sectionTitle strong {
+  display: block;
+  margin-top: 5px;
+  font-size: 20px;
+}
+.oauthList { display: grid; gap: 10px; margin: 24px 0 14px; }
+.oauthButton,
+.solidButton,
+.dangerButton,
+.profileButton,
+.iconButton,
+.navButton,
+.sideButton,
+.tagChip,
+.segmented button,
+.emptyState {
+  border: 1px solid rgba(255, 255, 255, .22);
+  background: rgba(255, 255, 255, .095);
+  color: #fff;
+}
+.oauthButton {
+  height: 54px;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 16px;
+  font-weight: 700;
+}
+.oauthButton span {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, .14);
+}
+.oauthButton.kakao { background: rgba(245, 166, 35, .16); }
+.oauthButton.apple { background: rgba(255, 255, 255, .13); }
+.helperText, .cardText {
+  color: var(--soft);
+  line-height: 1.58;
+  font-size: 13px;
+}
+
+.sidebar {
+  height: 100vh;
+  padding: 28px 24px;
+  display: flex;
+  flex-direction: column;
+  background:
+    radial-gradient(300px 360px at 42% -8%, rgba(91, 141, 239, .42), transparent 68%),
+    linear-gradient(180deg, rgba(255, 255, 255, .09), rgba(255, 255, 255, .045));
+  border-right: 1px solid rgba(255, 255, 255, .14);
+  box-shadow: inset -1px 0 0 rgba(255, 255, 255, .06);
+  backdrop-filter: blur(34px) saturate(170%);
+  -webkit-backdrop-filter: blur(34px) saturate(170%);
+}
+.sideMenu { display: grid; gap: 12px; margin-top: 36px; }
+.sideButton {
+  height: 56px;
+  border-radius: 18px;
+  border: 1px solid transparent;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 14px;
+  color: rgba(255, 255, 255, .56);
+  text-align: left;
+  font-weight: 700;
+}
+.sideButton svg,
+.navGlyph svg {
+  display: block;
+  flex: none;
+}
+.sideButton.active,
+.navButton.active {
+  color: #fff;
+  background: rgba(255, 255, 255, .18);
+  border-color: rgba(255, 255, 255, .26);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .16),
+    0 16px 34px -24px rgba(91, 141, 239, .75);
+}
+.sideButton:hover,
+.profileMini:hover,
+.navButton:hover,
+.tagChip:hover,
+.oauthButton:hover,
+.solidButton:hover,
+.dayCell:hover {
+  background: rgba(255, 255, 255, .15);
+  border-color: rgba(255, 255, 255, .32);
+  box-shadow: 0 12px 30px -20px rgba(91, 141, 239, .75);
+}
+.sideButton:not(.active):hover {
+  background: rgba(255, 255, 255, .055);
+  border-color: transparent;
+  box-shadow: none;
+  color: rgba(255, 255, 255, .78);
+}
+.profileMini {
+  margin-top: auto;
+  border: 1px solid rgba(255, 255, 255, .12);
+  background: rgba(255, 255, 255, .06);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 11px;
+  color: #fff;
+  text-align: left;
+}
+.profileMini small { display: block; color: var(--muted); margin-top: 2px; }
+.profileAvatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, #FF7A6B, #F5A623);
+  border: 1px solid rgba(255, 255, 255, .28);
+  font-weight: 800;
+}
+.profileAvatar.large { width: 64px; height: 64px; font-size: 24px; }
+
+.pageGrid {
+  display: grid;
+  gap: 24px;
+  max-width: 1120px;
+  margin: 0 auto;
+}
+.homeGrid { grid-template-columns: minmax(500px, 1.55fr) minmax(300px, .85fr); align-items: start; }
+.calendarGrid { grid-template-columns: minmax(520px, 1.6fr) minmax(320px, .8fr); }
+.contentGrid { grid-template-columns: repeat(2, minmax(300px, 1fr)); }
+.pageLead {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px;
+}
+.pageLead h1 {
+  margin: 3px 0 0;
+  font-family: Fredoka, Pretendard, sans-serif;
+  font-size: 32px;
+  line-height: 1.1;
+}
+.homeMain { display: grid; gap: 12px; }
+.homeAside { display: grid; gap: 18px; }
+.recentPanel { grid-column: 2; padding: 22px; }
+
+.glassCard { padding: 22px; }
+.recordCard {
+  display: grid;
+  gap: 18px;
+  box-shadow: 0 24px 60px -28px rgba(0, 0, 0, .6);
+}
+.recordCard.inModal {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  gap: 16px;
+}
+.recordCard.inModal .chipGroup > span {
+  margin-bottom: 7px;
+}
+.recordCard.inModal .chipGroup > div {
+  gap: 7px;
+}
+.sectionTitle.compact strong { font-size: 16px; }
+.metricHeader {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+.metricHeader span { color: var(--muted); font-size: 13px; }
+.metricHeader strong { font-family: Fredoka, sans-serif; font-size: 36px; }
+.progressTrack {
+  height: 9px;
+  border-radius: 99px;
+  background: rgba(255, 255, 255, .15);
+  overflow: hidden;
+  margin: 14px 0;
+}
+.progressTrack span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--blue), var(--coral));
+}
+.progressTrack.mint span { background: linear-gradient(90deg, var(--mint), var(--blue)); }
+
+.segmented {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, .08);
+  border: 1px solid rgba(255, 255, 255, .14);
+}
+.segmented button {
+  height: 40px;
+  border-radius: 12px;
+}
+.segmented button.active { background: rgba(91, 141, 239, .28); }
+.recordTopline {
+  display: grid;
+  grid-template-columns: 86px 1fr;
+  gap: 10px;
+  align-items: center;
+}
+.recordTopline span {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+.typeToggle {
+  height: 38px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, .24);
+  background: rgba(255, 255, 255, .1);
+  color: #fff;
+  font-weight: 800;
+}
+.typeToggle.income {
+  background: rgba(91, 141, 239, .25);
+}
+.typeToggle.expense {
+  background: rgba(255, 122, 107, .18);
+}
+.amountMemoGrid {
+  display: grid;
+  grid-template-columns: minmax(120px, .48fr) minmax(180px, 1fr);
+  gap: 12px;
+}
+
+.emotionFlowCard {
+  margin-top: 0;
+  padding: 20px 24px 18px;
+  border-radius: 28px;
+  border: 1px solid rgba(255, 255, 255, .17);
+  background:
+    radial-gradient(420px 190px at 46% 108%, rgba(243, 95, 168, .18), transparent 72%),
+    rgba(255, 255, 255, .065);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .09),
+    0 28px 72px -42px rgba(0, 0, 0, .85);
+  backdrop-filter: blur(28px) saturate(150%);
+}
+.emotionFlowHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 18px;
+}
+.emotionFlowHeader h3 {
+  margin: 0;
+  color: rgba(255, 255, 255, .96);
+  font-size: 18px;
+}
+.emotionFlowHeader span {
+  color: rgba(255, 255, 255, .58);
+  font-size: 12px;
+  font-weight: 700;
+}
+.emotionBars {
+  height: 112px;
+  margin-top: 8px;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  align-items: end;
+  gap: 12px;
+}
+.emotionBarItem {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+}
+.emotionBar {
+  width: 100%;
+  max-width: 88px;
+  min-height: 30px;
+  border-radius: 8px;
+  box-shadow: 0 20px 34px -22px currentColor;
+}
+.emotionBar.lonely { color: #6EA0FF; background: linear-gradient(180deg, rgba(110, 160, 255, .95), rgba(65, 93, 166, .78)); }
+.emotionBar.anxious { color: #F5A623; background: linear-gradient(180deg, rgba(245, 166, 35, .96), rgba(148, 105, 31, .78)); }
+.emotionBar.calm { color: #2FBFA6; background: linear-gradient(180deg, rgba(54, 211, 188, .94), rgba(37, 126, 116, .76)); }
+.emotionBarItem span {
+  color: rgba(255, 255, 255, .44);
+  font-size: 12px;
+  font-weight: 700;
+}
+.emotionFlowLegend {
+  display: flex;
+  gap: 14px;
+  margin-top: 8px;
+  color: rgba(255, 255, 255, .76);
+  font-size: 12px;
+  font-weight: 700;
+}
+.emotionFlowLegend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.emotionFlowLegend i {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+}
+.emotionFlowLegend .lonely { background: #6EA0FF; }
+.emotionFlowLegend .anxious { background: #F5A623; }
+.emotionFlowLegend .calm { background: #2FBFA6; }
+
+.emotionExpenseCard {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: grid;
+  gap: 26px;
+  padding: 30px;
+  border-radius: 30px;
+  border: 1px solid rgba(255, 255, 255, .17);
+  background:
+    radial-gradient(420px 210px at 50% 118%, rgba(243, 95, 168, .17), transparent 72%),
+    radial-gradient(360px 220px at 84% 2%, rgba(91, 141, 239, .10), transparent 68%),
+    rgba(35, 34, 56, .72);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .10),
+    inset 0 -1px 0 rgba(255, 255, 255, .045),
+    0 28px 72px -38px rgba(0, 0, 0, .82);
+  backdrop-filter: blur(30px) saturate(150%);
+  -webkit-backdrop-filter: blur(30px) saturate(150%);
+}
+.emotionExpenseCard ::selection {
+  background: rgba(91, 141, 239, .46);
+  color: #fff;
+}
+.emotionExpenseCard::after {
+  content: "";
+  position: absolute;
+  left: 18%;
+  right: 12%;
+  bottom: -82px;
+  height: 180px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 45% 42%, rgba(255, 122, 180, .18), transparent 62%),
+    radial-gradient(circle at 62% 58%, rgba(138, 108, 255, .12), transparent 65%);
+  filter: blur(22px);
+  z-index: -1;
+}
+.emotionExpenseHeader h2 {
+  margin: 0;
+  color: rgba(255, 255, 255, .96);
+  font-size: 24px;
+  line-height: 1.18;
+  font-weight: 850;
+  letter-spacing: 0;
+}
+.emotionExpenseHeader p {
+  margin: 8px 0 0;
+  color: rgba(220, 217, 237, .66);
+  font-size: 13px;
+  line-height: 1.55;
+}
+.emotionExpenseHeader {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 18px;
+}
+.homeActionCluster {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.homeTypeToggle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  width: 116px;
+  padding: 3px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, .14);
+  background: rgba(11, 13, 30, .46);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .06),
+    0 12px 22px -20px rgba(0, 0, 0, .82);
+}
+.homeTypeToggle button {
+  min-height: 30px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: rgba(221, 220, 235, .58);
+  font-size: 12px;
+  font-weight: 850;
+}
+.homeTypeToggle button.active {
+  background: rgba(91, 141, 239, .30);
+  color: rgba(255, 255, 255, .96);
+  box-shadow: inset 0 0 0 1px rgba(118, 165, 255, .42);
+}
+.homeTypeToggle button:nth-child(2).active {
+  background: rgba(255, 122, 107, .24);
+  box-shadow: inset 0 0 0 1px rgba(255, 122, 107, .36);
+}
+.expenseSaveButton {
+  min-height: 34px;
+  min-width: 54px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, .22);
+  background: rgba(91, 141, 239, .24);
+  color: rgba(255, 255, 255, .94);
+  font-size: 12px;
+  font-weight: 850;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .10),
+    0 14px 24px -20px rgba(91, 141, 239, .75);
+}
+.expenseSaveButton:hover {
+  background: rgba(91, 141, 239, .32);
+  border-color: rgba(255, 255, 255, .32);
+}
+.expensePreviewCard {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: auto auto;
+  gap: 22px 18px;
+  padding: 18px 18px 16px;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, .13);
+  background:
+    radial-gradient(220px 120px at 78% 112%, rgba(138, 108, 255, .09), transparent 72%),
+    rgba(255, 255, 255, .075);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .08),
+    0 20px 46px -34px rgba(0, 0, 0, .78);
+}
+.expensePreviewTop {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+  gap: 0;
+  grid-column: 1 / 2;
+}
+.expensePreviewTop span {
+  color: rgba(220, 217, 237, .60);
+  font-size: 12px;
+  line-height: 1.4;
+}
+.merchantInput,
+.amountInput {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  color: rgba(220, 217, 237, .60);
+}
+.merchantInput input,
+.amountInput input {
+  width: 100%;
+  min-height: 30px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  padding: 0;
+  color: rgba(255, 255, 255, .88);
+  font-size: 13px;
+  line-height: 1.35;
+  caret-color: rgba(255, 255, 255, .9);
+}
+.merchantInput input::placeholder,
+.amountEditable input::placeholder {
+  color: rgba(255, 255, 255, .82);
+  opacity: 1;
+}
+.merchantInput input {
+  max-width: 330px;
+}
+.amountInput {
+  grid-column: 2 / 3;
+  grid-row: 1 / 3;
+  align-self: center;
+  justify-items: end;
+  text-align: right;
+}
+.amountInput span {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+.amountEditable {
+  display: inline-flex;
+  align-items: baseline;
+  justify-content: flex-end;
+  gap: 1px;
+  min-width: 168px;
+  color: rgba(255, 255, 255, .96);
+  font-family: Fredoka, Pretendard, sans-serif;
+  font-size: 30px;
+  line-height: 1;
+  font-weight: 800;
+  letter-spacing: 0;
+}
+.amountEditable b {
+  font: inherit;
+}
+.amountEditable input {
+  width: 136px;
+  min-height: 38px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  font: inherit;
+  line-height: 1;
+  cursor: text;
+}
+.amountEditable input::placeholder {
+  font: inherit;
+}
+.amountInput input:focus,
+.merchantInput input:focus {
+  outline: none;
+}
+.selectedMoodTags {
+  grid-column: 1 / 2;
+  grid-row: 2 / 3;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 9px;
+  min-height: 35px;
+}
+.moodChip {
+  --chip-accent: #6EA0FF;
+  min-height: 34px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 13px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, .19);
+  background: rgba(255, 255, 255, .075);
+  color: rgba(242, 241, 249, .82);
+  font-size: 13px;
+  font-weight: 750;
+  line-height: 1;
+  white-space: nowrap;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .06);
+}
+button.moodChip {
+  cursor: pointer;
+}
+button.moodChip:hover {
+  border-color: rgba(255, 255, 255, .30);
+  background: rgba(255, 255, 255, .10);
+}
+.moodChip i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--chip-accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--chip-accent) 18%, transparent);
+}
+.moodChip b {
+  margin-left: 1px;
+  color: rgba(255, 255, 255, .76);
+  font-size: 15px;
+  line-height: 1;
+}
+.moodChip.muted {
+  color: rgba(226, 224, 237, .72);
+  background: rgba(17, 18, 34, .30);
+  border-color: rgba(255, 255, 255, .16);
+}
+.moodChip.selected {
+  color: rgba(255, 255, 255, .94);
+  border-color: rgba(118, 165, 255, .72);
+  background: rgba(91, 141, 239, .24);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .10),
+    0 12px 24px -18px rgba(91, 141, 239, .75);
+}
+.chipCaret {
+  width: 1px;
+  height: 22px;
+  margin-left: 2px;
+  border-radius: 2px;
+  background: rgba(232, 230, 245, .74);
+  box-shadow: 0 0 10px rgba(255, 255, 255, .18);
+}
+.emotionChooser,
+.tagPickerStack {
+  display: grid;
+  gap: 12px;
+}
+.emotionChooser > span,
+.tagPickerSection > span {
+  display: block;
+  margin-bottom: 9px;
+  color: rgba(226, 223, 240, .78);
+  font-size: 13px;
+  font-weight: 700;
+}
+.tagPickerSection {
+  min-width: 0;
+}
+.pickerCategoryChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+.pickerCategoryChips.inline {
+  display: inline-flex;
+  margin-left: 0;
+  gap: 8px;
+}
+.pickerCategoryChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 34px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, .18);
+  background: rgba(255, 255, 255, .065);
+  color: rgba(242, 241, 249, .82);
+  padding: 0 14px;
+  font-size: 13px;
+  font-weight: 800;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .055);
+}
+.pickerCategoryChip i {
+  width: 8px;
+  height: 8px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: var(--chip-accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--chip-accent) 16%, transparent);
+}
+.pickerCategoryChip.selectedValue {
+  background: color-mix(in srgb, var(--chip-accent) 18%, rgba(255, 255, 255, .060));
+  border-color: color-mix(in srgb, var(--chip-accent) 58%, rgba(255, 255, 255, .18));
+  color: rgba(255, 255, 255, .90);
+}
+.pickerCategoryChip.active {
+  background: rgba(91, 141, 239, .20);
+  border-color: rgba(118, 165, 255, .62);
+  color: rgba(255, 255, 255, .96);
+}
+.tagPickerSection.expanded {
+  padding-top: 4px;
+}
+.emotionChipGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 9px;
+  max-width: 520px;
+}
+.emotionChipGrid .moodChip {
+  min-height: 34px;
+  padding: 0 13px;
+  color: rgba(242, 241, 249, .80);
+  background: rgba(255, 255, 255, .070);
+  border-color: rgba(255, 255, 255, .17);
+}
+.emotionChipGrid .moodChip:not(.selected)::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--chip-accent);
+}
+.emotionChipGrid .moodChip.selected {
+  background: rgba(91, 141, 239, .22);
+  border-color: rgba(118, 165, 255, .78);
+}
+.formGrid, .dateGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+label {
+  display: grid;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 12px;
+}
+input, textarea {
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, .14);
+  background: rgba(255, 255, 255, .085);
+  border-radius: 16px;
+  padding: 13px 14px;
+  outline: none;
+  resize: vertical;
+}
+.chipGroup > span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 12px;
+  margin-bottom: 9px;
+}
+.chipGroup > div { display: flex; flex-wrap: wrap; gap: 8px; }
+.stepGroup {
+  transition: opacity .18s ease, transform .18s ease;
+}
+.stepGroup.collapsed {
+  opacity: .78;
+}
+.stepGroup.collapsed > span {
+  width: min(100%, 340px);
+  min-height: 38px;
+  margin-bottom: 0;
+  padding: 7px 8px 7px 13px;
+  justify-content: space-between;
+  border-radius: 16px;
+  background:
+    radial-gradient(180px 60px at 0% 0%, rgba(91, 141, 239, .08), transparent 70%),
+    rgba(255, 255, 255, .042);
+  border: 1px solid rgba(255, 255, 255, .11);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .055);
+}
+.stepGroup.collapsed > div,
+.stepGroup.collapsed .inlineTagForm {
+  display: none;
+}
+.stepGroup.open {
+  opacity: 1;
+}
+.tagChip {
+  --tag-color: var(--blue);
+  border-radius: 99px;
+  padding: 8px 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: rgba(255, 255, 255, .82);
+}
+.recordCard.inModal .tagChip {
+  padding: 7px 10px;
+  font-size: 13px;
+}
+.tagChip.active {
+  background: color-mix(in srgb, var(--tag-color) 32%, transparent);
+  border-color: rgba(255, 255, 255, .64);
+  color: #fff;
+  font-weight: 700;
+}
+.tagDot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--tag-color);
+}
+.tagIcon {
+  min-width: 18px;
+  height: 18px;
+  display: inline-grid;
+  place-items: center;
+  font-size: 13px;
+  line-height: 1;
+}
+.addChipButton {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, .24);
+  background: rgba(255, 255, 255, .1);
+  color: #fff;
+  display: inline-grid;
+  place-items: center;
+  padding: 0;
+  line-height: 1;
+  font-weight: 800;
+}
+.editStepButton {
+  min-height: 24px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, .14);
+  background: rgba(255, 255, 255, .07);
+  color: rgba(255, 255, 255, .7);
+  padding: 0 10px;
+  font-size: 10px;
+  font-weight: 800;
+}
+.mutedChip {
+  height: 34px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, .18);
+  background: rgba(255, 255, 255, .065);
+  color: rgba(255, 255, 255, .62);
+  display: inline-flex;
+  align-items: center;
+  padding: 0 12px;
+  font-weight: 800;
+}
+.inlineTagForm {
+  display: grid;
+  grid-template-columns: 1fr 72px;
+  gap: 8px;
+  margin-top: 10px;
+}
+.inlineTagForm input {
+  min-height: 38px;
+  padding: 9px 12px;
+  border-radius: 14px;
+}
+.inlineTagForm button {
+  border: 1px solid rgba(255, 255, 255, .22);
+  background: rgba(91, 141, 239, .24);
+  border-radius: 14px;
+  color: #fff;
+  font-weight: 700;
+}
+.solidButton,
+.dangerButton {
+  min-height: 46px;
+  border-radius: 16px;
+  padding: 0 16px;
+  font-weight: 800;
+}
+.solidButton { background: rgba(91, 141, 239, .32); }
+.solidButton.small { width: auto; min-height: 40px; }
+.dangerButton { width: 100%; background: rgba(242, 85, 85, .2); }
+.profileButton,
+.iconButton {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  font-weight: 800;
+}
+.profileButton {
+  display: none;
+  background: rgba(255, 122, 107, .26);
+  border-color: rgba(255, 255, 255, .32);
+}
+.transactionList { display: grid; gap: 10px; margin-top: 14px; }
+.transactionRow {
+  display: grid;
+  grid-template-columns: 38px 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, .07);
+  border: 1px solid rgba(255, 255, 255, .11);
+}
+.transactionRow small { display: block; color: var(--muted); margin-top: 3px; }
+.transactionRow b { white-space: nowrap; }
+.incomeBadge,
+.expenseBadge {
+  width: 38px;
+  height: 38px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+}
+.incomeBadge { background: rgba(47, 191, 166, .22); color: #bdf8e8; }
+.expenseBadge { background: rgba(255, 122, 107, .2); color: #ffd0c9; }
+
+.calendarCard { padding: 24px; }
+.weekGrid,
+.monthGrid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
+.weekGrid { margin-bottom: 10px; color: rgba(255, 255, 255, .45); text-align: center; font-size: 12px; }
+.dayCell {
+  min-height: 76px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, .1);
+  background: rgba(255, 255, 255, .07);
+  color: rgba(255, 255, 255, .75);
+  padding: 9px;
+  text-align: left;
+}
+.dayCell b { display: block; margin-bottom: 10px; }
+.dayCell small { display: block; font-size: 11px; color: #ffd0c9; }
+.dayCell small.income { color: #bdf8e8; }
+.dayCell.hot { border-color: rgba(255, 122, 107, .35); background: rgba(255, 122, 107, .13); }
+.dayCell.selected { outline: 2px solid rgba(255, 255, 255, .44); color: #fff; }
+.dayDetailPanel { align-self: start; }
+.emptyState {
+  width: 100%;
+  min-height: 116px;
+  border-radius: 20px;
+  color: var(--muted);
+  margin: 16px 0;
+  display: grid;
+  place-items: center;
+}
+
+.calendarMoodPage {
+  width: min(100%, 1180px);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(520px, 1fr) 360px;
+  grid-template-rows: auto 1fr;
+  gap: 24px;
+}
+.calendarHeader {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  align-items: center;
+  gap: 18px;
+}
+.calendarHeader h1 {
+  margin: 0;
+  font-family: Fredoka, Pretendard, sans-serif;
+  font-size: 34px;
+  letter-spacing: 0;
+}
+.calendarHeader p {
+  margin: 8px 0 0;
+  color: rgba(255, 255, 255, .62);
+  font-size: 13px;
+}
+.calendarNavButtons {
+  display: flex;
+  gap: 8px;
+}
+.calendarNavButtons button {
+  width: 36px;
+  height: 36px;
+  border-radius: 13px;
+  border: 1px solid rgba(255, 255, 255, .24);
+  background: rgba(255, 255, 255, .09);
+  color: #fff;
+  font-size: 20px;
+}
+.emotionLegend {
+  justify-self: end;
+  display: flex;
+  gap: 14px;
+  color: rgba(255, 255, 255, .7);
+  font-size: 12px;
+}
+.emotionLegend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.legendDot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #5B8DEF;
+}
+.legendDot.anger { background: #FF7A6B; }
+.legendDot.anxious { background: #F5A623; }
+.legendDot.calm { background: #2FBFA6; }
+.legendDot.hot { background: #F25555; }
+.moodCalendarCard {
+  padding: 0;
+  height: 590px;
+  min-height: 590px;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  display: grid;
+  grid-template-rows: auto 1fr;
+}
+.moodWeekGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 7px;
+  margin-bottom: 10px;
+  color: rgba(255, 255, 255, .48);
+  font-size: 13px;
+  text-align: center;
+}
+.moodMonthGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  grid-template-rows: repeat(5, 1fr);
+  gap: 7px;
+  min-height: 0;
+}
+.moodDayCell {
+  min-height: 0;
+  border-radius: 28px;
+  border: 1px solid rgba(255, 255, 255, .14);
+  background: rgba(255, 255, 255, .06);
+  color: #fff;
+  padding: 16px 14px;
+  text-align: left;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  font-family: Fredoka, Pretendard, sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .12),
+    0 16px 34px -30px rgba(0, 0, 0, .78);
+}
+.moodDayCell.calm { background: rgba(135, 224, 211, .18); }
+.moodDayCell.lonely { background: rgba(144, 176, 255, .20); }
+.moodDayCell.anxious { background: rgba(255, 208, 130, .18); }
+.moodDayCell.anger { background: rgba(255, 157, 164, .17); }
+.moodDayCell.plain { background: rgba(205, 211, 229, .13); }
+.moodDayCell.empty { background: rgba(255, 255, 255, .026); color: rgba(255, 255, 255, .32); }
+.moodDayCell.disabled { opacity: .54; }
+.moodDayCell.selected {
+  outline: 2px solid rgba(255, 255, 255, .82);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .16),
+    0 0 0 4px rgba(91, 141, 239, .12),
+    0 18px 36px -24px rgba(91, 141, 239, .72);
+}
+.selectedDayPanel {
+  height: 590px;
+  min-height: 590px;
+  padding: 26px;
+  background:
+    radial-gradient(440px 380px at 50% 0%, rgba(91, 141, 239, .34), transparent 72%),
+    rgba(255, 255, 255, .09);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.selectedDayHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+.calendarAddButton {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, .34);
+  background: rgba(255, 255, 255, .16);
+  color: #fff;
+  font-size: 22px;
+  line-height: 1;
+  display: grid;
+  place-items: center;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .12);
+}
+.calendarAddButton:hover {
+  background: rgba(255, 255, 255, .24);
+}
+.panelEyebrow {
+  color: rgba(255, 255, 255, .55);
+  font-size: 13px;
+}
+.selectedDayPanel h2 {
+  margin: 10px 0 14px;
+  font-size: 28px;
+  line-height: 1.15;
+}
+.emotionPill {
+  width: fit-content;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 16px;
+  border-radius: 999px;
+  background: rgba(91, 141, 239, .42);
+  border: 1px solid rgba(255, 255, 255, .22);
+  color: #fff;
+  font-weight: 800;
+  font-size: 13px;
+}
+.emotionPill i {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #5B8DEF;
+}
+.daySummary {
+  margin: 28px 0 14px;
+  color: rgba(255, 255, 255, .55);
+  font-size: 13px;
+  flex: none;
+}
+.selectedRecordList {
+  display: grid;
+  gap: 10px;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 4px;
+  overscroll-behavior: contain;
+}
+.selectedRecordRow {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr) max-content;
+  gap: 12px;
+  align-items: center;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, .12);
+}
+.selectedRecordRow > div {
+  min-width: 0;
+}
+.recordIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 122, 107, .28);
+}
+.recordIcon.c2 { background: rgba(91, 141, 239, .25); }
+.recordIcon.c3 { background: rgba(245, 166, 35, .25); }
+.selectedRecordRow strong {
+  display: block;
+  font-size: 14px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.selectedRecordRow small {
+  display: block;
+  color: rgba(255, 255, 255, .52);
+  margin-top: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+.selectedRecordRow b {
+  font-family: Fredoka, Pretendard, sans-serif;
+  font-size: 16px;
+  white-space: nowrap;
+}
+.calendarAdvice {
+  flex: none;
+  margin-top: 16px;
+  padding: 18px;
+  border-radius: 20px;
+  border: 1px solid rgba(91, 141, 239, .48);
+  background: rgba(91, 141, 239, .22);
+  color: rgba(255, 255, 255, .9);
+  line-height: 1.6;
+  font-weight: 700;
+  font-size: 13px;
+}
+.calendarEmpty {
+  color: rgba(255, 255, 255, .55);
+  padding: 20px 0;
+}
+
+.calendarRecordLayer {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(4, 5, 18, .44);
+  backdrop-filter: blur(14px);
+}
+.calendarRecordModal {
+  position: relative;
+  width: min(100%, 680px);
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  padding: 22px;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, .16);
+  background:
+    radial-gradient(760px 320px at 58% 112%, rgba(243, 95, 168, .22), transparent 72%),
+    radial-gradient(680px 420px at 90% -10%, rgba(91, 141, 239, .20), transparent 70%),
+    rgba(32, 34, 58, .78);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .08),
+    0 34px 90px -40px rgba(0, 0, 0, .92);
+}
+.calendarRecordClose {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, .18);
+  background: rgba(255, 255, 255, .075);
+  color: #fff;
+  font-size: 28px;
+  line-height: 1;
+}
+.calendarRecordHeader h2 {
+  margin: 0;
+  font-size: 25px;
+  line-height: 1.05;
+  color: rgba(255, 255, 255, .96);
+}
+.calendarRecordHeader p {
+  margin: 9px 0 18px;
+  color: rgba(255, 255, 255, .76);
+  font-size: 13px;
+}
+.calendarTypeLine {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.calendarTypeLine > span {
+  color: rgba(255, 255, 255, .50);
+  font-size: 12px;
+  font-weight: 700;
+}
+.calendarTypeToggle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  width: 146px;
+  padding: 3px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, .18);
+  background: rgba(255, 255, 255, .045);
+}
+.calendarTypeToggle button {
+  min-height: 32px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: rgba(255, 255, 255, .60);
+  font-size: 13px;
+  font-weight: 850;
+}
+.calendarTypeToggle button.active {
+  background: rgba(91, 141, 239, .28);
+  color: #fff;
+  box-shadow: inset 0 0 0 1px rgba(91, 141, 239, .40);
+}
+.calendarTypeToggle button:nth-child(2).active {
+  background: rgba(255, 122, 107, .25);
+  box-shadow: inset 0 0 0 1px rgba(255, 122, 107, .38);
+}
+.calendarRecordInputCard {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, .15);
+  background: rgba(255, 255, 255, .090);
+}
+.calendarMemoInput,
+.calendarAmountInput {
+  display: grid;
+  gap: 8px;
+  color: rgba(255, 255, 255, .52);
+  font-size: 12px;
+  font-weight: 800;
+}
+.calendarMemoInput input,
+.calendarAmountInput input {
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  background: transparent;
+  color: rgba(255, 255, 255, .94);
+  outline: none;
+}
+.calendarMemoInput input {
+  min-height: 28px;
+  font-size: 15px;
+}
+.calendarAmountInput {
+  justify-items: end;
+  text-align: right;
+}
+.calendarAmountInput div {
+  display: flex;
+  align-items: baseline;
+  color: rgba(255, 255, 255, .96);
+  font-family: Fredoka, Pretendard, sans-serif;
+  font-size: 27px;
+  line-height: 1;
+  font-weight: 850;
+}
+.calendarAmountInput b {
+  font: inherit;
+}
+.calendarAmountInput input {
+  width: 108px;
+  font: inherit;
+  color: inherit;
+}
+.calendarRecordSelectedTags {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-top: 9px;
+  border-top: 1px solid rgba(255, 255, 255, .10);
+}
+.calendarRecordSelectedTags button {
+  min-height: 32px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, .16);
+  background: color-mix(in srgb, var(--tag-accent) 14%, rgba(255, 255, 255, .052));
+  color: rgba(255, 255, 255, .82);
+  padding: 0 12px;
+  font-size: 12px;
+  font-weight: 850;
+}
+.calendarRecordSelectedTags button span {
+  width: 8px;
+  height: 8px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: var(--tag-accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--tag-accent) 15%, transparent);
+}
+.calendarRecordSelectedTags button.active,
+.calendarRecordSelectedTags button:first-child.active {
+  background: color-mix(in srgb, var(--tag-accent) 24%, rgba(91, 141, 239, .16));
+  border-color: color-mix(in srgb, var(--tag-accent) 62%, rgba(91, 141, 239, .40));
+  color: #fff;
+}
+.calendarRecordSelectedTags i {
+  width: 1px;
+  height: 24px;
+  background: rgba(255, 255, 255, .82);
+}
+.calendarFormTagBox {
+  margin-top: 8px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, .08);
+  background: rgba(255, 255, 255, .040);
+  overflow: hidden;
+}
+.calendarFormTagRow {
+  display: grid;
+  grid-template-columns: 104px 1fr;
+  gap: 8px;
+  align-items: center;
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, .07);
+}
+.calendarFormTagRow:last-child { border-bottom: 0; }
+.calendarFormTagTitle {
+  display: grid;
+  grid-template-columns: 18px 1fr;
+  gap: 3px 7px;
+  align-items: center;
+}
+.calendarFormTagTitle span {
+  grid-row: span 2;
+  color: rgba(255, 255, 255, .88);
+  font-size: 12px;
+}
+.calendarFormTagTitle strong {
+  color: rgba(255, 255, 255, .92);
+  font-size: 12px;
+}
+.calendarFormTagTitle small {
+  color: rgba(255, 255, 255, .48);
+  font-size: 10px;
+}
+.calendarFormTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.calendarFormTag {
+  min-height: 30px;
+  min-width: 66px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, .16);
+  background: rgba(255, 255, 255, .055);
+  color: rgba(255, 255, 255, .78);
+  padding: 0 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 850;
+}
+.calendarFormTag i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--tag-accent);
+}
+.calendarFormTag.active {
+  background: color-mix(in srgb, var(--tag-accent) 24%, transparent);
+  border-color: color-mix(in srgb, var(--tag-accent) 72%, white 20%);
+  color: #fff;
+}
+.calendarRecordHint {
+  margin-top: 8px;
+  padding: 9px 12px;
+  border-radius: 999px;
+  background: rgba(138, 108, 255, .16);
+  color: rgba(255, 255, 255, .72);
+  font-size: 12px;
+  font-weight: 750;
+}
+.calendarRecordSave {
+  width: 100%;
+  min-height: 44px;
+  margin-top: 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, .18);
+  background: rgba(91, 141, 239, .34);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.parallelCard { grid-column: 1 / -1; }
+.parallelGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 16px;
+}
+.futureCard {
+  min-height: 146px;
+  border-radius: 20px;
+  padding: 18px;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  text-align: center;
+  gap: 8px;
+}
+.futureCard span {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, .12);
+  font-family: Fredoka, sans-serif;
+  font-weight: 800;
+}
+.futureCard small { color: var(--muted); }
+.futureCard.good { background: rgba(47, 191, 166, .18); border: 1px solid rgba(47, 191, 166, .4); }
+.futureCard.quiet { background: rgba(255, 255, 255, .06); border: 1px solid rgba(255, 255, 255, .13); }
+.reportCard b { color: #fff; }
+.insightStack {
+  display: grid;
+  gap: 10px;
+}
+.insightCard {
+  border-radius: 18px;
+  padding: 14px 16px;
+  border: 1px solid rgba(255, 255, 255, .16);
+}
+.insightCard strong {
+  display: block;
+  color: #fff;
+  margin-bottom: 5px;
+}
+.insightCard span {
+  display: block;
+  color: var(--soft);
+  font-size: 12px;
+  line-height: 1.5;
+}
+.insightCard.blue {
+  background: rgba(91, 141, 239, .16);
+  border-color: rgba(91, 141, 239, .4);
+}
+.insightCard.gold {
+  background: rgba(245, 166, 35, .14);
+  border-color: rgba(245, 166, 35, .4);
+}
+.insightCard.pink {
+  background: rgba(243, 95, 168, .13);
+  border-color: rgba(243, 95, 168, .34);
+}
+.barList { display: grid; gap: 13px; margin-top: 16px; }
+.barRow {
+  display: grid;
+  grid-template-columns: 70px 1fr 88px;
+  gap: 10px;
+  align-items: center;
+  font-size: 13px;
+}
+.barRow div {
+  height: 9px;
+  border-radius: 99px;
+  background: rgba(255, 255, 255, .13);
+  overflow: hidden;
+}
+.barRow i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--mint), var(--blue));
+}
+.barRow b { text-align: right; }
+
+.bottomNav { display: none; }
+.modalLayer {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(0, 0, 0, .36);
+  backdrop-filter: blur(10px);
+}
+.modalPanel {
+  width: min(620px, 100%);
+  max-height: min(760px, calc(100vh - 40px));
+  overflow-y: auto;
+  padding: 24px;
+  border-radius: 28px;
+  background:
+    radial-gradient(520px 360px at 72% 0%, rgba(91, 141, 239, .16), transparent 70%),
+    rgba(24, 24, 42, .82);
+  border: 1px solid rgba(255, 255, 255, .18);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(30px) saturate(160%);
+}
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 22px;
+}
+.modalHeader h2 { margin: 0; }
+.profilePanel { display: grid; gap: 18px; }
+.profileHero {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, .07);
+  border: 1px solid rgba(255, 255, 255, .12);
+}
+.profileHero span, .profileHero small { display: block; color: var(--muted); margin-top: 4px; }
+.profileHero.compact {
+  border-radius: 18px;
+  padding: 14px;
+  background: rgba(255, 255, 255, .075);
+  border: 1px solid rgba(255, 255, 255, .12);
+}
+.profileBackButton {
+  position: absolute;
+  top: 22px;
+  left: 22px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, .14);
+  background: rgba(255, 255, 255, .06);
+  color: #fff;
+  font-size: 24px;
+  line-height: 1;
+}
+.profileMenuList {
+  display: grid;
+  overflow: hidden;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, .10);
+  background: rgba(255, 255, 255, .055);
+}
+.profileMenuItem {
+  min-height: 78px;
+  display: grid;
+  grid-template-columns: 42px 1fr auto;
+  gap: 14px;
+  align-items: center;
+  border: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, .08);
+  background: transparent;
+  color: #fff;
+  text-align: left;
+  padding: 14px 16px;
+}
+.profileMenuItem:last-child {
+  border-bottom: 0;
+}
+.profileMenuItem strong,
+.profileMenuItem small {
+  display: block;
+}
+.profileMenuItem small {
+  margin-top: 4px;
+  color: rgba(255, 255, 255, .56);
+  font-size: 12px;
+}
+.profileMenuItem b {
+  color: rgba(255, 255, 255, .64);
+  font-size: 24px;
+}
+.profileMenuIcon {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: rgba(138, 108, 255, .32);
+  color: #fff;
+}
+.profileMenuIcon.goal { background: rgba(47, 191, 166, .30); }
+.profileMenuIcon.settings { background: rgba(91, 141, 239, .30); }
+.profileSubPage {
+  display: grid;
+  gap: 14px;
+  padding-top: 8px;
+}
+.profileEditAvatar {
+  position: relative;
+  justify-self: center;
+  margin: 4px 0 10px;
+}
+.profileEditAvatar span {
+  position: absolute;
+  right: -2px;
+  bottom: 0;
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(91, 141, 239, .9);
+  border: 1px solid rgba(255, 255, 255, .28);
+  font-size: 12px;
+}
+.goalProgressPreview {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  margin: 4px 0;
+  color: rgba(255, 255, 255, .64);
+  font-size: 13px;
+}
+.goalProgressPreview div {
+  height: 10px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, .11);
+}
+.goalProgressPreview i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: rgba(91, 141, 239, .72);
+}
+.goalProgressPreview b {
+  color: rgba(255, 255, 255, .72);
+  font-weight: 700;
+}
+.settingGroup {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, .055);
+  border: 1px solid rgba(255, 255, 255, .10);
+}
+.settingGroup strong {
+  color: rgba(255, 255, 255, .92);
+}
+.settingGroup label,
+.settingGroup button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 28px;
+  border: 0;
+  background: transparent;
+  color: rgba(255, 255, 255, .76);
+  text-align: left;
+  padding: 0;
+}
+.modalSection {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, .07);
+  border: 1px solid rgba(255, 255, 255, .12);
+}
+.modalSection h3 { margin: 0 0 2px; }
+
+@media (max-width: 1040px) {
+  .appShell { display: block; }
+  .sidebar { display: none; }
+  .moodMascot {
+    top: 22px;
+    left: 58%;
+    width: 45px;
+    height: 35px;
+    opacity: .58;
+    animation-duration: 16s;
+  }
+  .moodMascot::before,
+  .moodMascot::after {
+    top: 6px;
+    width: 12px;
+    height: 14px;
+  }
+  .mascotEye {
+    top: 15px;
+    width: 3px;
+    height: 5px;
+  }
+  .mascotEye.left { left: 14px; }
+  .mascotEye.right { right: 14px; }
+  .mascotMouth {
+    bottom: 8px;
+    width: 10px;
+    height: 4px;
+  }
+  .mainSurface {
+    height: auto;
+    min-height: 100vh;
+    padding: 26px 20px 108px;
+    max-width: 440px;
+    margin: 0 auto;
+  }
+  .profileButton {
+    display: grid;
+    place-items: center;
+  }
+  .bottomNav {
+    position: fixed;
+    left: 50%;
+    bottom: 18px;
+    transform: translateX(-50%);
+    z-index: 10;
+    width: min(390px, calc(100% - 40px));
+    height: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    border-radius: 24px;
+    background:
+      radial-gradient(260px 120px at 18% 120%, rgba(255, 122, 107, .18), transparent 70%),
+      rgba(255, 255, 255, .14);
+    border: 1px solid rgba(255, 255, 255, .30);
+    backdrop-filter: blur(30px) saturate(160%);
+    box-shadow: 0 14px 36px -12px rgba(0, 0, 0, .6);
+  }
+  .navButton {
+    min-width: 86px;
+    height: 56px;
+    border: 0;
+    background: transparent;
+    border-radius: 18px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    color: rgba(255, 255, 255, .52);
+    font-size: 10px;
+  }
+  .navButton.active {
+    background: transparent;
+    border-color: transparent;
+    box-shadow: none;
+    color: #fff;
+  }
+  .navButton.active svg {
+    stroke-width: 2.4;
+  }
+  .navGlyph { font-size: 19px; line-height: 1; }
+  .navGlyph {
+    display: grid;
+    place-items: center;
+  }
+  .homeGrid,
+  .calendarGrid,
+  .contentGrid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .recentPanel,
+  .parallelCard { grid-column: auto; }
+  .homeMain { grid-row: auto; }
+  .homeAside { gap: 16px; }
+  .pageLead h1 { font-size: 26px; }
+  .glassCard { border-radius: 24px; padding: 18px; }
+  .emotionExpenseCard {
+    gap: 22px;
+    padding: 22px;
+    border-radius: 26px;
+  }
+  .emotionFlowCard {
+    padding: 20px;
+    border-radius: 24px;
+  }
+  .emotionBars {
+    height: 118px;
+    gap: 8px;
+  }
+  .emotionFlowLegend {
+    flex-wrap: wrap;
+  }
+  .emotionExpenseHeader {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  .expenseSaveButton {
+    justify-self: start;
+    min-height: 38px;
+    min-width: 68px;
+  }
+  .emotionExpenseHeader h2 {
+    font-size: 21px;
+  }
+  .emotionExpenseHeader p {
+    font-size: 12px;
+  }
+  .expensePreviewCard {
+    gap: 24px;
+    padding: 16px;
+    border-radius: 18px;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+  }
+  .expensePreviewTop {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    grid-column: auto;
+  }
+  .amountInput {
+    grid-column: auto;
+    grid-row: auto;
+    justify-items: start;
+    text-align: left;
+  }
+  .amountEditable {
+    min-width: 124px;
+    font-size: 24px;
+  }
+  .amountEditable input {
+    width: 108px;
+  }
+  .selectedMoodTags {
+    grid-column: auto;
+    grid-row: auto;
+  }
+  .emotionChipGrid {
+    gap: 8px;
+  }
+  .moodChip,
+  .emotionChipGrid .moodChip {
+    min-height: 33px;
+    padding: 0 12px;
+    font-size: 12px;
+  }
+  .formGrid,
+  .dateGrid,
+  .parallelGrid { grid-template-columns: 1fr; }
+  .calendarCard { padding: 16px; }
+  .monthGrid { gap: 6px; }
+  .dayCell { min-height: 54px; border-radius: 14px; padding: 7px; }
+  .dayCell b { margin-bottom: 6px; }
+  .calendarMoodPage {
+    width: 100%;
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .calendarHeader {
+    grid-template-columns: 1fr auto;
+    gap: 10px;
+  }
+  .calendarHeader h1 {
+    font-size: 28px;
+  }
+  .calendarHeader p {
+    font-size: 12px;
+  }
+  .emotionLegend {
+    display: none;
+  }
+  .moodCalendarCard {
+    height: auto;
+    min-height: auto;
+    padding: 0;
+    border-radius: 0;
+    width: 100%;
+    margin: 0 auto;
+  }
+  .moodWeekGrid {
+    gap: 5px;
+    font-size: 11px;
+  }
+  .moodMonthGrid {
+    gap: 6px;
+    grid-template-rows: auto;
+  }
+  .moodDayCell {
+    min-height: 0;
+    aspect-ratio: 1 / 1;
+    border-radius: 17px;
+    padding: 8px;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-size: 13px;
+  }
+  .selectedDayPanel {
+    height: auto;
+    min-height: 170px;
+    padding: 18px;
+    border-radius: 24px;
+  }
+  .selectedDayPanel h2 {
+    font-size: 17px;
+    margin: 7px 0 12px;
+  }
+  .daySummary {
+    margin: 16px 0 12px;
+  }
+  .selectedRecordRow {
+    grid-template-columns: 36px 1fr auto;
+    padding-bottom: 11px;
+  }
+  .recordIcon {
+    width: 36px;
+    height: 36px;
+    border-radius: 12px;
+  }
+  .calendarAdvice {
+    display: none;
+  }
+  .loginPage {
+    grid-template-columns: 1fr;
+    align-content: center;
+    padding: 26px 20px;
+  }
+  .loginHero h1 { margin-top: 34px; font-size: 42px; }
+  .calendarRecordLayer {
+    padding: 14px;
+    place-items: center;
+  }
+  .calendarRecordModal {
+    width: min(100%, 360px);
+    max-height: calc(100vh - 96px);
+    padding: 16px 13px;
+    border-radius: 20px;
+  }
+  .calendarRecordClose {
+    width: 30px;
+    height: 30px;
+    top: 12px;
+    right: 12px;
+    font-size: 22px;
+  }
+  .calendarRecordHeader h2 {
+    padding-right: 36px;
+    font-size: 20px;
+  }
+  .calendarRecordHeader p {
+    margin: 7px 0 12px;
+    font-size: 11px;
+    line-height: 1.45;
+  }
+  .calendarTypeLine {
+    align-items: center;
+    flex-direction: row;
+    gap: 10px;
+    margin-bottom: 9px;
+  }
+  .calendarTypeToggle {
+    width: 124px;
+  }
+  .calendarTypeToggle button {
+    min-height: 28px;
+    font-size: 11px;
+  }
+  .calendarTypeLine > span {
+    font-size: 11px;
+  }
+  .calendarRecordInputCard {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px 10px;
+    padding: 11px;
+    border-radius: 15px;
+  }
+  .calendarMemoInput,
+  .calendarAmountInput {
+    gap: 7px;
+    font-size: 11px;
+  }
+  .calendarMemoInput input {
+    min-height: 24px;
+    font-size: 12px;
+  }
+  .calendarAmountInput {
+    justify-items: end;
+    text-align: right;
+  }
+  .calendarAmountInput div {
+    font-size: 22px;
+  }
+  .calendarAmountInput input {
+    width: 94px;
+  }
+  .calendarRecordSelectedTags {
+    gap: 7px;
+    flex-wrap: wrap;
+    padding-top: 8px;
+  }
+  .calendarRecordSelectedTags button {
+    min-height: 28px;
+    padding: 0 9px;
+    font-size: 10px;
+  }
+  .calendarRecordSelectedTags button span {
+    width: 8px;
+    height: 8px;
+    padding: 0;
+    min-height: 0;
+    font-size: 0;
+  }
+  .calendarFormTagRow {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    padding: 11px 12px;
+  }
+  .calendarFormTagTitle strong {
+    font-size: 12px;
+  }
+  .calendarFormTagTitle small {
+    font-size: 10px;
+  }
+  .calendarFormTags {
+    gap: 6px;
+  }
+  .calendarFormTag {
+    min-width: auto;
+    min-height: 30px;
+    padding: 0 10px;
+    font-size: 11px;
+  }
+  .calendarRecordHint {
+    border-radius: 14px;
+    padding: 9px 11px;
+    font-size: 10px;
+  }
+  .calendarRecordSave {
+    min-height: 40px;
+    border-radius: 15px;
+    font-size: 14px;
+  }
+}
+
+@media (min-width: 1041px) {
+  .navButton { display: none; }
+}
