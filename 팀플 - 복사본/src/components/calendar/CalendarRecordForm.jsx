@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { parseMoney } from '../../utils/money.js';
+import { formatKoreanDateWithWeekday } from '../../utils/date.js';
 
 const categories = [
   { id: 'c1', label: '#배달', title: '배달', color: '#5CC8FF' },
@@ -59,6 +60,7 @@ function TagRow({ icon, title, caption, items, selected, onSelect }) {
 }
 
 export default function CalendarRecordForm({ selectedDate, selectedDay, onClose, onSubmit }) {
+  const selectedDateLabel = formatKoreanDateWithWeekday(`${selectedDate}T00:00:00`);
   const [type, setType] = useState('EXPENSE');
   const [memo, setMemo] = useState('퇴근 후 너무 지쳐서 안전한 메뉴로 주문했다.');
   const [amount, setAmount] = useState('14,500');
@@ -135,7 +137,7 @@ export default function CalendarRecordForm({ selectedDate, selectedDay, onClose,
       <section className="calendarRecordModal" role="dialog" aria-modal="true" aria-label={`${selectedDay}일 기록 추가`} onMouseDown={event => event.stopPropagation()}>
         <button type="button" className="calendarRecordClose" onClick={onClose} aria-label="닫기">×</button>
         <header className="calendarRecordHeader">
-          <h2>6월 {selectedDay}일 기록 추가</h2>
+          <h2>{selectedDateLabel} 기록 추가</h2>
           <p>기억나는 만큼만 가볍게 남겨볼까요?</p>
         </header>
 

@@ -51,7 +51,7 @@ export default function App() {
           <HomePage state={state} onAddTransaction={actions.addTransaction} onProfile={() => setProfileOpen(true)} />
         )}
         {currentTab === 'calendar' && (
-          <CalendarPage state={state} onAddTransaction={actions.addTransaction} />
+          <CalendarPage state={state} onAddTransaction={actions.addTransaction} onRemoveTransaction={actions.removeTransaction} />
         )}
         {currentTab === 'content' && (
           <ContentPage state={state} />

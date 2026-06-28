@@ -1563,8 +1563,17 @@ input, textarea {
   grid-template-columns: 40px minmax(0, 1fr) max-content;
   gap: 12px;
   align-items: center;
-  padding-bottom: 12px;
+  padding: 8px 0 12px;
   border-bottom: 1px solid rgba(255, 255, 255, .12);
+  border-radius: 16px;
+  cursor: pointer;
+  transition: background .16s ease, padding .16s ease;
+}
+.selectedRecordRow.deleteOpen {
+  grid-template-columns: 40px minmax(0, 1fr) max-content max-content;
+  padding-left: 10px;
+  padding-right: 10px;
+  background: rgba(255, 255, 255, .055);
 }
 .selectedRecordRow > div {
   min-width: 0;
@@ -3570,4 +3579,81 @@ input, textarea {
 }
 .calendarRecordSelectedTags > i {
   display: none;
+}
+
+.signalBlobWrap {
+  justify-self: end;
+  align-self: center;
+  display: grid;
+  place-items: center;
+  width: 150px;
+  height: 154px;
+}
+.signalBlobWrap > div {
+  max-width: 100%;
+}
+
+@media (max-width: 1040px) {
+  .signalBlobWrap {
+    justify-self: center;
+    width: 132px;
+    height: 136px;
+  }
+}
+@keyframes eb-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes eb-breathe{0%,100%{transform:scale(1,1)}50%{transform:scale(1.03,.97)}}
+@keyframes eb-squish{0%{transform:scale(1,1)}18%{transform:scale(1.22,.8)}38%{transform:scale(.86,1.14)}56%{transform:scale(1.08,.94)}74%{transform:scale(.97,1.03)}88%{transform:scale(1.01,.99)}100%{transform:scale(1,1)}}
+@keyframes eb-morph{0%,100%{border-radius:46% 54% 60% 40%/58% 52% 48% 42%}33%{border-radius:58% 42% 46% 54%/50% 58% 42% 50%}66%{border-radius:42% 58% 54% 46%/60% 44% 56% 40%}}
+.moodMonthGrid {
+  grid-template-rows: repeat(6, 1fr);
+}
+.moodDayCell.blank {
+  pointer-events: none;
+  visibility: hidden;
+}
+.moodDayCell.today:not(.selected) {
+  border-color: rgba(255, 255, 255, .22);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .14),
+    0 16px 34px -30px rgba(0, 0, 0, .78);
+}
+.recordDeleteButton {
+  min-width: 48px;
+  height: 32px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, .16);
+  background: rgba(255, 255, 255, .07);
+  color: rgba(255, 255, 255, .72);
+  font-size: 12px;
+  font-weight: 850;
+}
+.recordDeleteButton:hover {
+  border-color: rgba(255, 122, 107, .52);
+  background: rgba(255, 122, 107, .16);
+  color: #fff;
+}
+.moodRidgeCard {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+}
+.moodRidgeHeader {
+  margin-bottom: 0;
+}
+.moodRidgeSvg {
+  position: relative;
+  z-index: 1;
+  display: block;
+  margin-top: 4px;
+}
+.moodRidgeCaption {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  color: rgba(255, 255, 255, .58);
+  font-size: 14px;
+  font-weight: 750;
+}
+.moodRidgeCaption span {
+  font-weight: 850;
 }

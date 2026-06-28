@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { parseMoney } from '../../utils/money.js';
+import { MoodRidge } from './MoodRidge.jsx';
 
 const categoryChips = [
   { tagId: 'c1', label: '#배달', title: '배달', color: '#8EA0C8' },
@@ -25,7 +26,7 @@ const situationChips = [
   { tagId: 's4', label: '#충동소비', color: '#FF6666' }
 ];
 
-const flowItems = [
+export const monthlyEmotionFlowItems = [
   { label: '외로움', value: '38%', color: '#6EA0FF' },
   { label: '불안', value: '22%', color: '#F7B844' },
   { label: '평온', value: '15%', color: '#46D3BC' },
@@ -70,31 +71,13 @@ function TagPickerSection({ chips, selectedIds, onSelect }) {
 }
 
 export function EmotionWaveCard() {
-  return (
-    <section className="homeEmotionWave" aria-label="감정소비 흐름">
-      <div className="homeEmotionWaveHeader">
-        <h3>감정소비 흐름 <span>i</span></h3>
-      </div>
-      <div className="emotionWaveArt" aria-hidden="true">
-        <i className="waveLayer waveBlue" />
-        <i className="waveLayer waveMint" />
-        <i className="waveLayer wavePink" />
-        <i className="waveLayer waveGold" />
-      </div>
-      <div className="emotionWaveLegend">
-        {flowItems.map(item => (
-          <span key={item.label}>
-            <i style={{ background: item.color }} />
-            <b>{item.label}</b>
-            <em>{item.value}</em>
-          </span>
-        ))}
-      </div>
-      <p className="emotionWaveNote">✧ 이번 달은 외로움 소비가 가장 많이 쌓였어요.</p>
-    </section>
-  );
-}
+  const ridgeData = monthlyEmotionFlowItems.map(item => ({
+    name: item.label,
+    value: Number(String(item.value).replace('%', '')) || 0
+  }));
 
+  return <MoodRidge data={ridgeData} />;
+}
 export default function EmotionExpenseCard({ onSubmit }) {
   const [transactionType, setTransactionType] = useState('EXPENSE');
   const [amount, setAmount] = useState('14500');

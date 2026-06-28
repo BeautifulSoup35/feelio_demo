@@ -1,6 +1,9 @@
 import GlassCard from '../components/common/GlassCard.jsx';
-import EmotionExpenseCard, { EmotionWaveCard } from '../components/home/EmotionExpenseCard.jsx';
+import EmotionExpenseCard, { EmotionWaveCard, monthlyEmotionFlowItems } from '../components/home/EmotionExpenseCard.jsx';
+import { EmotionBlob } from '../components/home/EmotionBlob.jsx';
 import { formatMoney } from '../utils/money.js';
+import { formatKoreanDateWithWeekday, toDateKey, todayKey } from '../utils/date.js';
+import { emotionPercent, makeEmotionSignalMessage, topEmotion, topTaggedEmotion } from '../utils/emotionInsights.js';
 
 export default function HomePage({ state, onAddTransaction, onProfile }) {
   const mainGoal = state.goals.find(goal => goal.isMain) || state.goals[0];
@@ -12,12 +15,24 @@ export default function HomePage({ state, onAddTransaction, onProfile }) {
     .reduce((sum, item) => sum + item.amount, 0);
   const leakRate = expenseTotal ? Math.round((emotionalExpense / expenseTotal) * 100) : 0;
   const goalRate = Math.min(100, Math.round((mainGoal.currentAmount / mainGoal.targetAmount) * 100));
+  const topMonthlyEmotion = topEmotion(monthlyEmotionFlowItems);
+  const today = todayKey();
+  const todayEmotionSummary = topTaggedEmotion(
+    state.transactions.filter(item => (
+      item.transactionType === 'EXPENSE' && toDateKey(item.transactionAt) === today
+    )),
+    state.tags
+  );
+  const signalEmotion = todayEmotionSummary.emotion || topMonthlyEmotion;
+  const signalPercent = todayEmotionSummary.percent || emotionPercent(monthlyEmotionFlowItems, signalEmotion);
+  const signalMessage = makeEmotionSignalMessage(signalEmotion, signalPercent);
+  const todayLabel = formatKoreanDateWithWeekday(new Date());
 
   return (
     <div className="pageGrid homeGrid">
       <div className="pageLead">
         <div>
-          <p>6월 25일 목요일</p>
+          <p>{todayLabel}</p>
           <h1>안녕, {state.user.nickname}</h1>
         </div>
         <button type="button" className="profileButton" onClick={onProfile}>{state.user.nickname.slice(0, 1)}</button>
@@ -44,12 +59,15 @@ export default function HomePage({ state, onAddTransaction, onProfile }) {
               <span>AI 코멘트</span>
               <strong>오늘의 소비 신호</strong>
             </div>
-            <p className="cardText">스트레스 태그가 붙은 소비가 전체 흐름의 32%를 차지해요. 야근 직장인은 결제 전 10분 쉬어가기 루틴을 추천합니다.</p>
+            <p className="cardText">{signalMessage}</p>
           </div>
-          <div className="signalBlob" aria-hidden="true">
-            <span className="signalEye left" />
-            <span className="signalEye right" />
-            <span className="signalMouth" />
+          <div className="signalBlobWrap">
+            <EmotionBlob
+              emotion={signalEmotion}
+              size={150}
+              variant="svg"
+              interactive={true}
+            />
           </div>
         </GlassCard>
 

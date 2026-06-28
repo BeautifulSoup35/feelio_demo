@@ -42,6 +42,12 @@ export function useAppStore() {
         ]
       }));
     },
+    removeTransaction(transactionId) {
+      setState(prev => ({
+        ...prev,
+        transactions: prev.transactions.filter(transaction => transaction.transactionId !== transactionId)
+      }));
+    },
     updateGoal(goalPatch) {
       setState(prev => ({
         ...prev,
