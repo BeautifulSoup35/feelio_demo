@@ -2305,3 +2305,623 @@ input, textarea {
 @media (min-width: 1041px) {
   .navButton { display: none; }
 }
+
+/* ==========================================================================
+   DAY THEME OVERRIDES (Pastel Watercolor & Glassmorphism Theme)
+   ========================================================================== */
+body.theme-day {
+  background: #f0f7fb !important;
+  color: #2c2c40 !important;
+}
+
+.theme-day {
+  --ink: #2c2c40;
+  --muted: rgba(44, 44, 64, 0.48);
+  --soft: rgba(44, 44, 64, 0.68);
+  --glass: rgba(255, 255, 255, 0.58);
+  --glass-strong: rgba(255, 255, 255, 0.78);
+  --line: rgba(255, 255, 255, 0.65);
+  --shadow: 0 16px 48px -18px rgba(44, 44, 64, 0.08), 0 4px 14px -5px rgba(44, 44, 64, 0.03);
+}
+
+/* Background Gradients in Day Theme */
+.theme-day .appShell {
+  background: linear-gradient(135deg, #e0f2fe 0%, #fef08a 40%, #dcfce7 80%, #f0fdf4 100%) !important;
+}
+
+/* Aurora adjustments for Day Theme */
+.theme-day .aurora.a1 {
+  background: radial-gradient(circle, rgba(14, 165, 233, 0.35), transparent 70%);
+}
+.theme-day .aurora.a2 {
+  background: radial-gradient(circle, rgba(34, 197, 94, 0.22), transparent 70%);
+}
+.theme-day .aurora.a3 {
+  background: radial-gradient(circle, rgba(234, 179, 8, 0.22), transparent 70%);
+}
+
+/* Sidebar Styling in Day Theme */
+.theme-day .sidebar {
+  background: 
+    radial-gradient(300px 360px at 42% -8%, rgba(254, 240, 138, 0.25), transparent 68%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.3));
+  border-right: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.3);
+}
+
+.theme-day .sideButton {
+  color: rgba(44, 44, 64, 0.6);
+}
+
+.theme-day .sideButton.active {
+  color: #1c1c32;
+  background: rgba(255, 255, 255, 0.65);
+  border-color: rgba(255, 255, 255, 0.85);
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.6),
+    0 12px 28px -14px rgba(91, 141, 239, 0.25);
+}
+
+.theme-day .sideButton:hover {
+  background: rgba(255, 255, 255, 0.45);
+  color: rgba(44, 44, 64, 0.85);
+}
+
+.theme-day .profileMini {
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.35);
+  color: #2c2c40;
+}
+
+.theme-day .profileMini small {
+  color: rgba(44, 44, 64, 0.5);
+}
+
+/* Page Header in Day Theme */
+.theme-day .pageLead h1 {
+  color: #1e293b;
+}
+.theme-day .pageLead p {
+  color: rgba(44, 44, 64, 0.5);
+}
+
+/* Glass Card text / title overrides in Day Theme */
+.theme-day .glassCard,
+.theme-day .loginCard {
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.48);
+  box-shadow: 0 16px 48px -18px rgba(44, 44, 64, 0.08), 0 4px 14px -5px rgba(44, 44, 64, 0.03);
+}
+
+.theme-day .cardText {
+  color: rgba(44, 44, 64, 0.7);
+}
+
+.theme-day .sectionTitle strong,
+.theme-day .metricHeader strong {
+  color: #1e293b;
+}
+
+/* Input boxes in EmotionExpenseCard.jsx */
+.theme-day .merchantInput input,
+.theme-day .amountInput input,
+.theme-day .amountEditable {
+  color: #1e293b;
+  caret-color: #1e293b;
+}
+
+.theme-day .merchantInput input::placeholder,
+.theme-day .amountEditable input::placeholder {
+  color: rgba(44, 44, 64, 0.4);
+}
+
+.theme-day .merchantInput,
+.theme-day .amountInput {
+  color: rgba(44, 44, 64, 0.5);
+}
+
+.theme-day .expensePreviewCard {
+  background: rgba(255, 255, 255, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.theme-day .homeActionCluster {
+  background: rgba(255, 255, 255, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.theme-day .homeTypeToggle button {
+  color: rgba(44, 44, 64, 0.6);
+}
+
+.theme-day .homeTypeToggle button.active {
+  background: #fff;
+  color: #1e293b;
+  box-shadow: 0 4px 12px -3px rgba(44, 44, 64, 0.1);
+}
+
+.theme-day .expenseSaveButton {
+  background: #2fbfa6;
+  color: #fff;
+}
+
+/* Interactive tag selection layout */
+.theme-day .pickerCategoryChip {
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  color: rgba(44, 44, 64, 0.7);
+}
+
+.theme-day .pickerCategoryChip.active {
+  background: #fff;
+  border-color: var(--chip-accent);
+  color: #1e293b;
+}
+
+/* Chips in tag picker */
+.theme-day .moodChip {
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  color: rgba(44, 44, 64, 0.8);
+}
+.theme-day .moodChip:hover {
+  background: #fff;
+  border-color: var(--chip-accent);
+}
+
+/* Theme Toggle Button styling */
+.sidebarThemeToggle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  padding: 4px;
+  margin: 18px 0;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.themeToggleBtn {
+  height: 36px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.themeToggleBtn.active {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.18);
+  color: #fff;
+}
+
+.theme-day .sidebarThemeToggle {
+  background: rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.theme-day .themeToggleBtn {
+  color: rgba(44, 44, 64, 0.5);
+}
+
+.theme-day .themeToggleBtn.active {
+  background: #fff;
+  border-color: rgba(255, 255, 255, 0.9);
+  color: #1c1c32;
+  box-shadow: 0 4px 12px -3px rgba(44, 44, 64, 0.08);
+}
+
+/* Mobile Theme Toggle Button styling */
+.themeToggleButtonMobile {
+  display: none;
+}
+
+@media (max-width: 1040px) {
+  .themeToggleButtonMobile {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--glass);
+    border: 1px solid var(--line);
+    font-size: 18px;
+    cursor: pointer;
+    color: var(--ink);
+    transition: all 0.2s ease;
+  }
+  .theme-day .themeToggleButtonMobile {
+    background: rgba(255, 255, 255, 0.6);
+    border-color: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 4px 10px -3px rgba(44, 44, 64, 0.06);
+  }
+}
+
+/* Interactive AI Comment Card Selectors */
+.aiEmotionSelectorLabel {
+  font-size: 11px;
+  color: var(--muted);
+  margin-bottom: 8px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.aiEmotionSelector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.aiEmotionMiniChip {
+  position: relative;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.aiEmotionMiniChip:hover {
+  transform: scale(1.1);
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.aiEmotionMiniChip.active {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.35);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.15);
+  transform: scale(1.1);
+}
+
+.aiEmotionMiniChip.hasSpent {
+  background: rgba(91, 141, 239, 0.12);
+  border-color: rgba(91, 141, 239, 0.35);
+}
+
+.aiEmotionMiniChip.hasSpent.active {
+  background: rgba(91, 141, 239, 0.24);
+  border-color: rgba(91, 141, 239, 0.6);
+}
+
+.theme-day .aiEmotionMiniChip {
+  background: rgba(255, 255, 255, 0.5);
+  border-color: rgba(255, 255, 255, 0.7);
+}
+
+.theme-day .aiEmotionMiniChip:hover {
+  background: #fff;
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+.theme-day .aiEmotionMiniChip.active {
+  background: #fff;
+  border-color: rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 10px -3px rgba(44, 44, 64, 0.1);
+}
+
+.theme-day .aiEmotionMiniChip.hasSpent {
+  background: rgba(91, 141, 239, 0.12);
+  border-color: rgba(91, 141, 239, 0.35);
+}
+
+.theme-day .aiEmotionMiniChip.hasSpent.active {
+  background: rgba(91, 141, 239, 0.2);
+  border-color: rgba(91, 141, 239, 0.5);
+}
+
+.miniChipEmoji {
+  font-size: 15px;
+}
+
+.spentDot {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background-color: #5b8def;
+}
+
+.commentHighlight {
+  font-style: italic;
+  font-size: 14px;
+  color: var(--soft);
+  line-height: 1.5;
+}
+
+/* Insight Cards in Content Page Day theme overrides */
+.theme-day .insightCard {
+  border: 1px solid rgba(255, 255, 255, 0.6) !important;
+}
+
+.theme-day .insightCard.blue {
+  background: rgba(91, 141, 239, 0.12) !important;
+  color: #2b3d63 !important;
+}
+.theme-day .insightCard.gold {
+  background: rgba(245, 166, 35, 0.12) !important;
+  color: #63430e !important;
+}
+.theme-day .insightCard.pink {
+  background: rgba(243, 95, 168, 0.12) !important;
+  color: #632343 !important;
+}
+
+.theme-day .insightCard strong {
+  color: inherit !important;
+}
+.theme-day .insightCard span {
+  color: rgba(44, 44, 64, 0.78) !important;
+}
+
+/* Calendar Day Cell Overrides in Day Theme */
+.theme-day .moodDayCell {
+  color: rgba(44, 44, 64, 0.8) !important;
+  background: rgba(255, 255, 255, 0.3) !important;
+  border: 1px solid rgba(255, 255, 255, 0.4) !important;
+}
+
+.theme-day .moodDayCell:hover {
+  background: rgba(255, 255, 255, 0.6) !important;
+  border-color: rgba(255, 255, 255, 0.8) !important;
+}
+
+.theme-day .moodDayCell.selected {
+  background: #fff !important;
+  border-color: rgba(44, 44, 64, 0.3) !important;
+  box-shadow: 0 4px 10px -3px rgba(44, 44, 64, 0.1) !important;
+}
+
+.theme-day .moodDayCell.disabled {
+  color: rgba(44, 44, 64, 0.25) !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-color: transparent !important;
+}
+
+.theme-day .moodDayCell.lonely { background: rgba(91, 141, 239, 0.25) !important; border-color: rgba(91, 141, 239, 0.4) !important; }
+.theme-day .moodDayCell.anxious { background: rgba(245, 166, 35, 0.25) !important; border-color: rgba(245, 166, 35, 0.4) !important; }
+.theme-day .moodDayCell.calm { background: rgba(47, 191, 166, 0.25) !important; border-color: rgba(47, 191, 166, 0.4) !important; }
+.theme-day .moodDayCell.anger { background: rgba(255, 122, 107, 0.25) !important; border-color: rgba(255, 122, 107, 0.4) !important; }
+.theme-day .moodDayCell.plain { background: rgba(154, 160, 180, 0.25) !important; border-color: rgba(154, 160, 180, 0.4) !important; }
+
+/* Progress bar rail in Day Theme */
+.theme-day .progressTrack {
+  background: rgba(44, 44, 64, 0.08) !important;
+}
+
+/* ==========================================================================
+   EDIT MODE TOGGLE & DIFFICULTY ALERT STYLES (목표/예산 설정 추가 디자인)
+   ========================================================================== */
+.editToggleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 20px;
+}
+.theme-day .editToggleRow {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.05);
+}
+
+.editToggleRow span {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--soft);
+}
+
+.toggleSwitch {
+  position: relative;
+  display: inline-block;
+  width: 46px;
+  height: 24px;
+}
+
+.toggleSwitch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggleSlider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  transition: .3s;
+  border-radius: 24px;
+}
+
+.theme-day .toggleSlider {
+  background-color: rgba(0, 0, 0, 0.08);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+.toggleSlider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 3px;
+  bottom: 3px;
+  background-color: #fff;
+  transition: .3s;
+  border-radius: 50%;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.toggleSwitch input:checked + .toggleSlider {
+  background-color: #2fbfa6;
+  border-color: rgba(47, 191, 166, 0.4);
+}
+
+.toggleSwitch input:checked + .toggleSlider:before {
+  transform: translateX(22px);
+}
+
+/* Custom Dropdown select styling */
+.profileSubPage select {
+  width: 100%;
+  min-height: 48px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, .12);
+  background: rgba(255, 255, 255, .06);
+  padding: 0 16px;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  outline: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  background-size: 16px;
+}
+
+.theme-day .profileSubPage select {
+  border-color: rgba(0, 0, 0, .1);
+  background: rgba(255, 255, 255, .6);
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%232c2c40' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
+}
+
+.profileSubPage select:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Difficulty Alerts inside Goal Settings */
+.difficultyAlert {
+  display: flex;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  margin-top: 18px;
+  font-size: 13px;
+  line-height: 1.5;
+  transition: all 0.3s ease;
+}
+
+.difficultyAlert.easy {
+  background: rgba(47, 191, 166, 0.12);
+  border: 1px solid rgba(47, 191, 166, 0.3);
+  color: #2fbfa6;
+}
+.theme-day .difficultyAlert.easy {
+  background: rgba(47, 191, 166, 0.08);
+  color: #1e7d6c;
+}
+
+.difficultyAlert.normal {
+  background: rgba(245, 166, 35, 0.12);
+  border: 1px solid rgba(245, 166, 35, 0.3);
+  color: #f5a623;
+}
+.theme-day .difficultyAlert.normal {
+  background: rgba(245, 166, 35, 0.08);
+  color: #8c5d0c;
+}
+
+.difficultyAlert.hard {
+  background: rgba(242, 85, 85, 0.12);
+  border: 1px solid rgba(242, 85, 85, 0.3);
+  color: #f25555;
+  animation: pulseWarning 2s infinite alternate;
+}
+.theme-day .difficultyAlert.hard {
+  background: rgba(242, 85, 85, 0.08);
+  color: #ad3232;
+}
+
+@keyframes pulseWarning {
+  0% { box-shadow: 0 0 0 0 rgba(242, 85, 85, 0.2); }
+  100% { box-shadow: 0 0 12px 2px rgba(242, 85, 85, 0.3); }
+}
+
+.difficultyText strong {
+  display: block;
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+
+.difficultyText p {
+  margin: 0;
+  opacity: 0.85;
+}
+
+/* Sub-section titles & spacing */
+.subSectionTitle {
+  font-size: 14px;
+  font-weight: 700;
+  margin: 24px 0 12px;
+  color: var(--ink);
+}
+
+.budgetGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.savingRateInputWrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.savingRateInputWrapper input {
+  width: 80px !important;
+}
+
+.savingRateInputWrapper span {
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--soft);
+}
+
+/* Side-by-Side Goal Modal Split Layout */
+.goalSplitLayout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+.goalSplitCol {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Adjust layout on smaller modal size or viewport */
+@media (max-width: 600px) {
+  .goalSplitLayout {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+}

@@ -7,7 +7,7 @@ const tabs = [
   { key: 'content', label: '콘텐츠', Icon: ContentIcon }
 ];
 
-export default function Sidebar({ currentTab, onChange, user, onProfile }) {
+export default function Sidebar({ currentTab, onChange, user, onProfile, theme, onToggleTheme }) {
   return (
     <aside className="sidebar">
       <Logo />
@@ -24,6 +24,26 @@ export default function Sidebar({ currentTab, onChange, user, onProfile }) {
           </button>
         ))}
       </div>
+      
+      <div className="sidebarThemeToggle">
+        <button
+          type="button"
+          className={`themeToggleBtn ${theme === 'day' ? 'active' : ''}`}
+          onClick={() => theme !== 'day' && onToggleTheme()}
+          aria-label="라이트 테마"
+        >
+          ☀️ 데이
+        </button>
+        <button
+          type="button"
+          className={`themeToggleBtn ${theme === 'night' ? 'active' : ''}`}
+          onClick={() => theme !== 'night' && onToggleTheme()}
+          aria-label="다크 테마"
+        >
+          🌙 나이트
+        </button>
+      </div>
+
       <button type="button" className="profileMini" onClick={onProfile}>
         <span className="profileAvatar">{user.nickname.slice(0, 1)}</span>
         <span>

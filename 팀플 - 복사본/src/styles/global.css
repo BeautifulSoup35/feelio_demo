@@ -1900,32 +1900,85 @@ input, textarea {
   gap: 12px;
   margin-top: 16px;
 }
-.futureCard {
+.futureCardWrapper {
+  perspective: 1000px;
+  cursor: pointer;
+  height: 124px;
   width: 100%;
-  min-height: 146px;
+}
+.futureCardInner {
+  position: relative;
+  width: 100%;
+  height: 100%;
   border-radius: 20px;
-  padding: 18px;
-  display: grid;
-  align-content: center;
-  justify-items: center;
-  text-align: center;
-  gap: 8px;
+  transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
+  transform-style: preserve-3d;
   color: #fff;
 }
-.futureCard span {
-  width: 44px;
-  height: 44px;
-  display: grid;
-  place-items: center;
-  border-radius: 16px;
-  background: rgba(255, 255, 255, .12);
-  font-family: Fredoka, sans-serif;
+.futureCardWrapper.flipped .futureCardInner {
+  transform: rotateX(180deg);
+}
+.futureCardFront,
+.futureCardBack {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 20px;
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  text-align: left;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  box-sizing: border-box;
+}
+.futureCardFront {
+  z-index: 2;
+}
+.futureCardBack {
+  transform: rotateX(180deg);
+  background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+.futureIcon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  line-height: 1;
+}
+.futureContent {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.futureTag {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--mint);
+}
+.futureCardInner.quiet .futureTag {
+  color: rgba(255, 255, 255, 0.6);
+}
+.futureCardInner strong {
+  font-size: 17px;
+  font-weight: 800;
+  color: #fff;
+}
+.futureCardInner small { color: var(--muted); }
+.futurePriceText {
+  color: #5B8DEF !important;
+  font-size: 20px !important;
   font-weight: 800;
 }
-.futureCard small { color: var(--muted); }
-.futureCard.good { background: rgba(47, 191, 166, .18); border: 1px solid rgba(47, 191, 166, .4); }
-.futureCard.quiet { background: rgba(255, 255, 255, .06); border: 1px solid rgba(255, 255, 255, .13); }
-.futureCard.active {
+.futureCardInner.good { background: rgba(47, 191, 166, .18); border: 1px solid rgba(47, 191, 166, .4); }
+.futureCardInner.quiet { background: rgba(255, 255, 255, .06); border: 1px solid rgba(255, 255, 255, .13); }
+.futureCardInner.active {
   border-color: rgba(91, 141, 239, .72);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, .14),
@@ -1939,13 +1992,16 @@ input, textarea {
 .contentLowerGrid {
   grid-column: 1 / -1;
   display: grid;
-  grid-template-columns: minmax(420px, 1fr) minmax(360px, .9fr);
+  grid-template-columns: minmax(440px, 1.08fr) minmax(360px, 0.92fr);
   gap: 22px;
+  align-items: stretch;
 }
 .contentLowerGrid > * {
   min-width: 0;
 }
 .monthlyReport {
+  grid-column: 1;
+  grid-row: 1;
   min-height: 210px;
 }
 .contentPriceReveal {
@@ -1969,6 +2025,14 @@ input, textarea {
   color: #fff;
   font-family: Fredoka, Pretendard, sans-serif;
   font-size: 28px;
+}
+.contentPriceReveal .factAttackMain {
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  line-height: 1.6 !important;
+  color: #FF8BA7 !important;
+  margin-top: 6px !important;
+  word-break: keep-all;
 }
 .contentPriceReveal p,
 .patternDetail p {
@@ -2062,10 +2126,33 @@ input, textarea {
 }
 .emotionBubblePanel,
 .timePatternPanel {
+  grid-column: 1;
+  grid-row: 2;
   min-height: 300px;
   background:
     radial-gradient(420px 260px at 58% 68%, rgba(243, 95, 168, .13), transparent 70%),
     rgba(255, 255, 255, .045);
+}
+.combinedSpendBudgetCard {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  height: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 16px;
+}
+.combinedSpendBudgetCard .gaugeDesc {
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 13px;
+  line-height: 1.5;
+  margin: 0;
+}
+.combinedSpendBudgetCard .budgetPlanSection {
+  background: transparent;
+  border: none;
+  padding: 0;
 }
 .bubbleField {
   position: relative;
@@ -2139,59 +2226,149 @@ input, textarea {
 }
 .timeLegend {
   display: flex;
-  gap: 12px;
-  color: rgba(255, 255, 255, .58);
+  align-items: center;
+  gap: 14px;
+  color: rgba(255, 255, 255, .68);
   font-size: 11px;
-  font-weight: 750;
+  font-weight: 700;
 }
 .timeLegend span {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
 }
 .timeLegend i {
   width: 8px;
   height: 8px;
-  border-radius: 2px;
+  border-radius: 50%;
 }
-.timeLegend .spend { background: #F35FA8; }
-.timeLegend .income { background: #5B8DEF; }
+.timeLegend .emotionLegendChip {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: rgba(255, 255, 255, 0.65);
+  padding: 4px 12px;
+  border-radius: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 11px;
+  font-family: inherit;
+}
+.timeLegend .emotionLegendChip:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.9);
+}
+.timeLegend .emotionLegendChip.active {
+  background: rgba(243, 95, 168, 0.2);
+  border-color: rgba(243, 95, 168, 0.5);
+  color: #FF8BA7;
+  box-shadow: 0 0 12px rgba(243, 95, 168, 0.3);
+}
+.timeLegend .peakBadge {
+  background: rgba(243, 95, 168, 0.15);
+  border: 1px solid rgba(243, 95, 168, 0.35);
+  color: #FF7B93;
+  padding: 4px 12px;
+  border-radius: 14px;
+  font-weight: 800;
+}
+.timeBarChartWrapper {
+  position: relative;
+  margin-top: 14px;
+  padding: 16px 4px 6px;
+}
+.timeChartGrid {
+  position: absolute;
+  top: 16px;
+  left: 0;
+  right: 0;
+  height: 140px;
+  pointer-events: none;
+}
+.timeChartGrid span {
+  position: absolute;
+  left: 0;
+  right: 0;
+  border-top: 1px dashed rgba(255, 255, 255, 0.08);
+}
 .timeBarChart {
-  height: 214px;
+  height: 184px;
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(12, 1fr);
   align-items: end;
-  gap: 18px;
-  padding: 26px 8px 0;
+  gap: 8px;
+  position: relative;
+  z-index: 1;
 }
 .timeBarItem {
-  display: grid;
-  justify-items: center;
-  gap: 10px;
-}
-.timeBarItem div {
-  height: 140px;
   display: flex;
-  align-items: end;
-  gap: 5px;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  height: 100%;
+  justify-content: flex-end;
 }
-.timeBarItem i {
-  width: 13px;
-  min-height: 18px;
-  border-radius: 999px;
-  display: block;
+.timeBarItem .barTrack {
+  width: 100%;
+  max-width: 24px;
+  height: 140px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 12px;
+  display: flex;
+  align-items: flex-end;
+  position: relative;
+  overflow: visible;
 }
 .timeBarItem i.spend {
-  background: linear-gradient(180deg, rgba(243, 95, 168, .96), rgba(151, 61, 133, .78));
-  box-shadow: 0 16px 28px -18px rgba(243, 95, 168, .95);
+  width: 100%;
+  min-height: 12px;
+  border-radius: 10px;
+  display: block;
+  position: relative;
+  transition: all 0.3s ease;
 }
-.timeBarItem i.income {
-  background: linear-gradient(180deg, rgba(91, 141, 239, .96), rgba(65, 93, 166, .78));
+.timeBarItem .barValue {
+  position: absolute;
+  top: -36px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  font-size: 10px;
+  color: #fff;
+  opacity: 0;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  white-space: nowrap;
+  pointer-events: none;
+  background: rgba(15, 23, 42, 0.95);
+  padding: 3px 7px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+  z-index: 10;
+}
+.timeBarItem .barValue b {
+  font-weight: 800;
+  color: #fff;
+}
+.timeBarItem .barValue small {
+  font-size: 9px;
+  color: rgba(255, 255, 255, 0.75);
+}
+.timeBarItem:hover .barValue,
+.timeBarItem.isPeak .barValue {
+  opacity: 1;
 }
 .timeBarItem span {
-  color: rgba(255, 255, 255, .48);
+  color: rgba(255, 255, 255, .55);
   font-size: 11px;
-  font-weight: 750;
+  font-weight: 700;
+}
+.timeBarItem.isPeak span {
+  color: #FF7B93;
+  font-weight: 800;
 }
 .patternPanel {
   display: grid;

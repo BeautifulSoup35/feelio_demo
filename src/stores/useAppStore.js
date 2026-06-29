@@ -53,6 +53,33 @@ export function useAppStore() {
               : goal
         ))
       }));
+    },
+    addGoal(newGoal) {
+      setState(prev => {
+        const updatedGoals = prev.goals.map(g => newGoal.isMain ? { ...g, isMain: false } : g);
+        return {
+          ...prev,
+          goals: [...updatedGoals, { ...newGoal, goalId: Date.now() }]
+        };
+      });
+    },
+    deleteGoal(goalId) {
+      setState(prev => {
+        const remaining = prev.goals.filter(g => g.goalId !== goalId);
+        if (prev.goals.find(g => g.goalId === goalId)?.isMain && remaining.length > 0) {
+          remaining[0].isMain = true;
+        }
+        return {
+          ...prev,
+          goals: remaining
+        };
+      });
+    },
+    toggleTheme() {
+      setState(prev => ({
+        ...prev,
+        theme: prev.theme === 'day' ? 'night' : 'day'
+      }));
     }
   }), []);
 
