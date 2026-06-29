@@ -1895,10 +1895,31 @@ input, textarea {
 
 .parallelCard { grid-column: 1 / -1; }
 .parallelGrid {
+  position: relative;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  gap: 16px;
   margin-top: 16px;
+}
+.versusBadge {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  font-family: Fredoka, Pretendard, sans-serif;
+  font-size: 15px;
+  font-weight: 900;
+  color: rgba(255, 255, 255, 0.9);
+  background: rgba(15, 23, 42, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.6);
+  pointer-events: none;
 }
 .futureCardWrapper {
   perspective: 1000px;
@@ -2143,16 +2164,121 @@ input, textarea {
   justify-content: space-between;
   gap: 16px;
 }
+.combinedSpendBudgetCard .sectionTitle.compact strong {
+  font-size: 24px !important;
+  font-weight: 800 !important;
+  color: #fff !important;
+  margin-top: 4px;
+}
 .combinedSpendBudgetCard .gaugeDesc {
-  color: rgba(255, 255, 255, 0.72);
-  font-size: 13px;
-  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 15px;
+  line-height: 1.6;
   margin: 0;
+}
+.combinedSpendBudgetCard .gaugeDesc b {
+  color: #2FBFA6;
+  font-size: 16px;
 }
 .combinedSpendBudgetCard .budgetPlanSection {
   background: transparent;
   border: none;
   padding: 0;
+}
+.extraFlipWrapper {
+  perspective: 1000px;
+  cursor: pointer;
+  height: 64px;
+  width: 100%;
+  margin-top: 4px;
+}
+.extraFlipInner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 18px;
+  transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
+  transform-style: preserve-3d;
+  color: #fff;
+}
+.extraFlipWrapper.flipped .extraFlipInner {
+  transform: rotateX(180deg);
+}
+.extraFlipFront,
+.extraFlipBack {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 18px;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  box-sizing: border-box;
+}
+.extraFlipFront {
+  z-index: 2;
+  background: rgba(47, 191, 166, 0.12);
+  border: 1px dashed rgba(47, 191, 166, 0.45);
+  transition: all 0.2s ease;
+}
+.extraFlipFront:hover {
+  background: rgba(47, 191, 166, 0.18);
+  border-color: rgba(47, 191, 166, 0.7);
+}
+.extraFlipFront b {
+  color: #2FBFA6;
+  font-size: 13px;
+  display: block;
+}
+.extraFlipFront small {
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 11px;
+  margin-top: 2px;
+  display: block;
+}
+.extraFlipFront .flipHintBadge {
+  font-size: 11px;
+  font-weight: 800;
+  color: #2FBFA6;
+  background: rgba(47, 191, 166, 0.15);
+  padding: 4px 10px;
+  border-radius: 10px;
+}
+.extraFlipBack {
+  transform: rotateX(180deg);
+  background: rgba(47, 191, 166, 0.15);
+  border: 1px solid rgba(47, 191, 166, 0.45);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+}
+.extraFlipBack .extraBackHeader {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 12px;
+  font-weight: 800;
+}
+.extraFlipBack .extraBackHeader b { color: #fff; }
+.extraFlipBack i {
+  width: 100%;
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+}
+.extraFlipBack i span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: #2FBFA6;
 }
 .bubbleField {
   position: relative;
@@ -3225,18 +3351,37 @@ input, textarea {
 }
 .budgetPlanItem {
   display: grid;
-  gap: 10px;
-  padding: 14px 16px;
-  border-radius: 18px;
-  border: 1px solid rgba(255, 255, 255, .12);
-  background: rgba(255, 255, 255, .055);
+  gap: 8px;
+  padding: 8px 0;
+  border-radius: 0;
+  border: none;
+  background: transparent;
+}
+.budgetPlanItem.dangerItem .dangerText {
+  color: #FF4757 !important;
+  font-weight: 800;
+}
+.totalRemainingBudgetFooter {
+  text-align: center;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px dashed rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 14px;
+  font-weight: 700;
+}
+.totalRemainingBudgetFooter b {
+  color: #fff;
+  font-size: 18px;
+  font-family: Fredoka, Pretendard, sans-serif;
+  margin-left: 4px;
 }
 .budgetPlanItem div {
   display: flex;
   justify-content: space-between;
   gap: 12px;
-  color: rgba(255, 255, 255, .68);
-  font-size: 12px;
+  color: rgba(255, 255, 255, .78);
+  font-size: 13px;
   font-weight: 800;
 }
 .budgetPlanItem b {

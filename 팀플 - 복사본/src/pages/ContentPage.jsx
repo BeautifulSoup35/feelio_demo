@@ -60,9 +60,14 @@ const patternInsights = [
 ];
 
 const budgetPlans = [
-  { label: '생활비', value: 420000, max: 520000, className: 'life' },
-  { label: '감정소비', value: 77500, max: 60000, className: 'emotion' },
   { label: '여유비', value: 138000, max: 180000, className: 'extra' }
+];
+
+const detailedCategoryPlans = [
+  { label: '쇼핑', value: 95000, max: 110000, color: '#8A6CFF' },
+  { label: '카페', value: 35000, max: 70000, color: '#F5A623' },
+  { label: '택시🚖', value: 45000, max: 150000, color: '#2FBFA6' },
+  { label: '편의점🧺', value: 79000, max: 80000, color: '#FF4757', danger: true }
 ];
 
 const timeBars = [
@@ -85,6 +90,7 @@ export default function ContentPage({ state }) {
   const [flippedId, setFlippedId] = useState(null);
   const [selectedInsight, setSelectedInsight] = useState(null);
   const [showEmotionColors, setShowEmotionColors] = useState(true);
+  const [isExtraFlipped, setIsExtraFlipped] = useState(false);
   const expenses = state.transactions.filter(item => item.transactionType === 'EXPENSE');
   const totalExpense = expenses.reduce((sum, item) => sum + item.amount, 0);
   const emotionalExpense = expenses
@@ -112,6 +118,7 @@ export default function ContentPage({ state }) {
           <strong>같은 출발선에서 갈라진 선택 (카드를 터치해 금액 확인)</strong>
         </div>
         <div className="parallelGrid">
+          <div className="versusBadge">VS</div>
           {futureOptions.map(option => {
             const isFlipped = flippedId === option.id;
             const isActive = selectedFuture.id === option.id;
@@ -259,23 +266,58 @@ export default function ContentPage({ state }) {
           <p className="gaugeDesc">
             예산의 <b>{budgetUsedRate}%</b>를 사용했어요. 아직 {formatMoney(budgetGap)} 여유가 있지만, 감정소비 비중은 조금 낮추는 노력이 필요해요.
           </p>
-          <div className="budgetPlanSection">
-            <div className="budgetPlanList">
-              {budgetPlans.map(item => (
-                <div key={item.label} className={`budgetPlanItem ${item.className}`}>
-                  <div>
-                    <b>{item.label}</b>
-                    <span>{formatMoney(item.value)} / {formatMoney(item.max)}</span>
-                  </div>
-                  <i><span style={{ width: `${Math.min(100, Math.round((item.value / item.max) * 100))}%` }} /></i>
-                </div>
-              ))}
-            </div>
-          </div>
           <div className="monthlySpendAdvice">
             <span>추천 이번 달 한도</span>
             <strong>{formatMoney(recommendedBudget)}</strong>
             <small>남은 기간에는 하루 평균 {formatMoney(dailyLimit)} 안쪽으로 맞춰봐요.</small>
+          </div>
+
+          {(() => {
+            const extraPlan = budgetPlans.find(p => p.className === 'extra');
+            return extraPlan ? (
+              <div
+                className={`extraFlipWrapper ${isExtraFlipped ? 'flipped' : ''}`}
+                onClick={() => setIsExtraFlipped(prev => !prev)}
+              >
+                <div className="extraFlipInner">
+                  <div className="extraFlipFront">
+                    <div>
+                      <b>🌱 여유비 한도 진단</b>
+                      <small>터치하여 위아래로 뒤집어 한도 확인</small>
+                    </div>
+                    <span className="flipHintBadge">클릭해서 보기 🔄</span>
+                  </div>
+                  <div className="extraFlipBack">
+                    <div className="extraBackHeader">
+                      <b>{extraPlan.label}</b>
+                      <span>{formatMoney(extraPlan.value)} / {formatMoney(extraPlan.max)}</span>
+                    </div>
+                    <i><span style={{ width: `${Math.min(100, Math.round((extraPlan.value / extraPlan.max) * 100))}%` }} /></i>
+                  </div>
+                </div>
+              </div>
+            ) : null;
+          })()}
+
+          <div className="budgetPlanSection">
+            <div className="budgetPlanList">
+              {detailedCategoryPlans
+                .slice()
+                .sort((a, b) => (a.max - a.value) - (b.max - b.value))
+                .slice(0, 3)
+                .map(item => (
+                  <div key={item.label} className={`budgetPlanItem ${item.danger ? 'dangerItem' : ''}`}>
+                    <div>
+                      <b>{item.label}</b>
+                      <span className={item.danger ? 'dangerText' : ''}>{formatMoney(item.value)} / {formatMoney(item.max)}</span>
+                    </div>
+                    <i><span style={{ width: `${Math.min(100, Math.round((item.value / item.max) * 100))}%`, background: item.color }} /></i>
+                  </div>
+                ))}
+            </div>
+            <div className="totalRemainingBudgetFooter">
+              총 남은 예산: <b>{formatMoney(121000)}</b>
+            </div>
           </div>
         </GlassCard>
       </div>
