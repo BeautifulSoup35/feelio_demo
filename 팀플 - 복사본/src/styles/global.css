@@ -1898,7 +1898,7 @@ input, textarea {
   position: relative;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 16px;
+  gap: 42px;
   margin-top: 16px;
 }
 .versusBadge {
@@ -3002,8 +3002,7 @@ input, textarea {
     font-size: 12px;
   }
   .formGrid,
-  .dateGrid,
-  .parallelGrid { grid-template-columns: 1fr; }
+  .dateGrid { grid-template-columns: 1fr; }
   .calendarCard { padding: 16px; }
   .monthGrid { gap: 6px; }
   .dayCell { min-height: 54px; border-radius: 14px; padding: 7px; }
@@ -3410,8 +3409,19 @@ input, textarea {
 }
 
 @media (max-width: 1040px) {
+  .contentLowerGrid {
+    grid-template-columns: 1fr !important;
+    gap: 18px;
+  }
+  .monthlyReport,
+  .timePatternPanel,
+  .combinedSpendBudgetCard {
+    grid-column: auto !important;
+    grid-row: auto !important;
+    width: 100%;
+  }
   .contentStatRow {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(3, 1fr);
   }
   .contentStatCard {
     min-height: 96px;
@@ -3420,9 +3430,60 @@ input, textarea {
   .budgetPlannerPanel {
     min-height: auto;
   }
-  .budgetPlanItem div {
-    display: grid;
+}
+
+@media (max-width: 1040px) {
+  .parallelGrid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 20px !important;
+  }
+  .futureCardWrapper {
+    height: 180px !important;
+  }
+  .futureCardFront,
+  .futureCardBack {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    text-align: center !important;
+    padding: 16px 8px !important;
+  }
+  .futureContent {
+    display: contents !important;
+  }
+  .futureTag {
+    order: 1 !important;
+    font-size: 11px !important;
+  }
+  .futureIcon {
+    order: 2 !important;
+    font-size: 38px !important;
+    margin: 4px 0 !important;
+  }
+  .futureCardInner strong {
+    order: 3 !important;
+    font-size: 15px !important;
+  }
+  .futureCardInner small {
+    order: 4 !important;
+    font-size: 11px !important;
+    margin-top: -2px !important;
+  }
+  .versusBadge {
+    width: 34px !important;
+    height: 34px !important;
+    font-size: 13px !important;
+  }
+}
+  .contentStatRow {
+    grid-template-columns: 1fr;
+  }
+  .timeBarChart {
     gap: 4px;
+  }
+  .timeBarItem span {
+    font-size: 9px;
   }
 }
 
