@@ -177,9 +177,8 @@ export function EmotionBlob({ emotion = "평온", size = 140, variant = "svg", i
           <svg width={W} height={H} viewBox="0 0 200 205" style={{ position: "absolute", inset: 0, display: "block" }}>
             <defs>
               <radialGradient id={gradId} cx="38%" cy="26%" r="80%">
-                <stop offset="0%" stopColor="#ffffff" stopOpacity="0.55" />
-                <stop offset="22%" stopColor={e.light} />
-                <stop offset="62%" stopColor={e.base} />
+                <stop offset="0%" stopColor={e.light} />
+                <stop offset="44%" stopColor={e.base} />
                 <stop offset="100%" stopColor={e.dark} />
               </radialGradient>
               <radialGradient id={`${gradId}-sheen`} cx="34%" cy="22%" r="42%">

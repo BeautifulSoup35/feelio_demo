@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react';
 import { parseMoney } from '../../utils/money.js';
 import { formatKoreanDateWithWeekday } from '../../utils/date.js';
+import { moodEmotions } from '../../constants/emotions.js';
+import Modal from '../common/Modal.jsx';
 
 const categories = [
   { id: 'c1', label: '#배달', title: '배달', color: '#5CC8FF' },
@@ -10,13 +12,11 @@ const categories = [
   { id: 'c4', label: '#교통', title: '교통', color: '#E5B05C' }
 ];
 
-const moods = [
-  { id: 'e2', label: '#외로움', color: '#6F7DFF' },
-  { id: 'e8', label: '#신남', color: '#F35FA8' },
-  { id: 'e3', label: '#불안', color: '#F5A623' },
-  { id: 'e4', label: '#평온', color: '#2FBFA6' },
-  { id: 'e6', label: '#무덤덤', color: '#9EA3BB' }
-];
+const moods = moodEmotions.map(emotion => ({
+  id: emotion.tagId,
+  label: `#${emotion.name}`,
+  color: emotion.color
+}));
 
 const situations = [
   { id: 's1', label: '#퇴근후', color: '#46D3BC' },
@@ -65,7 +65,7 @@ export default function CalendarRecordForm({ selectedDate, selectedDay, onClose,
   const [memo, setMemo] = useState('퇴근 후 너무 지쳐서 안전한 메뉴로 주문했다.');
   const [amount, setAmount] = useState('14,500');
   const [categoryId, setCategoryId] = useState('c1');
-  const [moodId, setMoodId] = useState('e2');
+  const [moodId, setMoodId] = useState('e5');
   const [situationId, setSituationId] = useState('s1');
   const [activeGroup, setActiveGroup] = useState(null);
 
@@ -133,7 +133,7 @@ export default function CalendarRecordForm({ selectedDate, selectedDay, onClose,
   }
 
   return (
-    <div className="calendarRecordLayer" role="presentation" onMouseDown={onClose}>
+    <Modal title={`${selectedDateLabel} 기록 추가`} onClose={onClose}>
       <section className="calendarRecordModal" role="dialog" aria-modal="true" aria-label={`${selectedDay}일 기록 추가`} onMouseDown={event => event.stopPropagation()}>
         <button type="button" className="calendarRecordClose" onClick={onClose} aria-label="닫기">×</button>
         <header className="calendarRecordHeader">
@@ -183,6 +183,6 @@ export default function CalendarRecordForm({ selectedDate, selectedDay, onClose,
 
         <button type="button" className="calendarRecordSave" onClick={save}>기록 저장하기</button>
       </section>
-    </div>
+    </Modal>
   );
 }

@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { parseMoney } from '../../utils/money.js';
+import { moodEmotions } from '../../constants/emotions.js';
 import { MoodRidge } from './MoodRidge.jsx';
 
 const categoryChips = [
@@ -10,14 +11,11 @@ const categoryChips = [
   { tagId: 'c5', label: '#편의점', title: '편의점', color: '#6EC8CA' }
 ];
 
-const emotionChips = [
-  { tagId: 'e2', label: '#외로움', color: '#6EA0FF' },
-  { tagId: 'e8', label: '#신남', color: '#FF7A8C' },
-  { tagId: 'e3', label: '#불안', color: '#F7B844' },
-  { tagId: 'e4', label: '#평온', color: '#46D3BC' },
-  { tagId: 'e5', label: '#화남', color: '#FF6666' },
-  { tagId: 'e6', label: '#무덤덤', color: '#9EA3BB' }
-];
+const emotionChips = moodEmotions.map(emotion => ({
+  tagId: emotion.tagId,
+  label: `#${emotion.name}`,
+  color: emotion.color
+}));
 
 const situationChips = [
   { tagId: 's1', label: '#야근', color: '#7B8DFF' },
@@ -27,12 +25,12 @@ const situationChips = [
 ];
 
 export const monthlyEmotionFlowItems = [
-  { label: '외로움', value: '38%', color: '#6EA0FF' },
-  { label: '불안', value: '22%', color: '#F7B844' },
-  { label: '평온', value: '15%', color: '#46D3BC' },
-  { label: '신남', value: '12%', color: '#F35FA8' },
-  { label: '화남', value: '8%', color: '#FF6666' },
-  { label: '무덤덤', value: '5%', color: '#8A6CFF' }
+  { label: '외로움', value: '38%', color: '#9FB0F0' },
+  { label: '스트레스', value: '22%', color: '#B398E6' },
+  { label: '평온', value: '15%', color: '#92DEC2' },
+  { label: '신남', value: '12%', color: '#F9A9CB' },
+  { label: '화남', value: '8%', color: '#F89189' },
+  { label: '무덤덤', value: '5%', color: '#BDB9CC' }
 ];
 
 function MoodChip({ label, color, selected = false, onClick }) {
@@ -83,7 +81,7 @@ export default function EmotionExpenseCard({ onSubmit }) {
   const [amount, setAmount] = useState('14500');
   const [memo, setMemo] = useState('퇴근 후 너무 지쳐서 안전한 메뉴로 주문했다.');
   const [selectedCategoryId, setSelectedCategoryId] = useState('c1');
-  const [selectedEmotionId, setSelectedEmotionId] = useState('e2');
+  const [selectedEmotionId, setSelectedEmotionId] = useState('e5');
   const [selectedSituationId, setSelectedSituationId] = useState('');
   const [activePicker, setActivePicker] = useState(null);
   const [saveState, setSaveState] = useState('idle');
@@ -184,7 +182,6 @@ export default function EmotionExpenseCard({ onSubmit }) {
           <label className="amountInput">
             <span>금액</span>
             <div className="amountEditable">
-              <b aria-hidden="true">₩</b>
               <input
                 value={amount}
                 onChange={event => { setAmount(event.target.value); markEditing(); }}
@@ -192,6 +189,7 @@ export default function EmotionExpenseCard({ onSubmit }) {
                 inputMode="numeric"
                 placeholder="14,500"
               />
+              <b aria-hidden="true">₩</b>
             </div>
           </label>
         </div>

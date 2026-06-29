@@ -4,14 +4,15 @@ import GlassCard from '../common/GlassCard.jsx';
 const providers = [
   { key: 'google', label: 'Google로 계속하기' },
   { key: 'kakao', label: 'Kakao로 계속하기' },
-  { key: 'apple', label: 'Apple로 계속하기' }
+  { key: 'naver', label: 'Naver로 계속하기' }
 ];
 
 function OAuthSymbol({ provider }) {
-  if (provider === 'apple') {
+  if (provider === 'naver') {
     return (
-      <svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-        <path d="M16.5 2.4c0 1.2-.45 2.26-1.34 3.17-.94.96-1.98 1.51-3.12 1.42-.15-1.15.35-2.37 1.19-3.24.86-.9 2.25-1.56 3.27-1.35ZM20.36 17.37c-.49 1.12-.73 1.62-1.37 2.62-.89 1.36-2.15 3.06-3.71 3.08-1.39.02-1.75-.9-3.63-.89-1.88.01-2.28.91-3.67.89-1.56-.02-2.75-1.55-3.64-2.91-2.49-3.83-2.75-8.33-1.21-10.72 1.09-1.7 2.82-2.69 4.44-2.69 1.65 0 2.69.91 4.06.91 1.33 0 2.14-.91 4.06-.91 1.45 0 2.99.79 4.08 2.15-3.59 1.97-3.01 7.11.59 8.47Z" />
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <rect width="24" height="24" rx="6" fill="#03C75A" />
+        <path d="M7 6.6h3.16l3.7 5.2V6.6H17v10.8h-3.16l-3.7-5.2v5.2H7V6.6Z" fill="white" />
       </svg>
     );
   }

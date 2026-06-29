@@ -30,7 +30,8 @@ export const initialGoals = [
   }
 ];
 
-export const initialTransactions = [
+export const initialTransactions = [];
+/*
   {
     transactionId: 1,
     transactionType: 'EXPENSE',
@@ -77,6 +78,7 @@ export const initialTransactions = [
     tags: ['c3', 'e2', 's5']
   }
 ];
+*/
 
 export const initialState = {
   isLoggedIn: false,

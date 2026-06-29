@@ -32,11 +32,11 @@ const patternInsights = [
     tone: 'blue'
   },
   {
-    label: '불안',
+    label: '스트레스',
     value: 22,
     amount: 17100,
     title: '월급날 다음 3일이 제일 위험해',
-    caption: '불안 소비가 평소의 2.3배로 튐',
+    caption: '스트레스 소비가 평소의 2.3배로 튐',
     summary: '월급 직후에는 작은 쇼핑을 여러 번 나누어 결제했어요.',
     tone: 'gold'
   },
@@ -72,7 +72,7 @@ export default function ContentPage({ state }) {
   const expenses = state.transactions.filter(item => item.transactionType === 'EXPENSE');
   const totalExpense = expenses.reduce((sum, item) => sum + item.amount, 0);
   const emotionalExpense = expenses
-    .filter(item => item.tags.some(tagId => ['e1', 'e2', 'e3', 'e5', 'e7'].includes(tagId)))
+    .filter(item => item.tags.some(tagId => /^e\d+$/.test(tagId)))
     .reduce((sum, item) => sum + item.amount, 0);
   const leakRate = totalExpense ? Math.round((emotionalExpense / totalExpense) * 100) : 0;
   const monthlyBudget = 760000;

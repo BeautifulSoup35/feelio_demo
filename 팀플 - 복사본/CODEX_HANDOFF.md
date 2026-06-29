@@ -61,6 +61,48 @@ npm run dev
 - `src/pages/OnboardingPage.jsx`를 새로 추가하고, `src/App.jsx`에서 로그인 후 `feelio_onboarding_completed` localStorage 값이 없으면 온보딩을 먼저 보여주도록 분기했습니다.
 - 온보딩 완료 시 `feelio_onboarding`, `feelio_onboarding_completed`를 localStorage에 저장하고 기존 메인 목표를 `actions.updateGoal`로 갱신한 뒤 홈으로 이동합니다.
 - 온보딩 전용 스타일은 `src/styles/global.css`에 `onboarding*` 클래스명으로만 추가했습니다. 기존 Home/Calendar/Content 컴포넌트는 수정하지 않았습니다.
+- 로그인 OAuth 제공자 중 Apple을 Naver로 수정했습니다. `LoginPage.jsx`의 provider key/label과 아이콘, `.oauthButton.naver` 스타일을 반영했습니다.
+- 온보딩 PC 레이아웃을 좌우 분할 소개형에서 중앙 대형 폼 중심으로 정리하고, 단계 전환 시 가벼운 slide/fade 애니메이션이 적용되도록 CSS를 보정했습니다.
+- 홈 화면의 AI 소비 신호와 감정소비 흐름을 같은 월간 감정 태그 데이터에서 파생되도록 통합했습니다.
+- `BlobEmptyCard.jsx`, `RidgeEmpty.jsx`를 추가했고, `HomePage.jsx`에서 `totalTags >= 1`이면 `EmotionBlob`, `totalTags >= RIDGE_MIN_TAGS(5)`이면 `MoodRidge`를 보여주도록 분기했습니다.
+- `EmotionBlob.jsx`와 `MoodRidge.jsx` 내부 좌표/path/색상/애니메이션은 수정하지 않았습니다.
+- 사용자가 `RidgeEmpty`의 흐릿한 봉우리 빈 상태가 보낸 디자인과 다르다고 지적했습니다.
+- 임의로 만든 가짜 능선 비주얼을 제거하고, 확정 디자인 코드가 들어오기 전까지는 텍스트 중심의 최소 빈 상태로 정리했습니다.
+- 사용자가 `C:\Users\user\Downloads\EmptyStates.jsx`를 제공했고, 지금 과정은 충분한 유저 정보가 없을 때 기본으로 보여줄 디자인이라고 명확히 했습니다.
+- 제공된 `EmptyStates.jsx`를 `src/components/home/EmptyStates.jsx`로 추가하고, 데모용 default export만 제거한 뒤 `BlobEmptyCard`, `RidgeEmpty` named export를 홈 화면에 연결했습니다.
+- 제공 파일의 빈 상태 SVG/좌표/색/blur/opacity/mixBlendMode/그라데이션/애니메이션 값은 수정하지 않았고, 데모 `<style>`에 있던 `es-*` keyframes만 `src/styles/global.css`로 옮겼습니다.
+- 이전에 임의로 만든 `src/components/home/BlobEmptyCard.jsx`, `src/components/home/RidgeEmpty.jsx`는 제거했습니다.
+- 사용자가 처음 UI 확인을 위해 캘린더 기록을 모두 비워 디폴트 상태를 먼저 보고 싶다고 요청했습니다.
+- `initialTransactions`를 빈 배열로 바꾸고, `useAppStore` 저장 키를 `feelio-app-state-v2-empty-demo`로 변경해 기존 브라우저 localStorage의 샘플 거래가 섞이지 않게 했습니다.
+- 캘린더의 날짜별 임시 감정 색과 2026-06-14 fallback 기록을 실제 거래 데이터 기준으로 바꿨습니다. 이제 기록이 없는 날짜는 empty 상태이고, 기록을 추가한 날짜만 감정 태그에 맞춰 색이 들어갑니다.
+- 홈의 마음 능선 영역은 `moodRidgeFrame`으로 감싸 실제 능선과 빈 상태가 같은 높이를 유지하도록 했습니다.
+- 캘린더 기록 모달은 공통 `Modal`의 폭/높이/패딩/둥근값 기준과 맞도록 CSS를 보정했습니다.
+- 사용자가 "말랑이만 추가되어야 하고 뒷배경 카드는 없어야 한다"고 지적했습니다.
+- 홈 AI 소비 신호의 데이터 부족 상태는 `BlobEmptyCard` 대신 `BlobEmpty` 본체만 렌더링하도록 바꿨습니다.
+- 캘린더 기록 입력은 공통 `Modal`을 사용하도록 연결했고, 내부 `calendarRecordModal`은 투명 컨텐츠 래퍼처럼 보이도록 덮어 기존 Feelio 글래스 모달 질감을 유지했습니다.
+- 사용자가 마음 능선 빈 상태와 모달이 검게 막히면 안 되고, 다른 모달처럼 배경이 비치는 투명 글래스여야 한다고 재요청했습니다.
+- `RidgeEmpty` 내부 SVG/좌표는 건드리지 않고, 홈의 `.moodRidgeFrame > div`에만 CSS override를 적용해 검은 inline 배경을 투명 글래스 배경으로 덮었습니다.
+- `.modalLayer`, `.modalPanel`, `.calendarRecordModal` 투명도/blur를 다시 정리했고, 공통 모달 안쪽의 `.calendarRecordModal`은 완전 투명한 래퍼로 유지되도록 마지막 override를 추가했습니다.
+- 사용자가 홈 카드 높이를 맞추고, 디폴트 말랑이도 다른 감정 말랑이와 같은 크기와 클릭 효과를 가져야 한다고 요청했습니다.
+- 홈 AI 소비 신호의 `BlobEmpty` 크기를 `150`으로 맞추고, `defaultBlobButton` wrapper를 추가해 hover/focus/active 눌림 효과를 적용했습니다.
+- 오른쪽 홈 카드(`homeMetricCard`, `aiSignalCard`, `homeGoalCard`) 높이를 `194px` 기준으로 통일하고, `aiSignalCard`의 말랑이 컬럼도 `150px`로 맞췄습니다.
+- 사용자가 홈 화면 좌우 높이 비율이 맞지 않는다고 다시 요청했습니다.
+- 데스크톱 홈에서 `.homeMain`과 `.homeAside`가 같은 `--home-content-height`를 쓰도록 맞추고, 오른쪽은 3등분, 왼쪽은 입력 카드 + 220px 능선 카드 비율로 정렬되게 했습니다.
+- 사용자가 마음 능선의 감정 색을 말랑이 색과 매칭하고, 말랑이 머리에 멍처럼 보이는 장식을 없애달라고 요청했습니다.
+- `MoodRidge.jsx`의 감정별 COLORS를 `EmotionBlob.jsx`의 말랑이 `base` 색상과 맞췄고, 알 수 없는 감정명은 `무덤덤` 색으로 fallback 하도록 했습니다.
+- `EmptyStates.jsx`의 빈 상태 팔레트도 말랑이 색 계열로 맞추고, 빈 말랑이 머리 쪽 물음표 장식을 제거했습니다.
+- 사용자가 디폴트 말랑이처럼 모든 말랑이의 머리 쪽 멍처럼 보이는 하이라이트를 없애고, 캘린더 날짜 색은 하루마다 가장 많이 태깅된 감정 기준으로 투명하게 보여달라고 요청했습니다.
+- `EmotionBlob.jsx`의 SVG radialGradient에서 흰색 하이라이트 stop을 제거해 어두운 배경에서 멍처럼 보이는 부분을 줄였습니다.
+- `CalendarPage.jsx`에서 날짜별 기록의 감정 태그를 모두 집계해 가장 많이 나온 감정을 계산하도록 바꾸고, 날짜 셀/선택한 날 패널/감정 pill에 `--day-emotion` CSS 변수로 투명한 감정 배경을 적용했습니다.
+- 캘린더의 예전 2026-06-14 fallback 기록 함수와 첫 번째 감정 태그 기준 헬퍼는 제거했습니다.
+- 모달 레이어와 패널은 마지막 CSS override에서 더 투명한 글래스모피즘 톤으로 유지되도록 재정리했습니다.
+- 사용자가 캘린더 기분 태그 색과 홈 기분 태그 색을 말랑이 8종 기준으로 통일하고, 캘린더 배경은 직전보다 이전 느낌에 가깝게 되돌려달라고 요청했습니다.
+- `src/constants/emotions.js`를 추가해 말랑이 기준 8종 감정(`신남`, `설렘`, `뿌듯함`, `스트레스`, `외로움`, `화남`, `평온`, `무덤덤`)과 base 색을 공통 팔레트로 분리했습니다.
+- `tags.js`, `EmotionExpenseCard.jsx`, `CalendarRecordForm.jsx`, `CalendarPage.jsx`, `MoodRidge.jsx`, `EmptyStates.jsx`가 이 팔레트를 공유하도록 정리했습니다.
+- 기존 `e8 -> 신남` 강제 override는 제거했고, 예전 저장 데이터 호환용 `피곤/불안/분노` alias만 `emotionInsights.js`에 남겼습니다.
+- 캘린더 날짜/선택 패널 색은 말랑이 팔레트를 쓰되, 배경 톤은 더 이전처럼 묵직한 `rgba(.09)` 기반 글래스로 되돌렸습니다.
+- 사용자가 캘린더 날짜 배경이 여전히 흐린 유리처럼 보이고, 원래처럼 또렷한 컬러 블록 느낌을 원한다고 요청했습니다.
+- `.moodDayCell.hasEmotion` 마지막 override를 추가해 날짜 셀 배경을 `--day-emotion` 기반의 선명한 linear-gradient 컬러 블록으로 되돌렸고, empty 셀은 어두운 빈 칸으로 유지했습니다.
 
 ## 현재 대화 맥락
 

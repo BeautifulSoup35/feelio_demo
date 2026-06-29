@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { initialState } from '../constants/mockData.js';
 
-const STORAGE_KEY = 'feelio-app-state-v1';
+const STORAGE_KEY = 'feelio-app-state-v2-empty-demo';
 
 function loadState() {
   try {

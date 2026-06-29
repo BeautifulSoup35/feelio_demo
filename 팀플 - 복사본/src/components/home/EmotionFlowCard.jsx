@@ -25,7 +25,7 @@ export default function EmotionFlowCard() {
       </div>
       <div className="emotionFlowLegend">
         <span><i className="lonely" />외로움</span>
-        <span><i className="anxious" />불안</span>
+        <span><i className="anxious" />스트레스</span>
         <span><i className="calm" />평온</span>
       </div>
     </section>

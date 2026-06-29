@@ -1,12 +1,13 @@
+import { moodEmotions } from './emotions.js';
+
 export const emotionTags = [
-  { tagId: 'e1', name: '피곤', type: 'EMOTION', color: '#5B8DEF', isDefault: true },
-  { tagId: 'e2', name: '외로움', type: 'EMOTION', color: '#FF7A6B', isDefault: true },
-  { tagId: 'e3', name: '불안', type: 'EMOTION', color: '#F5A623', isDefault: true },
-  { tagId: 'e4', name: '평온', type: 'EMOTION', color: '#2FBFA6', isDefault: true },
-  { tagId: 'e5', name: '분노', type: 'EMOTION', color: '#F25555', isDefault: true },
-  { tagId: 'e6', name: '무덤덤', type: 'EMOTION', color: '#9AA0B4', isDefault: true },
-  { tagId: 'e7', name: '스트레스', type: 'EMOTION', color: '#8A6CFF', isDefault: true },
-  { tagId: 'e8', name: '뿌듯함', type: 'EMOTION', color: '#F35FA8', isDefault: true }
+  ...moodEmotions.map(emotion => ({
+    tagId: emotion.tagId,
+    name: emotion.name,
+    type: 'EMOTION',
+    color: emotion.color,
+    isDefault: true
+  }))
 ];
 
 export const expenseCategoryTags = [

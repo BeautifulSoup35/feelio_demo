@@ -7,10 +7,14 @@ export function parseEmotionPercent(value) {
 export function topEmotion(flowItems = []) {
   const fallback = '평온';
   const sorted = [...flowItems]
-    .filter(item => emotionNames.includes(item.label))
+    .map(item => ({
+      ...item,
+      emotion: item.name || item.label
+    }))
+    .filter(item => emotionNames.includes(item.emotion))
     .sort((a, b) => parseEmotionPercent(b.value) - parseEmotionPercent(a.value));
 
-  return sorted[0]?.label || fallback;
+  return sorted[0]?.emotion || fallback;
 }
 
 export function emotionPercent(flowItems = [], emotion) {
@@ -31,10 +35,6 @@ export function makeEmotionSignalMessage(emotion, percent) {
 
   return `${emotion} 태그가 붙은 소비가 전체 흐름의 ${percent}를 차지해요. ${tips[emotion] || tips.평온}`;
 }
-const emotionTagOverrides = {
-  e8: '신남'
-};
-
 const emotionAlias = {
   피곤: '스트레스',
   불안: '스트레스',
@@ -57,7 +57,7 @@ export function topTaggedEmotion(transactions = [], tags = []) {
 
   transactions.forEach(transaction => {
     transaction.tags?.forEach(tagId => {
-      const emotion = emotionTagOverrides[tagId] || emotionTagNames.get(tagId);
+      const emotion = emotionTagNames.get(tagId);
       if (!emotion) return;
       const normalizedEmotion = normalizeBlobEmotion(emotion);
       counts.set(normalizedEmotion, (counts.get(normalizedEmotion) || 0) + 1);
@@ -72,4 +72,30 @@ export function topTaggedEmotion(transactions = [], tags = []) {
     count: count || 0,
     percent: total ? `${Math.round(((count || 0) / total) * 100)}%` : '0%'
   };
+}
+
+export function taggedEmotionData(transactions = [], tags = []) {
+  const emotionTagNames = new Map(
+    tags
+      .filter(tag => tag.type === 'EMOTION')
+      .map(tag => [tag.tagId, tag.name])
+  );
+  const counts = new Map();
+  let totalTags = 0;
+
+  transactions.forEach(transaction => {
+    transaction.tags?.forEach(tagId => {
+      const emotion = emotionTagNames.get(tagId);
+      if (!emotion) return;
+      const normalizedEmotion = normalizeBlobEmotion(emotion);
+      counts.set(normalizedEmotion, (counts.get(normalizedEmotion) || 0) + 1);
+      totalTags += 1;
+    });
+  });
+
+  const data = [...counts.entries()]
+    .map(([name, value]) => ({ name, value }))
+    .sort((a, b) => b.value - a.value);
+
+  return { data, totalTags };
 }
