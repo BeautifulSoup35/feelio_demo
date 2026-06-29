@@ -9,6 +9,10 @@ const futureOptions = [
     title: '전세 아파트 입주',
     subtitle: '보증금 2억 + 목표 3년 앞당김',
     price: 65000000,
+    priceText: '+65,000,000원',
+    priceSub: '감정소비 막아서 모은 자산',
+    factAttackBadge: '🔥 팩폭 한마디 (감정소비 막은 나)',
+    factAttackText: '“월 18만 원만 아껴도 3년 뒤 통장에 6,500만 원이 쌓입니다. 지금의 작은 절약이 전세 아파트 열쇠가 됩니다!”',
     tone: 'good'
   },
   {
@@ -17,6 +21,10 @@ const futureOptions = [
     title: '월세 원룸 4년째',
     subtitle: '매달 -65만 · 모은 돈 거의 없음',
     price: -650000,
+    priceText: '-650,000원',
+    priceSub: '매달 새어나가는 월세 및 감정소비',
+    factAttackBadge: '⚡️ 팩폭 한마디 (그대로 쓴 나)',
+    factAttackText: '“새벽 배달음식과 스트레스성 쇼핑, 계속하면 3년 뒤에도 여전히 이 원룸에서 월세 입금을 누르고 있을 겁니다!”',
     tone: 'quiet'
   }
 ];
@@ -52,23 +60,37 @@ const patternInsights = [
 ];
 
 const budgetPlans = [
-  { label: '생활비', value: 420000, max: 520000, className: 'life' },
-  { label: '감정소비', value: 77500, max: 60000, className: 'emotion' },
   { label: '여유비', value: 138000, max: 180000, className: 'extra' }
 ];
 
+const detailedCategoryPlans = [
+  { label: '쇼핑', value: 95000, max: 110000, color: '#8A6CFF' },
+  { label: '카페', value: 35000, max: 70000, color: '#F5A623' },
+  { label: '택시🚖', value: 45000, max: 150000, color: '#2FBFA6' },
+  { label: '편의점🧺', value: 79000, max: 80000, color: '#FF4757', danger: true }
+];
+
 const timeBars = [
-  { time: '0시', spend: 32, income: 0 },
-  { time: '4시', spend: 18, income: 0 },
-  { time: '8시', spend: 45, income: 0 },
-  { time: '12시', spend: 72, income: 30 },
-  { time: '16시', spend: 52, income: 0 },
-  { time: '20시', spend: 98, income: 24 }
+  { time: '00시', spend: 45, emotion: '외로움', color: '#FF7A6B' },
+  { time: '02시', spend: 85, peak: true, emotion: '외로움 + 스트레스', colors: ['#FF7A6B', '#8A6CFF'] },
+  { time: '04시', spend: 20, emotion: '피곤', color: '#5B8DEF' },
+  { time: '06시', spend: 12, emotion: '무덤덤', color: '#9AA0B4' },
+  { time: '08시', spend: 38, emotion: '피곤', color: '#5B8DEF' },
+  { time: '10시', spend: 28, emotion: '평온', color: '#2FBFA6' },
+  { time: '12시', spend: 62, emotion: '뿌듯함', color: '#F35FA8' },
+  { time: '14시', spend: 42, emotion: '불안', color: '#F5A623' },
+  { time: '16시', spend: 58, emotion: '스트레스', color: '#8A6CFF' },
+  { time: '18시', spend: 75, emotion: '피곤 + 분노', colors: ['#5B8DEF', '#F25555'] },
+  { time: '20시', spend: 98, peak: true, emotion: '스트레스 + 외로움', colors: ['#8A6CFF', '#FF7A6B'] },
+  { time: '22시', spend: 80, emotion: '불안 + 스트레스', colors: ['#F5A623', '#8A6CFF'] }
 ];
 
 export default function ContentPage({ state }) {
   const [selectedFuture, setSelectedFuture] = useState(futureOptions[0]);
+  const [flippedId, setFlippedId] = useState(null);
   const [selectedInsight, setSelectedInsight] = useState(null);
+  const [showEmotionColors, setShowEmotionColors] = useState(true);
+  const [isExtraFlipped, setIsExtraFlipped] = useState(false);
   const expenses = state.transactions.filter(item => item.transactionType === 'EXPENSE');
   const totalExpense = expenses.reduce((sum, item) => sum + item.amount, 0);
   const emotionalExpense = expenses
@@ -93,26 +115,48 @@ export default function ContentPage({ state }) {
       <GlassCard className="parallelCard contentFeatureCard">
         <div className="sectionTitle compact">
           <span>평행우주 · 2029년의 나</span>
-          <strong>같은 출발선에서 갈라진 선택</strong>
+          <strong>같은 출발선에서 갈라진 선택 (카드를 터치해 금액 확인)</strong>
         </div>
         <div className="parallelGrid">
-          {futureOptions.map(option => (
-            <button
-              type="button"
-              key={option.id}
-              className={`futureCard ${option.tone} ${selectedFuture.id === option.id ? 'active' : ''}`}
-              onClick={() => setSelectedFuture(option)}
-            >
-              <span>{option.icon}</span>
-              <strong>{option.title}</strong>
-              <small>{option.subtitle}</small>
-            </button>
-          ))}
+          <div className="versusBadge">VS</div>
+          {futureOptions.map(option => {
+            const isFlipped = flippedId === option.id;
+            const isActive = selectedFuture.id === option.id;
+            return (
+              <div
+                key={option.id}
+                className={`futureCardWrapper ${isFlipped ? 'flipped' : ''}`}
+                onClick={() => {
+                  setSelectedFuture(option);
+                  setFlippedId(prev => (prev === option.id ? null : option.id));
+                }}
+              >
+                <div className={`futureCardInner ${option.tone} ${isActive ? 'active' : ''}`}>
+                  <div className="futureCardFront">
+                    <span className="futureIcon">{option.icon}</span>
+                    <div className="futureContent">
+                      <span className="futureTag">{option.id === 'steady' ? '감정소비 막은 나' : '그대로 쓴 나'}</span>
+                      <strong>{option.title}</strong>
+                      <small>{option.subtitle}</small>
+                    </div>
+                  </div>
+                  <div className="futureCardBack">
+                    <span className="futureIcon">{option.icon}</span>
+                    <div className="futureContent">
+                      <span className="futureTag">3년 뒤 금액 결과</span>
+                      <strong className="futurePriceText">{option.priceText}</strong>
+                      <small>{option.priceSub}</small>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
         <div className="contentPriceReveal">
-          <span>감정소비를 월 18만 원씩만 막아도</span>
-          <strong>{selectedFuture.price > 0 ? '+' : ''}{formatMoney(selectedFuture.price)}</strong>
-          <p>3년 뒤 두 우주의 차이는 현재의 작은 선택에서 시작돼요.</p>
+          <span>{selectedFuture.factAttackBadge}</span>
+          <strong className="factAttackMain">{selectedFuture.factAttackText}</strong>
+          <p>💡 카드를 클릭하면 뒤집어지면서 금액 결과가 나타납니다.</p>
         </div>
       </GlassCard>
 
@@ -150,65 +194,130 @@ export default function ContentPage({ state }) {
           )}
         </GlassCard>
 
-        <GlassCard className="contentInsightRail monthlySpendCard">
+        <GlassCard className="timePatternPanel">
+          <div className="timePatternHeader">
+            <div className="sectionTitle compact">
+              <strong>시간대별 감정 소비 패턴</strong>
+              <span>시간대별 지출을 유발한 감정 컬러</span>
+            </div>
+            <div className="timeLegend">
+              <button
+                type="button"
+                className={`emotionLegendChip toggleBtn ${showEmotionColors ? 'active' : ''}`}
+                onClick={() => setShowEmotionColors(prev => !prev)}
+              >
+                🎨 감정 컬러 {showEmotionColors ? 'ON' : 'OFF'}
+              </button>
+              <span className="peakBadge">🔥 소비 피크: 20시 ~ 02시</span>
+            </div>
+          </div>
+          <div className="timeBarChartWrapper">
+            <div className="timeChartGrid">
+              <span style={{ bottom: '75%' }} />
+              <span style={{ bottom: '50%' }} />
+              <span style={{ bottom: '25%' }} />
+            </div>
+            <div className="timeBarChart">
+              {timeBars.map(item => {
+                const gradient = showEmotionColors
+                  ? (item.colors
+                      ? `linear-gradient(180deg, ${item.colors[0]} 0%, ${item.colors[1]} 100%)`
+                      : `linear-gradient(180deg, ${item.color} 0%, rgba(20, 25, 45, 0.7) 100%)`)
+                  : (item.peak
+                      ? `linear-gradient(180deg, #FF5288 0%, #FF8D5C 100%)`
+                      : `linear-gradient(180deg, #FF6EA7 0%, rgba(160, 48, 125, 0.85) 100%)`);
+                const glowColor = showEmotionColors ? (item.colors ? item.colors[0] : item.color) : null;
+                const boxShadowStyle = glowColor
+                  ? (item.peak ? `0 0 18px ${glowColor}` : `0 4px 12px ${glowColor}66`)
+                  : (item.peak ? `0 0 16px rgba(255, 82, 136, 0.85)` : `0 4px 14px rgba(243, 95, 168, 0.4)`);
+                return (
+                  <div className={`timeBarItem ${item.peak ? 'isPeak' : ''}`} key={item.time}>
+                    <div className="barTrack">
+                      <i
+                        className="spend"
+                        style={{
+                          height: `${item.spend}%`,
+                          background: gradient,
+                          boxShadow: boxShadowStyle
+                        }}
+                      >
+                        <span className="barValue">
+                          <b>{item.spend}%</b>
+                          <small>{item.emotion}</small>
+                        </span>
+                      </i>
+                    </div>
+                    <span>{item.time}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </GlassCard>
+
+        <GlassCard className="contentInsightRail monthlySpendCard combinedSpendBudgetCard">
           <div className="sectionTitle compact">
-            <span>이번 달 지출 진단</span>
+            <span>이번 달 지출 & 예산 진단</span>
             <strong>{formatMoney(totalExpense)} 썼어요</strong>
           </div>
           <div className="monthlySpendGauge">
             <span style={{ width: `${budgetUsedRate}%` }} />
           </div>
-          <p>
-            예산의 <b>{budgetUsedRate}%</b>를 사용했어요. 아직 {formatMoney(budgetGap)} 여유가 있지만,
-            감정소비 비중은 조금 낮추는 노력이 필요해요.
+          <p className="gaugeDesc">
+            예산의 <b>{budgetUsedRate}%</b>를 사용했어요. 아직 {formatMoney(budgetGap)} 여유가 있지만, 감정소비 비중은 조금 낮추는 노력이 필요해요.
           </p>
           <div className="monthlySpendAdvice">
             <span>추천 이번 달 한도</span>
             <strong>{formatMoney(recommendedBudget)}</strong>
             <small>남은 기간에는 하루 평균 {formatMoney(dailyLimit)} 안쪽으로 맞춰봐요.</small>
           </div>
-        </GlassCard>
 
-        <GlassCard className="emotionBubblePanel budgetPlannerPanel">
-          <div className="sectionTitle compact">
-            <strong>한 달 예산 정하기</strong>
-            <span>카테고리별 권장 한도</span>
-          </div>
-          <div className="budgetPlanList">
-            {budgetPlans.map(item => (
-              <div key={item.label} className={`budgetPlanItem ${item.className}`}>
-                <div>
-                  <b>{item.label}</b>
-                  <span>{formatMoney(item.value)} / {formatMoney(item.max)}</span>
+          {(() => {
+            const extraPlan = budgetPlans.find(p => p.className === 'extra');
+            return extraPlan ? (
+              <div
+                className={`extraFlipWrapper ${isExtraFlipped ? 'flipped' : ''}`}
+                onClick={() => setIsExtraFlipped(prev => !prev)}
+              >
+                <div className="extraFlipInner">
+                  <div className="extraFlipFront">
+                    <div>
+                      <b>🌱 여유비 한도 진단</b>
+                      <small>터치하여 위아래로 뒤집어 한도 확인</small>
+                    </div>
+                    <span className="flipHintBadge">클릭해서 보기 🔄</span>
+                  </div>
+                  <div className="extraFlipBack">
+                    <div className="extraBackHeader">
+                      <b>{extraPlan.label}</b>
+                      <span>{formatMoney(extraPlan.value)} / {formatMoney(extraPlan.max)}</span>
+                    </div>
+                    <i><span style={{ width: `${Math.min(100, Math.round((extraPlan.value / extraPlan.max) * 100))}%` }} /></i>
+                  </div>
                 </div>
-                <i><span style={{ width: `${Math.min(100, Math.round((item.value / item.max) * 100))}%` }} /></i>
               </div>
-            ))}
-            <p>감정소비 한도는 이미 넘었어요. 다음 기록부터는 결제 전 메모를 한 줄 남기는 방식이 좋아요.</p>
-          </div>
-        </GlassCard>
+            ) : null;
+          })()}
 
-        <GlassCard className="timePatternPanel">
-          <div className="timePatternHeader">
-            <div className="sectionTitle compact">
-              <strong>시간대별 소비 패턴</strong>
-              <span>하루 중 지갑이 새는 시간</span>
+          <div className="budgetPlanSection">
+            <div className="budgetPlanList">
+              {detailedCategoryPlans
+                .slice()
+                .sort((a, b) => (a.max - a.value) - (b.max - b.value))
+                .slice(0, 3)
+                .map(item => (
+                  <div key={item.label} className={`budgetPlanItem ${item.danger ? 'dangerItem' : ''}`}>
+                    <div>
+                      <b>{item.label}</b>
+                      <span className={item.danger ? 'dangerText' : ''}>{formatMoney(item.value)} / {formatMoney(item.max)}</span>
+                    </div>
+                    <i><span style={{ width: `${Math.min(100, Math.round((item.value / item.max) * 100))}%`, background: item.color }} /></i>
+                  </div>
+                ))}
             </div>
-            <div className="timeLegend">
-              <span><i className="spend" />지출</span>
-              <span><i className="income" />수입</span>
+            <div className="totalRemainingBudgetFooter">
+              총 남은 예산: <b>{formatMoney(121000)}</b>
             </div>
-          </div>
-          <div className="timeBarChart">
-            {timeBars.map(item => (
-              <div className="timeBarItem" key={item.time}>
-                <div>
-                  <i className="spend" style={{ height: `${item.spend}%` }} />
-                  {item.income > 0 && <i className="income" style={{ height: `${item.income}%` }} />}
-                </div>
-                <span>{item.time}</span>
-              </div>
-            ))}
           </div>
         </GlassCard>
       </div>

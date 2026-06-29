@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { parseMoney } from '../../utils/money.js';
+import { emotionTags } from '../../constants/tags.js';
 
 const categoryChips = [
   { tagId: 'c1', label: '#배달', title: '배달', color: '#8EA0C8' },
@@ -9,14 +10,11 @@ const categoryChips = [
   { tagId: 'c5', label: '#편의점', title: '편의점', color: '#6EC8CA' }
 ];
 
-const emotionChips = [
-  { tagId: 'e2', label: '#외로움', color: '#6EA0FF' },
-  { tagId: 'e8', label: '#신남', color: '#FF7A8C' },
-  { tagId: 'e3', label: '#불안', color: '#F7B844' },
-  { tagId: 'e4', label: '#평온', color: '#46D3BC' },
-  { tagId: 'e5', label: '#화남', color: '#FF6666' },
-  { tagId: 'e6', label: '#무덤덤', color: '#9EA3BB' }
-];
+const emotionChips = emotionTags.map(tag => ({
+  tagId: tag.tagId,
+  label: `#${tag.name}`,
+  color: tag.color
+}));
 
 const situationChips = [
   { tagId: 's1', label: '#야근', color: '#7B8DFF' },

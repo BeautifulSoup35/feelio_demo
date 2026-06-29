@@ -3,10 +3,20 @@ export const emotionTags = [
   { tagId: 'e2', name: '외로움', type: 'EMOTION', color: '#FF7A6B', isDefault: true },
   { tagId: 'e3', name: '불안', type: 'EMOTION', color: '#F5A623', isDefault: true },
   { tagId: 'e4', name: '평온', type: 'EMOTION', color: '#2FBFA6', isDefault: true },
-  { tagId: 'e5', name: '분노', type: 'EMOTION', color: '#F25555', isDefault: true },
+  { tagId: 'e5', name: '화남', type: 'EMOTION', color: '#F25555', isDefault: true },
   { tagId: 'e6', name: '무덤덤', type: 'EMOTION', color: '#9AA0B4', isDefault: true },
   { tagId: 'e7', name: '스트레스', type: 'EMOTION', color: '#8A6CFF', isDefault: true },
-  { tagId: 'e8', name: '뿌듯함', type: 'EMOTION', color: '#F35FA8', isDefault: true }
+  { tagId: 'e8', name: '성취감', type: 'EMOTION', color: '#F35FA8', isDefault: true },
+  { tagId: 'e9', name: '신남', type: 'EMOTION', color: '#FF7A8C', isDefault: true },
+  { tagId: 'e10', name: '설렘', type: 'EMOTION', color: '#FF66B2', isDefault: true },
+  { tagId: 'e11', name: '우울', type: 'EMOTION', color: '#8A6CFF', isDefault: true },
+  { tagId: 'e12', name: '자신감', type: 'EMOTION', color: '#5B8DEF', isDefault: true },
+  { tagId: 'e13', name: '고민', type: 'EMOTION', color: '#9AA0B4', isDefault: true },
+  { tagId: 'e14', name: '행복', type: 'EMOTION', color: '#2FBFA6', isDefault: true },
+  { tagId: 'e15', name: '민망함', type: 'EMOTION', color: '#9AA0B4', isDefault: true },
+  { tagId: 'e16', name: '충동', type: 'EMOTION', color: '#F25555', isDefault: true },
+  { tagId: 'e17', name: '귀찮음', type: 'EMOTION', color: '#8A6CFF', isDefault: true },
+  { tagId: 'e18', name: 'FOMO(놓칠까 두려움)', type: 'EMOTION', color: '#F5A623', isDefault: true }
 ];
 
 export const expenseCategoryTags = [

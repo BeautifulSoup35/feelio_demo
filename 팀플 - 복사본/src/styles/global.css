@@ -1895,37 +1895,111 @@ input, textarea {
 
 .parallelCard { grid-column: 1 / -1; }
 .parallelGrid {
+  position: relative;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  gap: 42px;
   margin-top: 16px;
 }
-.futureCard {
-  width: 100%;
-  min-height: 146px;
-  border-radius: 20px;
-  padding: 18px;
-  display: grid;
-  align-content: center;
-  justify-items: center;
-  text-align: center;
-  gap: 8px;
-  color: #fff;
-}
-.futureCard span {
-  width: 44px;
-  height: 44px;
+.versusBadge {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  font-family: Fredoka, Pretendard, sans-serif;
+  font-size: 15px;
+  font-weight: 900;
+  color: rgba(255, 255, 255, 0.9);
+  background: rgba(15, 23, 42, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
   display: grid;
   place-items: center;
-  border-radius: 16px;
-  background: rgba(255, 255, 255, .12);
-  font-family: Fredoka, sans-serif;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.6);
+  pointer-events: none;
+}
+.futureCardWrapper {
+  perspective: 1000px;
+  cursor: pointer;
+  height: 124px;
+  width: 100%;
+}
+.futureCardInner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 20px;
+  transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
+  transform-style: preserve-3d;
+  color: #fff;
+}
+.futureCardWrapper.flipped .futureCardInner {
+  transform: rotateX(180deg);
+}
+.futureCardFront,
+.futureCardBack {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 20px;
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  text-align: left;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  box-sizing: border-box;
+}
+.futureCardFront {
+  z-index: 2;
+}
+.futureCardBack {
+  transform: rotateX(180deg);
+  background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+.futureIcon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  line-height: 1;
+}
+.futureContent {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.futureTag {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--mint);
+}
+.futureCardInner.quiet .futureTag {
+  color: rgba(255, 255, 255, 0.6);
+}
+.futureCardInner strong {
+  font-size: 17px;
+  font-weight: 800;
+  color: #fff;
+}
+.futureCardInner small { color: var(--muted); }
+.futurePriceText {
+  color: #5B8DEF !important;
+  font-size: 20px !important;
   font-weight: 800;
 }
-.futureCard small { color: var(--muted); }
-.futureCard.good { background: rgba(47, 191, 166, .18); border: 1px solid rgba(47, 191, 166, .4); }
-.futureCard.quiet { background: rgba(255, 255, 255, .06); border: 1px solid rgba(255, 255, 255, .13); }
-.futureCard.active {
+.futureCardInner.good { background: rgba(47, 191, 166, .18); border: 1px solid rgba(47, 191, 166, .4); }
+.futureCardInner.quiet { background: rgba(255, 255, 255, .06); border: 1px solid rgba(255, 255, 255, .13); }
+.futureCardInner.active {
   border-color: rgba(91, 141, 239, .72);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, .14),
@@ -1939,13 +2013,16 @@ input, textarea {
 .contentLowerGrid {
   grid-column: 1 / -1;
   display: grid;
-  grid-template-columns: minmax(420px, 1fr) minmax(360px, .9fr);
+  grid-template-columns: minmax(440px, 1.08fr) minmax(360px, 0.92fr);
   gap: 22px;
+  align-items: stretch;
 }
 .contentLowerGrid > * {
   min-width: 0;
 }
 .monthlyReport {
+  grid-column: 1;
+  grid-row: 1;
   min-height: 210px;
 }
 .contentPriceReveal {
@@ -1969,6 +2046,14 @@ input, textarea {
   color: #fff;
   font-family: Fredoka, Pretendard, sans-serif;
   font-size: 28px;
+}
+.contentPriceReveal .factAttackMain {
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  line-height: 1.6 !important;
+  color: #FF8BA7 !important;
+  margin-top: 6px !important;
+  word-break: keep-all;
 }
 .contentPriceReveal p,
 .patternDetail p {
@@ -2062,10 +2147,138 @@ input, textarea {
 }
 .emotionBubblePanel,
 .timePatternPanel {
+  grid-column: 1;
+  grid-row: 2;
   min-height: 300px;
   background:
     radial-gradient(420px 260px at 58% 68%, rgba(243, 95, 168, .13), transparent 70%),
     rgba(255, 255, 255, .045);
+}
+.combinedSpendBudgetCard {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  height: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 16px;
+}
+.combinedSpendBudgetCard .sectionTitle.compact strong {
+  font-size: 24px !important;
+  font-weight: 800 !important;
+  color: #fff !important;
+  margin-top: 4px;
+}
+.combinedSpendBudgetCard .gaugeDesc {
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 15px;
+  line-height: 1.6;
+  margin: 0;
+}
+.combinedSpendBudgetCard .gaugeDesc b {
+  color: #2FBFA6;
+  font-size: 16px;
+}
+.combinedSpendBudgetCard .budgetPlanSection {
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+.extraFlipWrapper {
+  perspective: 1000px;
+  cursor: pointer;
+  height: 64px;
+  width: 100%;
+  margin-top: 4px;
+}
+.extraFlipInner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 18px;
+  transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
+  transform-style: preserve-3d;
+  color: #fff;
+}
+.extraFlipWrapper.flipped .extraFlipInner {
+  transform: rotateX(180deg);
+}
+.extraFlipFront,
+.extraFlipBack {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 18px;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  box-sizing: border-box;
+}
+.extraFlipFront {
+  z-index: 2;
+  background: rgba(47, 191, 166, 0.12);
+  border: 1px dashed rgba(47, 191, 166, 0.45);
+  transition: all 0.2s ease;
+}
+.extraFlipFront:hover {
+  background: rgba(47, 191, 166, 0.18);
+  border-color: rgba(47, 191, 166, 0.7);
+}
+.extraFlipFront b {
+  color: #2FBFA6;
+  font-size: 13px;
+  display: block;
+}
+.extraFlipFront small {
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 11px;
+  margin-top: 2px;
+  display: block;
+}
+.extraFlipFront .flipHintBadge {
+  font-size: 11px;
+  font-weight: 800;
+  color: #2FBFA6;
+  background: rgba(47, 191, 166, 0.15);
+  padding: 4px 10px;
+  border-radius: 10px;
+}
+.extraFlipBack {
+  transform: rotateX(180deg);
+  background: rgba(47, 191, 166, 0.15);
+  border: 1px solid rgba(47, 191, 166, 0.45);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+}
+.extraFlipBack .extraBackHeader {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 12px;
+  font-weight: 800;
+}
+.extraFlipBack .extraBackHeader b { color: #fff; }
+.extraFlipBack i {
+  width: 100%;
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+}
+.extraFlipBack i span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: #2FBFA6;
 }
 .bubbleField {
   position: relative;
@@ -2139,59 +2352,149 @@ input, textarea {
 }
 .timeLegend {
   display: flex;
-  gap: 12px;
-  color: rgba(255, 255, 255, .58);
+  align-items: center;
+  gap: 14px;
+  color: rgba(255, 255, 255, .68);
   font-size: 11px;
-  font-weight: 750;
+  font-weight: 700;
 }
 .timeLegend span {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
 }
 .timeLegend i {
   width: 8px;
   height: 8px;
-  border-radius: 2px;
+  border-radius: 50%;
 }
-.timeLegend .spend { background: #F35FA8; }
-.timeLegend .income { background: #5B8DEF; }
+.timeLegend .emotionLegendChip {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: rgba(255, 255, 255, 0.65);
+  padding: 4px 12px;
+  border-radius: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 11px;
+  font-family: inherit;
+}
+.timeLegend .emotionLegendChip:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.9);
+}
+.timeLegend .emotionLegendChip.active {
+  background: rgba(243, 95, 168, 0.2);
+  border-color: rgba(243, 95, 168, 0.5);
+  color: #FF8BA7;
+  box-shadow: 0 0 12px rgba(243, 95, 168, 0.3);
+}
+.timeLegend .peakBadge {
+  background: rgba(243, 95, 168, 0.15);
+  border: 1px solid rgba(243, 95, 168, 0.35);
+  color: #FF7B93;
+  padding: 4px 12px;
+  border-radius: 14px;
+  font-weight: 800;
+}
+.timeBarChartWrapper {
+  position: relative;
+  margin-top: 14px;
+  padding: 16px 4px 6px;
+}
+.timeChartGrid {
+  position: absolute;
+  top: 16px;
+  left: 0;
+  right: 0;
+  height: 140px;
+  pointer-events: none;
+}
+.timeChartGrid span {
+  position: absolute;
+  left: 0;
+  right: 0;
+  border-top: 1px dashed rgba(255, 255, 255, 0.08);
+}
 .timeBarChart {
-  height: 214px;
+  height: 184px;
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(12, 1fr);
   align-items: end;
-  gap: 18px;
-  padding: 26px 8px 0;
+  gap: 8px;
+  position: relative;
+  z-index: 1;
 }
 .timeBarItem {
-  display: grid;
-  justify-items: center;
-  gap: 10px;
-}
-.timeBarItem div {
-  height: 140px;
   display: flex;
-  align-items: end;
-  gap: 5px;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  height: 100%;
+  justify-content: flex-end;
 }
-.timeBarItem i {
-  width: 13px;
-  min-height: 18px;
-  border-radius: 999px;
-  display: block;
+.timeBarItem .barTrack {
+  width: 100%;
+  max-width: 24px;
+  height: 140px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 12px;
+  display: flex;
+  align-items: flex-end;
+  position: relative;
+  overflow: visible;
 }
 .timeBarItem i.spend {
-  background: linear-gradient(180deg, rgba(243, 95, 168, .96), rgba(151, 61, 133, .78));
-  box-shadow: 0 16px 28px -18px rgba(243, 95, 168, .95);
+  width: 100%;
+  min-height: 12px;
+  border-radius: 10px;
+  display: block;
+  position: relative;
+  transition: all 0.3s ease;
 }
-.timeBarItem i.income {
-  background: linear-gradient(180deg, rgba(91, 141, 239, .96), rgba(65, 93, 166, .78));
+.timeBarItem .barValue {
+  position: absolute;
+  top: -36px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  font-size: 10px;
+  color: #fff;
+  opacity: 0;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  white-space: nowrap;
+  pointer-events: none;
+  background: rgba(15, 23, 42, 0.95);
+  padding: 3px 7px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+  z-index: 10;
+}
+.timeBarItem .barValue b {
+  font-weight: 800;
+  color: #fff;
+}
+.timeBarItem .barValue small {
+  font-size: 9px;
+  color: rgba(255, 255, 255, 0.75);
+}
+.timeBarItem:hover .barValue,
+.timeBarItem.isPeak .barValue {
+  opacity: 1;
 }
 .timeBarItem span {
-  color: rgba(255, 255, 255, .48);
+  color: rgba(255, 255, 255, .55);
   font-size: 11px;
-  font-weight: 750;
+  font-weight: 700;
+}
+.timeBarItem.isPeak span {
+  color: #FF7B93;
+  font-weight: 800;
 }
 .patternPanel {
   display: grid;
@@ -2699,8 +3002,7 @@ input, textarea {
     font-size: 12px;
   }
   .formGrid,
-  .dateGrid,
-  .parallelGrid { grid-template-columns: 1fr; }
+  .dateGrid { grid-template-columns: 1fr; }
   .calendarCard { padding: 16px; }
   .monthGrid { gap: 6px; }
   .dayCell { min-height: 54px; border-radius: 14px; padding: 7px; }
@@ -3048,18 +3350,37 @@ input, textarea {
 }
 .budgetPlanItem {
   display: grid;
-  gap: 10px;
-  padding: 14px 16px;
-  border-radius: 18px;
-  border: 1px solid rgba(255, 255, 255, .12);
-  background: rgba(255, 255, 255, .055);
+  gap: 8px;
+  padding: 8px 0;
+  border-radius: 0;
+  border: none;
+  background: transparent;
+}
+.budgetPlanItem.dangerItem .dangerText {
+  color: #FF4757 !important;
+  font-weight: 800;
+}
+.totalRemainingBudgetFooter {
+  text-align: center;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px dashed rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 14px;
+  font-weight: 700;
+}
+.totalRemainingBudgetFooter b {
+  color: #fff;
+  font-size: 18px;
+  font-family: Fredoka, Pretendard, sans-serif;
+  margin-left: 4px;
 }
 .budgetPlanItem div {
   display: flex;
   justify-content: space-between;
   gap: 12px;
-  color: rgba(255, 255, 255, .68);
-  font-size: 12px;
+  color: rgba(255, 255, 255, .78);
+  font-size: 13px;
   font-weight: 800;
 }
 .budgetPlanItem b {
@@ -3088,8 +3409,19 @@ input, textarea {
 }
 
 @media (max-width: 1040px) {
+  .contentLowerGrid {
+    grid-template-columns: 1fr !important;
+    gap: 18px;
+  }
+  .monthlyReport,
+  .timePatternPanel,
+  .combinedSpendBudgetCard {
+    grid-column: auto !important;
+    grid-row: auto !important;
+    width: 100%;
+  }
   .contentStatRow {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(3, 1fr);
   }
   .contentStatCard {
     min-height: 96px;
@@ -3098,9 +3430,60 @@ input, textarea {
   .budgetPlannerPanel {
     min-height: auto;
   }
-  .budgetPlanItem div {
-    display: grid;
+}
+
+@media (max-width: 1040px) {
+  .parallelGrid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 20px !important;
+  }
+  .futureCardWrapper {
+    height: 180px !important;
+  }
+  .futureCardFront,
+  .futureCardBack {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    text-align: center !important;
+    padding: 16px 8px !important;
+  }
+  .futureContent {
+    display: contents !important;
+  }
+  .futureTag {
+    order: 1 !important;
+    font-size: 11px !important;
+  }
+  .futureIcon {
+    order: 2 !important;
+    font-size: 38px !important;
+    margin: 4px 0 !important;
+  }
+  .futureCardInner strong {
+    order: 3 !important;
+    font-size: 15px !important;
+  }
+  .futureCardInner small {
+    order: 4 !important;
+    font-size: 11px !important;
+    margin-top: -2px !important;
+  }
+  .versusBadge {
+    width: 34px !important;
+    height: 34px !important;
+    font-size: 13px !important;
+  }
+}
+  .contentStatRow {
+    grid-template-columns: 1fr;
+  }
+  .timeBarChart {
     gap: 4px;
+  }
+  .timeBarItem span {
+    font-size: 9px;
   }
 }
 

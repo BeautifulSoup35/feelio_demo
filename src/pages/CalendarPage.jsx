@@ -55,7 +55,7 @@ function selectedFallbackRecords(selectedDay) {
   return [];
 }
 
-export default function CalendarPage({ state, onAddTransaction }) {
+export default function CalendarPage({ state, onAddTransaction, theme, onToggleTheme }) {
   const [selectedDate, setSelectedDate] = useState('2026-06-14');
   const [isAdding, setIsAdding] = useState(false);
   const days = buildDays();
@@ -85,9 +85,19 @@ export default function CalendarPage({ state, onAddTransaction }) {
           <h1>2026년 6월</h1>
           <p>평온하게 시작했지만, 셋째 주는 파랗게 가라앉았어요.</p>
         </div>
-        <div className="calendarNavButtons">
-          <button type="button" aria-label="이전 달">‹</button>
-          <button type="button" aria-label="다음 달">›</button>
+        <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+          <button
+            type="button"
+            className="themeToggleButtonMobile"
+            onClick={onToggleTheme}
+            aria-label="테마 전환"
+          >
+            {theme === 'day' ? '☀️' : '🌙'}
+          </button>
+          <div className="calendarNavButtons">
+            <button type="button" aria-label="이전 달">‹</button>
+            <button type="button" aria-label="다음 달">›</button>
+          </div>
         </div>
         <div className="emotionLegend">
           {legend.map(([key, label]) => (

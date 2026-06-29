@@ -1,13 +1,30 @@
+import { useMemo } from 'react';
 import GlassCard from '../components/common/GlassCard.jsx';
 import { formatMoney } from '../utils/money.js';
+import { aiEmotionComments } from '../constants/aiComments.js';
 
-export default function ContentPage({ state }) {
+export default function ContentPage({ state, theme, onToggleTheme }) {
   const expenses = state.transactions.filter(item => item.transactionType === 'EXPENSE');
   const totalExpense = expenses.reduce((sum, item) => sum + item.amount, 0);
   const emotionalExpense = expenses
     .filter(item => item.tags.some(tagId => ['e1', 'e2', 'e3', 'e5', 'e7'].includes(tagId)))
     .reduce((sum, item) => sum + item.amount, 0);
   const leakRate = totalExpense ? Math.round((emotionalExpense / totalExpense) * 100) : 0;
+
+  // Extract unique emotion tags recorded in user's expenses
+  const userEmotions = useMemo(() => {
+    const emotionSet = new Set();
+    state.transactions
+      .filter(item => item.transactionType === 'EXPENSE')
+      .forEach(item => {
+        item.tags.forEach(tagId => {
+          if (tagId.startsWith('e')) {
+            emotionSet.add(tagId);
+          }
+        });
+      });
+    return Array.from(emotionSet);
+  }, [state.transactions]);
 
   return (
     <div className="pageGrid contentGrid">
@@ -16,26 +33,44 @@ export default function ContentPage({ state }) {
           <p>Content</p>
           <h1>콘텐츠</h1>
         </div>
+        <button
+          type="button"
+          className="themeToggleButtonMobile"
+          onClick={onToggleTheme}
+          aria-label="테마 전환"
+        >
+          {theme === 'day' ? '☀️' : '🌙'}
+        </button>
       </div>
 
       <GlassCard className="parallelCard">
         <div className="sectionTitle compact">
-          <span>평행우주 · 2029년</span>
-          <strong>같은 출발점, 다른 미래</strong>
+          <span>평행우주 · 2029년의 나</span>
+          <strong>같은 출발선에서 갈라진 선택</strong>
         </div>
         <div className="parallelGrid">
           <div className="futureCard good">
-            <span>A</span>
-            <strong>감정소비를 막은 나</strong>
-            <small>3년 뒤 주거 선택지 +6,500만원</small>
+            <div className="futureIcon">🏡</div>
+            <div className="futureContent">
+              <span className="futureTag">감정소비 막은 나</span>
+              <strong>전세 아파트 입주</strong>
+              <small>보증금 2.4억 · 목표 3년 앞당김</small>
+            </div>
           </div>
           <div className="futureCard quiet">
-            <span>B</span>
-            <strong>그대로 쓴 나</strong>
-            <small>매달 월세 부담 -65만원</small>
+            <div className="futureIcon">🏢</div>
+            <div className="futureContent">
+              <span className="futureTag">그대로 쓴 나</span>
+              <strong>월세 원룸 4년째</strong>
+              <small>매달 -65만 · 모은 돈 거의 없음</small>
+            </div>
           </div>
         </div>
-        <p className="cardText">월 18만원의 감정소비만 줄여도, 3년 뒤 선택지가 달라져요.</p>
+        <div className="parallelSummary">
+          <p className="summaryLabel">감정소비를 월 18만씩만 막아도</p>
+          <h2 className="summaryAmount">+65,000,000원</h2>
+          <p className="cardText">3년 뒤 두 우주의 사이는 현재의 작은 선택에서 시작돼요.</p>
+        </div>
       </GlassCard>
 
       <GlassCard className="reportCard">
@@ -50,18 +85,25 @@ export default function ContentPage({ state }) {
       </GlassCard>
 
       <div className="insightStack">
-        <div className="insightCard blue">
-          <strong>야근 1번, 지갑이 열린다</strong>
-          <span>저녁 이후 소비의 78%가 피곤 또는 스트레스 태그와 연결돼요.</span>
-        </div>
-        <div className="insightCard gold">
-          <strong>월급날 다음 3일이 위험해요</strong>
-          <span>보상소비가 평소보다 2.3배 높아지는 구간이에요.</span>
-        </div>
-        <div className="insightCard pink">
-          <strong>감정소비 금액</strong>
-          <span>{formatMoney(emotionalExpense)}가 이번 달 감정소비로 분류됐어요.</span>
-        </div>
+        {userEmotions.length === 0 ? (
+          <div className="insightCard blue">
+            <strong>감정 기록이 없습니다</strong>
+            <span>오늘 소비에서 느낀 감정을 기록하면 AI가 분석 코멘트를 이곳에 정리해 줍니다.</span>
+          </div>
+        ) : (
+          userEmotions.map((tagId, index) => {
+            const commentInfo = aiEmotionComments[tagId];
+            if (!commentInfo) return null;
+            const colors = ['blue', 'gold', 'pink'];
+            const cardColor = colors[index % colors.length];
+            return (
+              <div className={`insightCard ${cardColor}`} key={tagId}>
+                <strong>{commentInfo.emoji} {commentInfo.name} 소비 시그널</strong>
+                <span>{commentInfo.comment}</span>
+              </div>
+            );
+          })
+        )}
       </div>
     </div>
   );

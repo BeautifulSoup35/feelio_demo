@@ -82,5 +82,6 @@ export const initialState = {
   user: initialUser,
   goals: initialGoals,
   transactions: initialTransactions,
-  tags: allTags
+  tags: allTags,
+  theme: 'night'
 };
