@@ -3485,7 +3485,6 @@ input, textarea {
   .timeBarItem span {
     font-size: 9px;
   }
-}
 
 /* Refinements from UI review: entry feedback, compact record list, report cards */
 .homeActionCluster {
@@ -5522,5 +5521,658 @@ input, textarea {
   .selectedDayPanel {
     height: min(400px, calc(100vh - 236px));
     min-height: 320px;
+  }
+}
+
+/* Content palette harmonization: use Feelio's soft emotion colors instead of alert-like accents. */
+.contentPriceReveal .factAttackMain {
+  color: rgba(249, 169, 203, .92) !important;
+}
+
+.timePatternPanel {
+  background:
+    radial-gradient(420px 260px at 58% 68%, rgba(201, 178, 244, .10), transparent 70%),
+    rgba(255, 255, 255, .055);
+}
+
+.timeLegend .peakBadge {
+  background: rgba(249, 169, 203, .10);
+  border-color: rgba(249, 169, 203, .28);
+  color: rgba(249, 169, 203, .92);
+}
+
+.timeBarItem.isPeak span {
+  color: rgba(249, 169, 203, .90);
+}
+
+.contentStatCard.blue,
+.monthlyInsightDetail.blue {
+  background: rgba(159, 176, 240, .13);
+  border-color: rgba(159, 176, 240, .34);
+}
+
+.contentStatCard.gold,
+.monthlyInsightDetail.gold {
+  background: rgba(248, 192, 136, .11);
+  border-color: rgba(248, 192, 136, .32);
+}
+
+.contentStatCard.pink,
+.monthlyInsightDetail.pink {
+  background: rgba(249, 169, 203, .11);
+  border-color: rgba(249, 169, 203, .30);
+}
+
+.budgetPlanItem.dangerItem .dangerText {
+  color: rgba(248, 145, 137, .92) !important;
+}
+
+.combinedSpendBudgetCard .gaugeDesc b {
+  color: #92DEC2;
+}
+
+.budgetPlanItem.extra i span {
+  background: #92DEC2;
+}
+
+.budgetPlanItem.emotion i span {
+  background: #F9A9CB;
+}
+
+/* Future comparison card harmonization. */
+.parallelGrid {
+  align-items: center;
+}
+
+.versusBadge {
+  width: auto;
+  height: auto;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: rgba(255, 255, 255, .46);
+  letter-spacing: 0;
+}
+
+.futureCardBack {
+  background:
+    radial-gradient(260px 160px at 84% 110%, rgba(201, 178, 244, .12), transparent 70%),
+    rgba(255, 255, 255, .060);
+  border-color: rgba(255, 255, 255, .18);
+}
+
+.futurePriceText {
+  color: #92DEC2 !important;
+  text-shadow: 0 0 18px rgba(146, 222, 194, .18);
+}
+
+.futureCardInner.good {
+  background: rgba(146, 222, 194, .12);
+  border-color: rgba(146, 222, 194, .38);
+}
+
+.futureCardInner.quiet {
+  background: rgba(159, 176, 240, .105);
+  border-color: rgba(159, 176, 240, .24);
+}
+
+.futureCardInner.active {
+  border-color: rgba(255, 255, 255, .72);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .16),
+    0 18px 40px -30px rgba(255, 255, 255, .42);
+}
+
+.futureCardInner.good .futureTag {
+  color: #92DEC2;
+}
+
+.futureCardInner.quiet .futureTag {
+  color: rgba(159, 176, 240, .82);
+}
+
+@media (max-width: 1040px) {
+  .versusBadge {
+    width: auto !important;
+    height: auto !important;
+    font-size: 13px !important;
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+  }
+}
+
+/* Screen restructure: home summary, transactions, analysis, story content */
+.homeMoodCard {
+  min-height: clamp(330px, 38vh, 390px);
+  display: grid;
+  align-content: space-between;
+  overflow: hidden;
+  background:
+    radial-gradient(420px 260px at 72% 58%, rgba(146, 222, 194, .20), transparent 72%),
+    radial-gradient(520px 280px at 20% 108%, rgba(249, 169, 203, .16), transparent 74%),
+    rgba(255, 255, 255, .055);
+}
+
+.homeMoodBody {
+  display: grid;
+  grid-template-columns: minmax(0, .88fr) minmax(290px, 1.12fr);
+  align-items: end;
+  gap: 24px;
+}
+
+.homeMoodCopy {
+  display: grid;
+  gap: 12px;
+  color: rgba(255, 255, 255, .78);
+  line-height: 1.75;
+}
+
+.homeMoodCopy p {
+  margin: 0;
+  max-width: 42ch;
+}
+
+.homeMoodCopy span {
+  color: rgba(255, 255, 255, .48);
+  font-size: 13px;
+}
+
+.homeMoodBlob {
+  display: grid;
+  place-items: center;
+}
+
+.pageLead {
+  position: relative;
+}
+
+.homeMalliHouse {
+  display: grid;
+  grid-template-rows: minmax(170px, 1fr) auto;
+  gap: 14px;
+  align-self: stretch;
+  min-height: 260px;
+}
+
+.homeMalliStage {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 188px;
+  border-radius: 30px;
+  overflow: hidden;
+}
+
+.homeMalliStage::before {
+  content: "";
+  position: absolute;
+  inset: 34px 14px 0;
+  border-radius: 999px 999px 40px 40px;
+  background:
+    radial-gradient(160px 90px at 50% 70%, rgba(255, 255, 255, .18), transparent 70%),
+    radial-gradient(240px 120px at 50% 100%, rgba(146, 222, 194, .20), transparent 74%);
+  filter: blur(12px);
+  opacity: .9;
+}
+
+.homeMalliStage::after {
+  content: "";
+  position: absolute;
+  left: 18%;
+  right: 18%;
+  bottom: 12px;
+  height: 20px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, .18);
+  filter: blur(13px);
+}
+
+.homeMalliStage > * {
+  position: relative;
+  z-index: 1;
+}
+
+.homeMoodStats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.homeMoodStats span {
+  display: grid;
+  gap: 8px;
+  min-height: 92px;
+  align-content: center;
+  padding: 16px;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, .07);
+  border: 1px solid rgba(255, 255, 255, .12);
+}
+
+.homeMoodStats small {
+  color: rgba(255, 255, 255, .52);
+}
+
+.homeMoodStats b {
+  font-family: Fredoka, Pretendard, sans-serif;
+  font-size: 26px;
+}
+
+.homeRecentCard {
+  min-height: 194px;
+  display: grid;
+  align-content: start;
+  gap: 14px;
+  background:
+    radial-gradient(260px 180px at 100% 0%, rgba(201, 178, 244, .12), transparent 72%),
+    rgba(255, 255, 255, .055);
+}
+
+.homeRecentList {
+  display: grid;
+  gap: 10px;
+}
+
+.homeRecentItem {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr) max-content;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, .09);
+}
+
+.homeRecentItem:last-child {
+  border-bottom: 0;
+}
+
+.homeRecentItem > span {
+  padding: 7px 10px;
+  border-radius: 99px;
+  background: rgba(255, 255, 255, .10);
+  border: 1px solid rgba(255, 255, 255, .16);
+  color: rgba(255, 255, 255, .78);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.homeRecentItem b,
+.homeRecentItem small {
+  display: block;
+}
+
+.homeRecentItem small {
+  margin-top: 3px;
+  color: rgba(255, 255, 255, .52);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.homeRecentItem strong {
+  font-family: Fredoka, Pretendard, sans-serif;
+  white-space: nowrap;
+}
+
+.transactionsGrid,
+.analysisGrid {
+  grid-template-columns: minmax(520px, 1.05fr) minmax(340px, .95fr);
+  align-items: start;
+}
+
+.transactionsMain,
+.transactionsAside {
+  display: grid;
+  gap: 18px;
+}
+
+.transactionsAside {
+  align-content: start;
+}
+
+.transactionSummaryCard,
+.transactionHistoryCard,
+.analysisHeroCard,
+.analysisPanel,
+.storyCard {
+  background:
+    radial-gradient(360px 220px at 98% 14%, rgba(47, 191, 166, .12), transparent 72%),
+    rgba(255, 255, 255, .055);
+}
+
+.transactionSummaryGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 18px 0;
+}
+
+.transactionSummaryGrid span {
+  display: grid;
+  gap: 8px;
+  padding: 16px;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, .07);
+  border: 1px solid rgba(255, 255, 255, .12);
+}
+
+.transactionSummaryGrid small,
+.transactionHistoryItem span,
+.transactionHistoryItem small {
+  color: rgba(255, 255, 255, .52);
+}
+
+.transactionSummaryGrid b {
+  font-family: Fredoka, Pretendard, sans-serif;
+  font-size: 22px;
+}
+
+.transactionHistoryList {
+  display: grid;
+  gap: 10px;
+  max-height: min(52vh, 520px);
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.transactionHistoryItem {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) max-content max-content;
+  gap: 14px;
+  align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, .1);
+}
+
+.transactionHistoryItem:last-child {
+  border-bottom: 0;
+}
+
+.transactionHistoryItem strong,
+.transactionHistoryItem p {
+  display: block;
+  margin: 4px 0 0;
+}
+
+.transactionHistoryItem p {
+  color: rgba(255, 255, 255, .72);
+  line-height: 1.45;
+}
+
+.transactionHistoryItem > b {
+  color: rgba(255, 137, 129, .96);
+  font-family: Fredoka, Pretendard, sans-serif;
+}
+
+.transactionHistoryItem > b.income {
+  color: rgba(146, 222, 194, .96);
+}
+
+.transactionDeleteButton {
+  min-height: 32px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, .14);
+  background: rgba(255, 255, 255, .06);
+  color: rgba(255, 255, 255, .62);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.transactionDeleteButton:hover {
+  color: rgba(255, 255, 255, .9);
+  border-color: rgba(248, 145, 137, .42);
+  background: rgba(248, 145, 137, .14);
+}
+
+.transactionEmpty {
+  min-height: 180px;
+  display: grid;
+  place-items: center;
+  color: rgba(255, 255, 255, .55);
+  text-align: center;
+}
+
+.analysisHeroCard {
+  grid-column: 1 / -1;
+  min-height: 170px;
+  display: grid;
+  align-content: center;
+}
+
+.analysisSummaryCard {
+  min-height: 220px;
+  background:
+    radial-gradient(360px 220px at 88% 10%, rgba(201, 178, 244, .13), transparent 72%),
+    rgba(255, 255, 255, .055);
+}
+
+.analysisEmotionSummary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.analysisEmotionSummary > span {
+  display: grid;
+  gap: 8px;
+  padding: 16px;
+  border-radius: 22px;
+  background:
+    radial-gradient(120px 80px at 100% 0%, color-mix(in srgb, var(--emotion-color) 34%, transparent), transparent 72%),
+    rgba(255, 255, 255, .065);
+  border: 1px solid color-mix(in srgb, var(--emotion-color) 36%, rgba(255, 255, 255, .12));
+}
+
+.analysisEmotionSummary small,
+.analysisEmotionSummary em {
+  color: rgba(255, 255, 255, .58);
+  font-style: normal;
+}
+
+.analysisEmotionSummary b {
+  font-family: Fredoka, Pretendard, sans-serif;
+  font-size: 22px;
+}
+
+.analysisCategorySummary {
+  display: grid;
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.analysisCategorySummary > div {
+  display: grid;
+  gap: 8px;
+}
+
+.analysisCategorySummary span {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.analysisCategorySummary small {
+  color: rgba(255, 255, 255, .58);
+}
+
+.analysisCategorySummary i {
+  height: 10px;
+  overflow: hidden;
+  border-radius: 99px;
+  background: rgba(255, 255, 255, .12);
+}
+
+.analysisCategorySummary em {
+  display: block;
+  height: 100%;
+  min-width: 24px;
+  border-radius: inherit;
+}
+
+.analysisPanel.wide {
+  grid-column: 1 / -1;
+}
+
+.analysisBarList {
+  display: grid;
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.analysisBarItem {
+  display: grid;
+  gap: 8px;
+}
+
+.analysisBarItem div {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.analysisBarItem span {
+  color: rgba(255, 255, 255, .62);
+}
+
+.analysisBarItem i {
+  height: 10px;
+  border-radius: 99px;
+  background: rgba(255, 255, 255, .12);
+  overflow: hidden;
+}
+
+.analysisBarItem i span {
+  display: block;
+  height: 100%;
+  min-width: 24px;
+  border-radius: inherit;
+}
+
+.analysisEmotionGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.analysisEmotionGrid > span {
+  display: grid;
+  gap: 8px;
+  padding: 16px;
+  border-radius: 22px;
+  background:
+    radial-gradient(120px 80px at 100% 0%, color-mix(in srgb, var(--emotion-color) 34%, transparent), transparent 72%),
+    rgba(255, 255, 255, .065);
+  border: 1px solid color-mix(in srgb, var(--emotion-color) 36%, rgba(255, 255, 255, .12));
+}
+
+.analysisEmotionGrid small {
+  color: rgba(255, 255, 255, .58);
+}
+
+.analysisTimeBars {
+  min-height: 220px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  align-items: end;
+  gap: 18px;
+  padding-top: 24px;
+}
+
+.analysisTimeBars span {
+  min-height: 190px;
+  display: grid;
+  grid-template-rows: 1fr auto auto;
+  justify-items: center;
+  gap: 8px;
+}
+
+.analysisTimeBars i {
+  align-self: end;
+  width: min(64px, 68%);
+  min-height: 16px;
+  border-radius: 99px 99px 18px 18px;
+  background: linear-gradient(180deg, rgba(201, 178, 244, .95), rgba(91, 141, 239, .54));
+  box-shadow: 0 10px 24px rgba(138, 108, 255, .24);
+}
+
+.analysisTimeBars small {
+  color: rgba(255, 255, 255, .52);
+}
+
+.analysisBudgetValue {
+  margin: 18px 0 8px;
+  font-family: Fredoka, Pretendard, sans-serif;
+  font-size: clamp(34px, 5vw, 54px);
+  line-height: 1;
+}
+
+@media (max-width: 980px) {
+  .transactionsGrid,
+  .analysisGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .homeMoodBody {
+    grid-template-columns: 1fr;
+  }
+
+  .homeMalliStage {
+    justify-self: center;
+    width: 100%;
+  }
+
+  .analysisHeroCard,
+  .analysisPanel.wide {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 720px) {
+  .transactionHistoryList {
+    max-height: 360px;
+  }
+
+  .analysisEmotionGrid,
+  .transactionSummaryGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .analysisTimeBars {
+    gap: 10px;
+  }
+
+  .analysisTimeBars i {
+    width: min(42px, 74%);
+  }
+
+  .bottomNav {
+    gap: 4px;
+    padding-inline: 8px;
+  }
+
+  .bottomNav .navButton {
+    min-width: 0;
+    font-size: 10px;
+  }
+
+  .homeMoodStats,
+  .analysisEmotionSummary {
+    grid-template-columns: 1fr;
+  }
+
+  .homeRecentItem,
+  .transactionHistoryItem {
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+
+  .transactionDeleteButton {
+    justify-self: start;
   }
 }

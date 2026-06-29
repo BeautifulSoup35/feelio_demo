@@ -4,7 +4,9 @@ import BottomNav from './components/common/BottomNav.jsx';
 import Sidebar from './components/common/Sidebar.jsx';
 import ProfileModal from './components/profile/ProfileModal.jsx';
 import HomePage from './pages/HomePage.jsx';
+import TransactionsPage from './pages/TransactionsPage.jsx';
 import CalendarPage from './pages/CalendarPage.jsx';
+import AnalysisPage from './pages/AnalysisPage.jsx';
 import ContentPage from './pages/ContentPage.jsx';
 import OnboardingPage from './pages/OnboardingPage.jsx';
 import { useAppStore } from './stores/useAppStore.js';
@@ -65,10 +67,20 @@ export default function App() {
       <Sidebar currentTab={currentTab} onChange={setCurrentTab} user={state.user} onProfile={() => setProfileOpen(true)} />
       <main className="mainSurface">
         {currentTab === 'home' && (
-          <HomePage state={state} onAddTransaction={actions.addTransaction} onProfile={() => setProfileOpen(true)} />
+          <HomePage state={state} onProfile={() => setProfileOpen(true)} />
+        )}
+        {currentTab === 'transactions' && (
+          <TransactionsPage
+            state={state}
+            onAddTransaction={actions.addTransaction}
+            onRemoveTransaction={actions.removeTransaction}
+          />
         )}
         {currentTab === 'calendar' && (
           <CalendarPage state={state} onAddTransaction={actions.addTransaction} onRemoveTransaction={actions.removeTransaction} />
+        )}
+        {currentTab === 'analysis' && (
+          <AnalysisPage state={state} />
         )}
         {currentTab === 'content' && (
           <ContentPage state={state} />
