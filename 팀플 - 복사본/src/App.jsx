@@ -6,6 +6,7 @@ import ProfileModal from './components/profile/ProfileModal.jsx';
 import HomePage from './pages/HomePage.jsx';
 import CalendarPage from './pages/CalendarPage.jsx';
 import ContentPage from './pages/ContentPage.jsx';
+import OnboardingPage from './pages/OnboardingPage.jsx';
 import { useAppStore } from './stores/useAppStore.js';
 
 const auroraThemes = {
@@ -22,6 +23,9 @@ export default function App() {
   const { state, actions } = useAppStore();
   const [currentTab, setCurrentTab] = useState('home');
   const [profileOpen, setProfileOpen] = useState(false);
+  const [onboardingCompleted, setOnboardingCompleted] = useState(() => (
+    localStorage.getItem('feelio_onboarding_completed') === 'true'
+  ));
 
   const mainGoal = useMemo(() => state.goals.find(goal => goal.isMain) || state.goals[0], [state.goals]);
   const auroraColors = auroraThemes[state.user.auroraTheme || 'blue'] || auroraThemes.blue;
@@ -33,6 +37,19 @@ export default function App() {
 
   if (!state.isLoggedIn) {
     return <LoginPage onLogin={actions.login} />;
+  }
+
+  if (!onboardingCompleted) {
+    return (
+      <OnboardingPage
+        mainGoal={mainGoal}
+        onComplete={({ goalPatch }) => {
+          actions.updateGoal(goalPatch);
+          setOnboardingCompleted(true);
+          setCurrentTab('home');
+        }}
+      />
+    );
   }
 
   return (
