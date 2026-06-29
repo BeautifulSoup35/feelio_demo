@@ -1,8 +1,10 @@
-import { CalendarIcon, ContentIcon, HomeIcon } from './Icons.jsx';
+import { AnalysisIcon, CalendarIcon, ContentIcon, HomeIcon, WalletIcon } from './Icons.jsx';
 
 const tabs = [
   { key: 'home', label: '홈', Icon: HomeIcon },
+  { key: 'transactions', label: '지출', Icon: WalletIcon },
   { key: 'calendar', label: '캘린더', Icon: CalendarIcon },
+  { key: 'analysis', label: '분석', Icon: AnalysisIcon },
   { key: 'content', label: '콘텐츠', Icon: ContentIcon }
 ];
 

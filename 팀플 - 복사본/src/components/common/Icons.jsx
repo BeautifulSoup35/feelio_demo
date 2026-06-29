@@ -26,6 +26,29 @@ export function ContentIcon({ size = 22 }) {
   );
 }
 
+export function AnalysisIcon({ size = 22 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M4 19V5" />
+      <path d="M4 19h16" />
+      <path d="M8 16v-5" />
+      <path d="M12 16V8" />
+      <path d="M16 16v-7" />
+      <path d="M20 16v-3" />
+    </svg>
+  );
+}
+
+export function WalletIcon({ size = 22 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M4 7.5A2.5 2.5 0 0 1 6.5 5H18a2 2 0 0 1 2 2v12H6.5A2.5 2.5 0 0 1 4 16.5z" />
+      <path d="M4 8h16" />
+      <path d="M16 13h4v4h-4a2 2 0 0 1 0-4Z" />
+    </svg>
+  );
+}
+
 export function FeelioMark({ size = 34 }) {
   return (
     <svg width={size} height={size} viewBox="0 0 100 100" fill="none" aria-hidden="true">
