@@ -45,22 +45,32 @@ export default function ContentPage({ state, theme, onToggleTheme }) {
 
       <GlassCard className="parallelCard">
         <div className="sectionTitle compact">
-          <span>평행우주 · 2029년</span>
-          <strong>같은 출발점, 다른 미래</strong>
+          <span>평행우주 · 2029년의 나</span>
+          <strong>같은 출발선에서 갈라진 선택</strong>
         </div>
         <div className="parallelGrid">
           <div className="futureCard good">
-            <span>A</span>
-            <strong>감정소비를 막은 나</strong>
-            <small>3년 뒤 주거 선택지 +6,500만원</small>
+            <div className="futureIcon">🏡</div>
+            <div className="futureContent">
+              <span className="futureTag">감정소비 막은 나</span>
+              <strong>전세 아파트 입주</strong>
+              <small>보증금 2.4억 · 목표 3년 앞당김</small>
+            </div>
           </div>
           <div className="futureCard quiet">
-            <span>B</span>
-            <strong>그대로 쓴 나</strong>
-            <small>매달 월세 부담 -65만원</small>
+            <div className="futureIcon">🏢</div>
+            <div className="futureContent">
+              <span className="futureTag">그대로 쓴 나</span>
+              <strong>월세 원룸 4년째</strong>
+              <small>매달 -65만 · 모은 돈 거의 없음</small>
+            </div>
           </div>
         </div>
-        <p className="cardText">월 18만원의 감정소비만 줄여도, 3년 뒤 선택지가 달라져요.</p>
+        <div className="parallelSummary">
+          <p className="summaryLabel">감정소비를 월 18만씩만 막아도</p>
+          <h2 className="summaryAmount">+65,000,000원</h2>
+          <p className="cardText">3년 뒤 두 우주의 사이는 현재의 작은 선택에서 시작돼요.</p>
+        </div>
       </GlassCard>
 
       <GlassCard className="reportCard">

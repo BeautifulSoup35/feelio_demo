@@ -1670,28 +1670,68 @@ input, textarea {
   margin-top: 16px;
 }
 .futureCard {
-  min-height: 146px;
+  min-height: 124px;
   border-radius: 20px;
-  padding: 18px;
-  display: grid;
-  align-content: center;
-  justify-items: center;
-  text-align: center;
-  gap: 8px;
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  text-align: left;
 }
-.futureCard span {
-  width: 44px;
-  height: 44px;
+.futureIcon {
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
   display: grid;
   place-items: center;
   border-radius: 16px;
-  background: rgba(255, 255, 255, .12);
-  font-family: Fredoka, sans-serif;
-  font-weight: 800;
+  background: rgba(255, 255, 255, .1);
+  font-size: 24px;
 }
-.futureCard small { color: var(--muted); }
-.futureCard.good { background: rgba(47, 191, 166, .18); border: 1px solid rgba(47, 191, 166, .4); }
-.futureCard.quiet { background: rgba(255, 255, 255, .06); border: 1px solid rgba(255, 255, 255, .13); }
+.futureContent {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.futureTag {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--mint);
+}
+.futureCard.quiet .futureTag {
+  color: rgba(255, 255, 255, 0.6);
+}
+.futureCard strong {
+  font-size: 17px;
+  font-weight: 800;
+  color: #fff;
+}
+.futureCard small {
+  font-size: 12px;
+  color: var(--muted);
+}
+.futureCard.good { background: rgba(47, 191, 166, .14); border: 1px solid rgba(47, 191, 166, .35); }
+.futureCard.quiet { background: rgba(255, 255, 255, .05); border: 1px solid rgba(255, 255, 255, .12); }
+
+.parallelSummary {
+  margin-top: 18px;
+  padding: 18px 20px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.summaryLabel {
+  margin: 0;
+  font-size: 13px;
+  color: var(--soft);
+}
+.summaryAmount {
+  margin: 4px 0 6px;
+  font-family: Fredoka, Pretendard, sans-serif;
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--mint);
+}
 .reportCard b { color: #fff; }
 .insightStack {
   display: grid;
@@ -2669,6 +2709,41 @@ body.theme-day {
 }
 .theme-day .insightCard span {
   color: rgba(44, 44, 64, 0.78) !important;
+}
+
+/* Parallel Card Overrides in Day Theme */
+.theme-day .futureIcon {
+  background: rgba(255, 255, 255, 0.6);
+}
+.theme-day .futureCard strong {
+  color: #1e293b;
+}
+.theme-day .futureCard small {
+  color: rgba(44, 44, 64, 0.6);
+}
+.theme-day .futureCard.good {
+  background: rgba(47, 191, 166, 0.15) !important;
+  border-color: rgba(47, 191, 166, 0.4) !important;
+}
+.theme-day .futureCard.good .futureTag {
+  color: #0d9488;
+}
+.theme-day .futureCard.quiet {
+  background: rgba(255, 255, 255, 0.4) !important;
+  border-color: rgba(255, 255, 255, 0.7) !important;
+}
+.theme-day .futureCard.quiet .futureTag {
+  color: rgba(44, 44, 64, 0.6);
+}
+.theme-day .parallelSummary {
+  background: rgba(255, 255, 255, 0.35);
+  border-color: rgba(255, 255, 255, 0.6);
+}
+.theme-day .summaryLabel {
+  color: rgba(44, 44, 64, 0.65);
+}
+.theme-day .summaryAmount {
+  color: #0d9488;
 }
 
 /* Calendar Day Cell Overrides in Day Theme */
