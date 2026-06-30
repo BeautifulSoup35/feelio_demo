@@ -158,6 +158,85 @@ button, input, textarea { color: inherit; }
   grid-template-columns: 260px 1fr;
 }
 
+.themeToggleButton {
+  position: fixed;
+  top: 26px;
+  right: 28px;
+  z-index: 12;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 0 13px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, .16);
+  background: rgba(255, 255, 255, .10);
+  color: rgba(255, 255, 255, .88);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .12),
+    0 18px 34px -28px rgba(0, 0, 0, .82);
+  backdrop-filter: blur(24px) saturate(150%);
+  -webkit-backdrop-filter: blur(24px) saturate(150%);
+  transition: transform .18s ease, background .18s ease, border-color .18s ease;
+}
+
+.themeToggleButton:hover {
+  transform: translateY(-1px);
+  border-color: rgba(255, 255, 255, .26);
+  background: rgba(255, 255, 255, .14);
+}
+
+.themeToggleButton:active {
+  transform: translateY(0) scale(.98);
+}
+
+.themeToggleTrack {
+  position: relative;
+  width: 42px;
+  height: 24px;
+  border-radius: 999px;
+  background: rgba(9, 12, 29, .58);
+  box-shadow: inset 0 1px 6px rgba(0, 0, 0, .28);
+}
+
+.themeToggleThumb {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #c9b2f4, #5b8def);
+  box-shadow: 0 0 18px rgba(138, 108, 255, .52);
+  transition: transform .22s cubic-bezier(.2, .9, .2, 1), background .22s ease;
+}
+
+.themeToggleText {
+  min-width: 34px;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0;
+}
+
+.theme-light .themeToggleButton {
+  color: rgba(31, 32, 54, .78);
+  border-color: rgba(40, 35, 66, .10);
+  background: rgba(255, 255, 255, .72);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .92),
+    0 18px 34px -28px rgba(65, 58, 96, .22);
+}
+
+.theme-light .themeToggleTrack {
+  background: rgba(143, 122, 245, .16);
+}
+
+.theme-light .themeToggleThumb {
+  transform: translateX(18px);
+  background: linear-gradient(135deg, #ffe6a8, #f35fa8);
+  box-shadow: 0 0 18px rgba(243, 95, 168, .32);
+}
+
 .mainSurface {
   position: relative;
   z-index: 1;
@@ -5735,6 +5814,61 @@ input, textarea {
   z-index: 1;
 }
 
+.homeMalliOnly {
+  min-height: clamp(280px, 38vh, 380px);
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 8px;
+  position: relative;
+  overflow: visible;
+}
+
+.homeMalliOnly::before {
+  content: "";
+  position: absolute;
+  width: min(460px, 74%);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 45%, rgba(255, 255, 255, .12), transparent 34%),
+    radial-gradient(circle at 48% 56%, rgba(146, 222, 194, .18), transparent 54%),
+    radial-gradient(circle at 50% 68%, rgba(201, 178, 244, .16), transparent 68%);
+  filter: blur(18px);
+  opacity: .9;
+  z-index: 0;
+}
+
+.homeMalliOnlyStage {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  filter: drop-shadow(0 28px 46px rgba(146, 222, 194, .20));
+}
+
+.homeMalliOnlyStage::after {
+  content: "";
+  position: absolute;
+  left: 18%;
+  right: 18%;
+  bottom: 18px;
+  height: 24px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, .22);
+  filter: blur(14px);
+  z-index: -1;
+}
+
+.homeMalliOnly p {
+  position: relative;
+  z-index: 2;
+  margin: 0;
+  color: rgba(255, 255, 255, .62);
+  font-size: 13px;
+  font-weight: 800;
+}
+
 .homeMoodStats {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -5936,6 +6070,286 @@ input, textarea {
   text-align: center;
 }
 
+.transactionsDashboard {
+  grid-template-columns: minmax(480px, 1.05fr) minmax(400px, .95fr);
+  align-items: start;
+  gap: 24px;
+}
+
+.transactionsLead {
+  align-items: center;
+}
+
+.transactionsLead .leadDot {
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  margin-right: 8px;
+  border-radius: 9px;
+  background: linear-gradient(135deg, rgba(91, 141, 239, .92), rgba(201, 178, 244, .84));
+  color: rgba(255, 255, 255, .96);
+  font-size: 12px;
+  box-shadow: 0 10px 28px -14px rgba(138, 108, 255, .9);
+}
+
+.monthStepper {
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+  min-height: 48px;
+  padding: 0 18px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, .06);
+  border: 1px solid rgba(255, 255, 255, .16);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .08);
+}
+
+.monthStepper button {
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: rgba(255, 255, 255, .72);
+  font-size: 20px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.monthStepper button:hover {
+  background: rgba(255, 255, 255, .08);
+  color: #fff;
+}
+
+.transactionOverviewStrip {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.overviewPill {
+  min-height: 92px;
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  padding: 18px;
+  border-radius: 22px;
+  border: 1px solid rgba(255, 255, 255, .15);
+  background:
+    radial-gradient(180px 120px at 100% 0%, rgba(91, 141, 239, .10), transparent 72%),
+    rgba(255, 255, 255, .052);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .08),
+    0 18px 42px -34px rgba(91, 141, 239, .38);
+}
+
+.overviewPill.expense {
+  background:
+    radial-gradient(180px 120px at 100% 0%, rgba(248, 145, 137, .16), transparent 72%),
+    rgba(255, 255, 255, .052);
+  border-color: rgba(248, 145, 137, .24);
+}
+
+.overviewPill > span {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 13px;
+  background: rgba(91, 141, 239, .20);
+  color: rgba(255, 255, 255, .82);
+  box-shadow: 0 12px 28px -14px rgba(91, 141, 239, .9);
+}
+
+.overviewPill.expense > span {
+  background: rgba(248, 145, 137, .22);
+  box-shadow: 0 12px 28px -14px rgba(248, 145, 137, .92);
+}
+
+.overviewPill small,
+.overviewPill em {
+  color: rgba(255, 255, 255, .58);
+  font-style: normal;
+  font-weight: 800;
+  font-size: 12px;
+}
+
+.overviewPill strong {
+  display: block;
+  margin-top: 6px;
+  font-family: Fredoka, Pretendard, sans-serif;
+  font-size: clamp(20px, 2.2vw, 27px);
+  line-height: 1;
+  white-space: nowrap;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.overviewPill em {
+  display: block;
+  margin-top: 6px;
+}
+
+.transactionsDashboard .transactionsMain,
+.transactionsDashboard .transactionsAside {
+  min-width: 0;
+}
+
+.transactionsDashboard .transactionsMain .emotionExpenseCard {
+  min-height: 520px;
+}
+
+.transactionsDashboard .transactionHistoryCard {
+  height: 520px;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  align-content: stretch;
+  padding: 26px;
+  overflow: hidden;
+}
+
+.transactionHistoryHeader {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.transactionHistoryHeader > span {
+  color: rgba(255, 255, 255, .48);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.transactionFilterChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 14px 0 22px;
+}
+
+.transactionFilterChips button {
+  min-height: 32px;
+  padding: 0 15px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, .16);
+  background: rgba(255, 255, 255, .045);
+  color: rgba(255, 255, 255, .66);
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.transactionFilterChips button.active,
+.transactionFilterChips button:hover {
+  color: rgba(255, 255, 255, .96);
+  border-color: rgba(255, 255, 255, .42);
+  background: rgba(255, 255, 255, .13);
+}
+
+.transactionsDashboard .transactionHistoryList {
+  min-height: 0;
+  max-height: none;
+  overflow-y: auto;
+  padding-right: 8px;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, .22) transparent;
+}
+
+.transactionsDashboard .transactionHistoryList::-webkit-scrollbar {
+  width: 6px;
+}
+
+.transactionsDashboard .transactionHistoryList::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.transactionsDashboard .transactionHistoryList::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .22);
+}
+
+.transactionDateGroup {
+  display: grid;
+  gap: 8px;
+}
+
+.transactionDateGroup + .transactionDateGroup {
+  margin-top: 14px;
+}
+
+.transactionDateHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 2px 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, .10);
+}
+
+.transactionDateHeader strong {
+  color: rgba(255, 255, 255, .75);
+  font-size: 13px;
+}
+
+.transactionDateHeader span {
+  color: rgba(248, 145, 137, .95);
+  font-family: Fredoka, Pretendard, sans-serif;
+  font-weight: 900;
+}
+
+.transactionsDashboard .transactionHistoryItem {
+  grid-template-columns: 42px minmax(0, 1fr) max-content 34px;
+  gap: 12px;
+  min-height: 64px;
+  padding: 10px 4px;
+  border-bottom-color: rgba(255, 255, 255, .07);
+}
+
+.transactionCategoryIcon {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 15px;
+  background: rgba(91, 141, 239, .24);
+  color: rgba(255, 255, 255, .92);
+}
+
+.transactionsDashboard .transactionHistoryItem small {
+  margin-top: 3px;
+  color: rgba(255, 255, 255, .48);
+}
+
+.transactionsDashboard .transactionHistoryItem > b {
+  color: rgba(248, 145, 137, .98);
+  font-size: 14px;
+}
+
+.transactionsDashboard .transactionDeleteButton {
+  width: 30px;
+  min-height: 30px;
+  padding: 0;
+  overflow: hidden;
+  text-indent: -999px;
+  position: relative;
+  border-radius: 12px;
+}
+
+.transactionsDashboard .transactionDeleteButton::before {
+  content: "⌫";
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  text-indent: 0;
+  color: rgba(255, 255, 255, .48);
+}
+
 .analysisHeroCard {
   grid-column: 1 / -1;
   min-height: 170px;
@@ -6114,8 +6528,25 @@ input, textarea {
 
 @media (max-width: 980px) {
   .transactionsGrid,
+  .transactionsDashboard,
   .analysisGrid {
     grid-template-columns: 1fr;
+  }
+
+  .transactionOverviewStrip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .overviewPill {
+    border-radius: 22px;
+  }
+
+  .transactionsDashboard .transactionsMain .emotionExpenseCard {
+    min-height: 0;
+  }
+
+  .transactionsDashboard .transactionHistoryCard {
+    height: 500px;
   }
 
   .homeMoodBody {
@@ -6127,6 +6558,10 @@ input, textarea {
     width: 100%;
   }
 
+  .homeMalliOnly {
+    min-height: 300px;
+  }
+
   .analysisHeroCard,
   .analysisPanel.wide {
     grid-column: auto;
@@ -6134,8 +6569,30 @@ input, textarea {
 }
 
 @media (max-width: 720px) {
-  .transactionHistoryList {
-    max-height: 360px;
+  .transactionsDashboard .transactionHistoryCard {
+    height: 430px;
+  }
+
+  .transactionsDashboard .transactionHistoryList {
+    max-height: none;
+  }
+
+  .transactionsLead {
+    align-items: flex-start;
+  }
+
+  .monthStepper {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .transactionOverviewStrip {
+    grid-template-columns: 1fr;
+  }
+
+  .overviewPill {
+    min-height: 86px;
+    padding: 16px;
   }
 
   .analysisEmotionGrid,
@@ -6172,7 +6629,1710 @@ input, textarea {
     align-items: start;
   }
 
+  .transactionsDashboard .transactionHistoryItem {
+    grid-template-columns: 38px minmax(0, 1fr) max-content;
+  }
+
+  .transactionsDashboard .transactionDeleteButton {
+    grid-column: 2 / -1;
+    justify-self: start;
+  }
+
   .transactionDeleteButton {
     justify-self: start;
   }
+
+  .homeMalliOnly {
+    min-height: 260px;
+  }
+
+  .homeMalliOnlyStage {
+    transform: scale(.86);
+  }
+}
+
+/* Home layout v2: sidebar + malli + ridge + goal + budget */
+.homeGrid {
+  grid-template-columns: minmax(440px, .95fr) minmax(480px, 1.05fr);
+  grid-template-areas:
+    "lead lead"
+    "main aside";
+  align-items: stretch;
+}
+
+.homeGrid > .pageLead {
+  grid-area: lead;
+}
+
+.homeGrid > .homeMain {
+  grid-area: main;
+}
+
+.homeGrid > .homeAside {
+  grid-area: aside;
+}
+
+.homeMain {
+  display: grid;
+  grid-template-rows: minmax(300px, 1fr) minmax(220px, .68fr);
+  gap: 24px;
+}
+
+.homeAside {
+  display: grid;
+  grid-template-rows: minmax(150px, .36fr) minmax(390px, 1fr);
+  gap: 24px;
+}
+
+.homeMalliOnly {
+  min-height: 0;
+  height: 100%;
+  border-radius: 0;
+  background: transparent;
+  border: 0;
+  overflow: hidden;
+}
+
+.homeMalliOnly::before {
+  width: min(520px, 82%);
+  opacity: .7;
+}
+
+.homeMalliWalker {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: min(340px, 72%);
+  animation: malli-walk-path 18s linear infinite;
+  will-change: transform;
+}
+
+.homeMalliOnlyStage {
+  --malli-scale: 1.08;
+  transform: scale(var(--malli-scale));
+  transform-origin: 50% 88%;
+  animation: malli-waddle-body 18s linear infinite;
+  transition: filter .38s ease;
+}
+
+.homeMalliOnlyStage > div {
+  animation: none !important;
+}
+
+.homeMalliOnlyStage::after {
+  transform-origin: 50% 50%;
+  animation: malli-step-shadow 18s linear infinite;
+}
+
+.homeMalliOnlyStage:active {
+  filter: drop-shadow(0 34px 58px rgba(146, 222, 194, .30));
+}
+
+@keyframes malli-walk-path {
+  0%, 16% {
+    transform: translateX(0%);
+  }
+  27% {
+    transform: translateX(-12%);
+  }
+  38% {
+    transform: translateX(-22%);
+  }
+  49%, 68% {
+    transform: translateX(0%);
+  }
+  79% {
+    transform: translateX(12%);
+  }
+  90% {
+    transform: translateX(22%);
+  }
+  100% {
+    transform: translateX(0%);
+  }
+}
+
+@keyframes malli-waddle-body {
+  0%, 16%, 49%, 68%, 100% {
+    transform: translateY(0) rotate(0deg) scale(var(--malli-scale));
+  }
+  22%, 44%, 74%, 96% {
+    transform: translateY(2px) rotate(-2deg) scale(var(--malli-scale));
+  }
+  27%, 38%, 79%, 90% {
+    transform: translateY(-3px) rotate(2.4deg) scale(var(--malli-scale));
+  }
+  32%, 84% {
+    transform: translateY(2px) rotate(-2.4deg) scale(var(--malli-scale));
+  }
+}
+
+@keyframes malli-step-shadow {
+  0%, 16%, 49%, 68%, 100% {
+    opacity: .24;
+    transform: translateX(0) scaleX(.84);
+  }
+  22%, 44%, 74%, 96% {
+    opacity: .32;
+    transform: translateX(-6px) scaleX(.9);
+  }
+  27%, 38%, 79%, 90% {
+    opacity: .2;
+    transform: translateX(6px) scaleX(.72);
+  }
+  32%, 84% {
+    opacity: .31;
+    transform: translateX(0) scaleX(.88);
+  }
+}
+
+.moodRidgeFrame {
+  min-height: 0;
+  height: 100%;
+}
+
+.moodRidgeFrame > .moodRidgeCard,
+.moodRidgeFrame > div {
+  min-height: 0;
+  height: 100%;
+}
+
+.homeGoalCard,
+.homeBudgetCard {
+  min-height: 0;
+  height: 100%;
+}
+
+.homeGoalCard {
+  align-content: center;
+}
+
+.homeBudgetCard {
+  align-content: start;
+  gap: 22px;
+  padding: 30px;
+}
+
+.budgetMetricHeader {
+  margin-top: 12px;
+}
+
+.homeBudgetCard .progressTrack {
+  margin: 6px 0 10px;
+}
+
+.budgetTrack span {
+  background: linear-gradient(90deg, var(--mint), var(--blue));
+}
+
+.budgetTrack.over span {
+  background: linear-gradient(90deg, var(--blue), #C9B2F4 52%, #F89189);
+}
+
+.budgetMiniStats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: auto;
+}
+
+.budgetMiniStats span {
+  display: grid;
+  gap: 7px;
+  padding: 15px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, .06);
+  border: 1px solid rgba(255, 255, 255, .11);
+}
+
+.budgetMiniStats small {
+  color: rgba(255, 255, 255, .52);
+  font-weight: 800;
+}
+
+.budgetMiniStats b {
+  font-family: Fredoka, Pretendard, sans-serif;
+  font-size: 18px;
+}
+
+@media (min-width: 1041px) {
+  .homeGrid {
+    --home-available-height: clamp(560px, calc(100vh - 176px), 680px);
+  }
+
+  .homeMain,
+  .homeAside {
+    height: var(--home-available-height);
+  }
+}
+
+@media (max-width: 1040px) {
+  .homeGrid {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "lead"
+      "main"
+      "aside";
+  }
+
+  .homeMain,
+  .homeAside {
+    height: auto;
+  }
+
+  .homeMain,
+  .homeAside {
+    grid-template-rows: none;
+  }
+
+  .homeMalliOnly {
+    min-height: 320px;
+  }
+
+  .homeBudgetCard {
+    min-height: 300px;
+  }
+}
+
+@media (max-width: 720px) {
+  .homeMalliOnly {
+    min-height: 260px;
+  }
+
+  .homeMalliWalker {
+    width: min(280px, 74%);
+  }
+
+  .homeMalliOnlyStage {
+    --malli-scale: .9;
+    transform: scale(var(--malli-scale));
+  }
+
+  .budgetMiniStats {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Transactions page polish: compact glass summary, fuller amount area, hidden list scroll. */
+.transactionsDashboard .transactionOverviewStrip {
+  gap: 12px;
+}
+
+.transactionsDashboard .overviewPill {
+  min-height: 74px;
+  padding: 13px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  user-select: none;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, .072), rgba(255, 255, 255, .028)),
+    radial-gradient(180px 115px at 100% 0%, rgba(91, 141, 239, .12), transparent 72%);
+  border-color: rgba(255, 255, 255, .16);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .10),
+    inset 0 -1px 0 rgba(255, 255, 255, .035),
+    0 18px 38px -34px rgba(0, 0, 0, .82);
+  transition:
+    transform .18s ease,
+    border-color .18s ease,
+    background .18s ease,
+    box-shadow .18s ease;
+}
+
+.transactionsDashboard .overviewPill:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, .26);
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, .095), rgba(255, 255, 255, .038)),
+    radial-gradient(180px 115px at 100% 0%, rgba(91, 141, 239, .16), transparent 72%);
+}
+
+.transactionsDashboard .overviewPill:active {
+  transform: translateY(0) scale(.985);
+  border-color: rgba(255, 255, 255, .34);
+  box-shadow:
+    inset 0 2px 12px rgba(0, 0, 0, .18),
+    inset 0 1px 0 rgba(255, 255, 255, .10);
+}
+
+.transactionsDashboard .overviewPill.expense {
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, .072), rgba(255, 255, 255, .028)),
+    radial-gradient(180px 115px at 100% 0%, rgba(248, 145, 137, .15), transparent 72%);
+}
+
+.transactionsDashboard .overviewPill > span {
+  width: 30px;
+  height: 30px;
+  border-radius: 12px;
+}
+
+.transactionsDashboard .overviewPill strong {
+  margin-top: 4px;
+  font-size: clamp(20px, 2vw, 25px);
+}
+
+.transactionsDashboard .overviewPill em {
+  margin-top: 4px;
+  font-size: 11px;
+}
+
+.transactionsDashboard .expensePreviewCard {
+  position: relative;
+  overflow: hidden;
+}
+
+.transactionsDashboard .expensePreviewCard::after {
+  content: "";
+  position: absolute;
+  right: 32px;
+  top: 24px;
+  bottom: 24px;
+  width: min(240px, 38%);
+  border-radius: 26px;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 50% 34%, rgba(255, 255, 255, .11), transparent 34%),
+    linear-gradient(180deg, rgba(255, 255, 255, .07), rgba(255, 255, 255, .025));
+  border: 1px solid rgba(255, 255, 255, .075);
+  opacity: .75;
+}
+
+.transactionsDashboard .amountInput {
+  position: relative;
+  z-index: 1;
+  min-height: 120px;
+  align-self: stretch;
+  justify-content: center;
+}
+
+.transactionsDashboard .amountInput::before {
+  content: "";
+  width: min(184px, 100%);
+  height: 5px;
+  margin: 0 0 16px auto;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(47, 191, 166, .82), rgba(91, 141, 239, .88), rgba(249, 169, 203, .78));
+  opacity: .78;
+  box-shadow: 0 0 22px rgba(91, 141, 239, .16);
+}
+
+.transactionsDashboard .amountInput span {
+  justify-self: end;
+}
+
+.transactionsDashboard .amountEditable {
+  width: min(220px, 100%);
+}
+
+.transactionsDashboard .transactionHistoryList {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.transactionsDashboard .transactionHistoryList::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+.transactionsDashboard .transactionHistoryItem small {
+  font-size: 11px;
+  line-height: 1.25;
+  letter-spacing: 0;
+}
+
+@media (max-width: 980px) {
+  .transactionsDashboard .overviewPill {
+    min-height: 70px;
+  }
+
+  .transactionsDashboard .expensePreviewCard::after {
+    right: 20px;
+    width: min(210px, 42%);
+  }
+}
+
+@media (max-width: 720px) {
+  .transactionsDashboard .overviewPill {
+    min-height: 68px;
+    padding: 12px 14px;
+  }
+
+  .transactionsDashboard .expensePreviewCard::after {
+    inset: auto 18px 18px auto;
+    width: 150px;
+    height: 96px;
+  }
+
+  .transactionsDashboard .amountInput {
+    min-height: 96px;
+  }
+}
+
+/* Revert the extra transaction amount decoration; keep the original input composition. */
+.transactionsDashboard .expensePreviewCard::after,
+.transactionsDashboard .amountInput::before {
+  content: none;
+  display: none;
+}
+
+.transactionsDashboard .amountInput {
+  min-height: 0;
+  align-self: center;
+  justify-content: initial;
+}
+
+.transactionsDashboard .amountInput span {
+  justify-self: inherit;
+}
+
+.transactionsDashboard .amountEditable {
+  width: auto;
+}
+
+/* Smaller transaction form chips and top-aligned fixed history list. */
+.transactionsDashboard .pickerCategoryChip,
+.transactionsDashboard .moodChip,
+.transactionsDashboard .transactionFilterChips button {
+  min-height: 28px;
+  padding: 0 12px;
+  font-size: 11px;
+  line-height: 1;
+}
+
+.transactionsDashboard .transactionFilterChips {
+  gap: 7px;
+  margin: 12px 0 18px;
+}
+
+.transactionsDashboard .transactionHistoryCard {
+  align-content: stretch;
+}
+
+.transactionsDashboard .transactionHistoryList {
+  align-content: start;
+  display: grid;
+}
+
+/* Light dashboard direction for the home screen reference. */
+@media (min-width: 981px) {
+  .appShell:has(.homeGrid) {
+    background:
+      radial-gradient(circle at 72% 18%, rgba(201, 178, 244, .18), transparent 34%),
+      radial-gradient(circle at 58% 72%, rgba(146, 222, 194, .12), transparent 32%),
+      linear-gradient(120deg, #fbfafc 0%, #f7f4f8 45%, #fbfafa 100%);
+    color: #17182b;
+  }
+
+  .appShell:has(.homeGrid) .mainSurface {
+    background: transparent;
+    padding: 48px 44px 40px;
+  }
+
+  .appShell:has(.homeGrid) .sidebar {
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, .92), rgba(255, 255, 255, .76)),
+      radial-gradient(circle at 20% 10%, rgba(139, 116, 246, .10), transparent 38%);
+    border-right: 1px solid rgba(40, 35, 66, .08);
+    box-shadow: 18px 0 50px rgba(65, 58, 96, .08);
+  }
+
+  .appShell:has(.homeGrid) .sideButton {
+    color: rgba(31, 32, 54, .72);
+    background: transparent;
+    border-color: transparent;
+  }
+
+  .appShell:has(.homeGrid) .sideButton.active {
+    color: #7b65f4;
+    background: rgba(255, 255, 255, .72);
+    border-color: rgba(139, 116, 246, .28);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, .86),
+      0 12px 30px rgba(116, 97, 222, .10);
+  }
+
+  .appShell:has(.homeGrid) .profileMini {
+    background: rgba(255, 255, 255, .72);
+    border-color: rgba(40, 35, 66, .08);
+    color: #17182b;
+  }
+
+  .appShell:has(.homeGrid) .profileMini small,
+  .appShell:has(.homeGrid) .pageLead p,
+  .appShell:has(.homeGrid) .cardText,
+  .appShell:has(.homeGrid) .sectionTitle span,
+  .appShell:has(.homeGrid) .metricHeader span {
+    color: rgba(31, 32, 54, .62);
+  }
+
+  .appShell:has(.homeGrid) .pageLead h1,
+  .appShell:has(.homeGrid) .sectionTitle strong,
+  .appShell:has(.homeGrid) .metricHeader strong {
+    color: #17182b;
+  }
+
+  .appShell:has(.homeGrid) .homeGrid {
+    width: min(100%, 1240px);
+    grid-template-columns: minmax(0, 1.18fr) minmax(340px, .82fr);
+    gap: 22px 34px;
+    margin-inline: auto;
+  }
+
+  .appShell:has(.homeGrid) .homeMain,
+  .appShell:has(.homeGrid) .homeAside {
+    height: auto;
+    min-height: 0;
+  }
+
+  .appShell:has(.homeGrid) .homeMain {
+    display: grid;
+    grid-template-rows: minmax(260px, .7fr) minmax(300px, 1fr);
+    gap: 22px;
+  }
+
+  .appShell:has(.homeGrid) .homeAside {
+    display: grid;
+    grid-template-rows: minmax(210px, .82fr) minmax(260px, 1fr);
+    gap: 22px;
+  }
+
+  .appShell:has(.homeGrid) .glassCard,
+  .appShell:has(.homeGrid) .homeMalliOnly,
+  .appShell:has(.homeGrid) .moodRidgeFrame > div {
+    background:
+      linear-gradient(145deg, rgba(255, 255, 255, .80), rgba(255, 255, 255, .56)),
+      radial-gradient(circle at 100% 0%, rgba(139, 116, 246, .08), transparent 42%);
+    border: 1px solid rgba(40, 35, 66, .08);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, .92),
+      0 20px 48px rgba(62, 54, 88, .10);
+    backdrop-filter: blur(24px);
+  }
+
+  .appShell:has(.homeGrid) .homeMalliOnly {
+    position: relative;
+    border-radius: 28px;
+    min-height: 260px;
+    display: grid;
+    place-items: center;
+    overflow: visible;
+  }
+
+  .appShell:has(.homeGrid) .homeMalliOnly::before {
+    opacity: .42;
+    background:
+      radial-gradient(circle at 50% 50%, rgba(139, 116, 246, .26), transparent 62%);
+    filter: blur(22px);
+  }
+
+  .appShell:has(.homeGrid) .homeMalliWalker {
+    width: min(300px, 70%);
+  }
+
+  .appShell:has(.homeGrid) .homeMalliOnlyStage {
+    --malli-scale: 1;
+    filter: drop-shadow(0 34px 44px rgba(111, 101, 190, .18));
+  }
+
+  .appShell:has(.homeGrid) .homeMalliOnlyStage::after {
+    background: rgba(116, 97, 222, .12);
+  }
+
+  .appShell:has(.homeGrid) .homeMalliOnly p {
+    color: rgba(31, 32, 54, .58);
+  }
+
+  .appShell:has(.homeGrid) .homeGoalCard,
+  .appShell:has(.homeGrid) .homeBudgetCard {
+    border-radius: 28px;
+    padding: 28px 30px;
+  }
+
+  .appShell:has(.homeGrid) .homeBudgetCard {
+    background:
+      linear-gradient(145deg, rgba(255, 255, 255, .82), rgba(255, 255, 255, .58)),
+      radial-gradient(circle at 100% 0%, rgba(146, 222, 194, .14), transparent 45%);
+  }
+
+  .appShell:has(.homeGrid) .progressTrack {
+    background: rgba(31, 32, 54, .075);
+  }
+
+  .appShell:has(.homeGrid) .progressTrack span {
+    background: linear-gradient(90deg, #8f7af5, #d95ea8);
+  }
+
+  .appShell:has(.homeGrid) .progressTrack.mint span,
+  .appShell:has(.homeGrid) .budgetTrack span {
+    background: linear-gradient(90deg, #8f7af5, #7f6df1);
+  }
+
+  .appShell:has(.homeGrid) .budgetMiniStats span {
+    background: rgba(255, 255, 255, .52);
+    border-color: rgba(40, 35, 66, .07);
+  }
+
+  .appShell:has(.homeGrid) .budgetMiniStats small {
+    color: rgba(31, 32, 54, .52);
+  }
+
+  .appShell:has(.homeGrid) .budgetMiniStats b {
+    color: #17182b;
+  }
+
+  .appShell:has(.homeGrid) .moodRidgeFrame {
+    min-height: 300px;
+  }
+
+  .appShell:has(.homeGrid) .moodRidgeCard,
+  .appShell:has(.homeGrid) .ridgeEmpty {
+    border-radius: 28px;
+  }
+
+  .appShell:has(.homeGrid) .moodRidgeCaption,
+  .appShell:has(.homeGrid) .moodRidgeHeader p {
+    color: rgba(31, 32, 54, .55);
+  }
+
+  .appShell:has(.homeGrid) .profileButton {
+    color: #fff;
+    border-color: rgba(139, 116, 246, .18);
+    background: linear-gradient(135deg, #8f7af5, #d95ea8);
+    box-shadow: 0 16px 38px rgba(143, 122, 245, .26);
+  }
+}
+
+@media (max-width: 980px) {
+  .appShell:has(.homeGrid) {
+    background:
+      radial-gradient(circle at 70% 0%, rgba(201, 178, 244, .16), transparent 34%),
+      linear-gradient(120deg, #fbfafc, #f7f4f8);
+  }
+
+  .appShell:has(.homeGrid) .mainSurface {
+    background: transparent;
+  }
+
+  .appShell:has(.homeGrid) .glassCard,
+  .appShell:has(.homeGrid) .homeMalliOnly,
+  .appShell:has(.homeGrid) .moodRidgeFrame > div {
+    background: rgba(255, 255, 255, .72);
+    border-color: rgba(40, 35, 66, .08);
+    color: #17182b;
+  }
+}
+
+/* App-wide light / dark theme layer. Dark keeps the original Feelio night mood. */
+.theme-light {
+  --ink: #17182b;
+  --muted: rgba(31, 32, 54, .58);
+  --soft: rgba(31, 32, 54, .72);
+  --glass: rgba(255, 255, 255, .70);
+  --glass-strong: rgba(255, 255, 255, .84);
+  --line: rgba(40, 35, 66, .09);
+  --shadow: 0 24px 70px -42px rgba(65, 58, 96, .38);
+  color: #17182b;
+  background:
+    radial-gradient(circle at 72% 18%, rgba(201, 178, 244, .18), transparent 34%),
+    radial-gradient(circle at 58% 72%, rgba(146, 222, 194, .12), transparent 32%),
+    linear-gradient(120deg, #fbfafc 0%, #f7f4f8 45%, #fbfafa 100%);
+}
+
+.theme-light .aurora {
+  opacity: .28;
+  filter: blur(96px);
+}
+
+.theme-light .moodMascot {
+  opacity: .56;
+}
+
+.theme-light .mainSurface {
+  background: transparent;
+}
+
+.theme-light .sidebar {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, .92), rgba(255, 255, 255, .76)),
+    radial-gradient(circle at 20% 10%, rgba(139, 116, 246, .10), transparent 38%);
+  border-right: 1px solid rgba(40, 35, 66, .08);
+  box-shadow: 18px 0 50px rgba(65, 58, 96, .08);
+}
+
+.theme-light .sideButton {
+  color: rgba(31, 32, 54, .70);
+  background: transparent;
+  border-color: transparent;
+}
+
+.theme-light .sideButton.active {
+  color: #7b65f4;
+  background: rgba(255, 255, 255, .72);
+  border-color: rgba(139, 116, 246, .28);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .86),
+    0 12px 30px rgba(116, 97, 222, .10);
+}
+
+.theme-light .profileMini,
+.theme-light .glassCard,
+.theme-light .modalPanel,
+.theme-light .loginCard,
+.theme-light .bottomNav {
+  color: #17182b;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, .80), rgba(255, 255, 255, .56)),
+    radial-gradient(circle at 100% 0%, rgba(139, 116, 246, .08), transparent 42%);
+  border-color: rgba(40, 35, 66, .08);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .92),
+    0 20px 48px rgba(62, 54, 88, .10);
+}
+
+.theme-light .pageLead p,
+.theme-light .cardText,
+.theme-light .sectionTitle span,
+.theme-light .metricHeader span,
+.theme-light .profileMini small,
+.theme-light .transactionHistoryHeader > span,
+.theme-light .transactionHistoryItem small,
+.theme-light .transactionDateHeader strong,
+.theme-light .overviewPill small,
+.theme-light .overviewPill em {
+  color: rgba(31, 32, 54, .58);
+}
+
+.theme-light .pageLead h1,
+.theme-light .sectionTitle strong,
+.theme-light .metricHeader strong,
+.theme-light .transactionHistoryItem strong,
+.theme-light .overviewPill strong,
+.theme-light .profileMini strong {
+  color: #17182b;
+}
+
+.theme-light .progressTrack,
+.theme-light .budgetTrack {
+  background: rgba(31, 32, 54, .075);
+}
+
+.theme-light .transactionFilterChips button,
+.theme-light .moodChip,
+.theme-light .pickerCategoryChip {
+  color: rgba(31, 32, 54, .66);
+  background: rgba(255, 255, 255, .54);
+  border-color: rgba(40, 35, 66, .10);
+}
+
+.theme-light .transactionFilterChips button.active,
+.theme-light .transactionFilterChips button:hover,
+.theme-light .moodChip.selected,
+.theme-light .pickerCategoryChip.active,
+.theme-light .pickerCategoryChip.selectedValue {
+  color: #17182b;
+  background: rgba(255, 255, 255, .82);
+  border-color: rgba(139, 116, 246, .30);
+}
+
+.theme-light .expensePreviewCard {
+  background:
+    radial-gradient(220px 120px at 78% 112%, rgba(138, 108, 255, .08), transparent 72%),
+    rgba(255, 255, 255, .62);
+  border-color: rgba(40, 35, 66, .08);
+}
+
+.theme-light input,
+.theme-light textarea {
+  color: #17182b;
+}
+
+.theme-light input::placeholder,
+.theme-light textarea::placeholder {
+  color: rgba(31, 32, 54, .38);
+}
+
+.theme-light .bottomNav .navButton {
+  color: rgba(31, 32, 54, .58);
+}
+
+.theme-light .bottomNav .navButton.active {
+  color: #7b65f4;
+}
+
+.theme-light .profileButton {
+  color: #fff;
+  border-color: rgba(139, 116, 246, .18);
+  background: linear-gradient(135deg, #8f7af5, #d95ea8);
+  box-shadow: 0 16px 38px rgba(143, 122, 245, .26);
+}
+
+.theme-dark.appShell:has(.homeGrid) {
+  background:
+    radial-gradient(820px 520px at 76% 0%, rgba(91, 141, 239, .15), transparent 64%),
+    linear-gradient(180deg, rgba(10, 10, 26, .10), rgba(10, 10, 26, .44));
+  color: var(--ink);
+}
+
+.theme-dark.appShell:has(.homeGrid) .sidebar {
+  background: rgba(11, 13, 30, .52);
+  border-right-color: rgba(255, 255, 255, .10);
+  box-shadow: none;
+}
+
+.theme-dark.appShell:has(.homeGrid) .sideButton {
+  color: rgba(248, 245, 238, .72);
+}
+
+.theme-dark.appShell:has(.homeGrid) .sideButton.active {
+  color: #fff;
+  background: rgba(91, 141, 239, .24);
+  border-color: rgba(255, 255, 255, .18);
+}
+
+.theme-dark.appShell:has(.homeGrid) .profileMini,
+.theme-dark.appShell:has(.homeGrid) .glassCard,
+.theme-dark.appShell:has(.homeGrid) .homeMalliOnly,
+.theme-dark.appShell:has(.homeGrid) .moodRidgeFrame > div {
+  color: var(--ink);
+  background: var(--glass);
+  border-color: var(--line);
+  box-shadow: var(--shadow);
+}
+
+.theme-dark.appShell:has(.homeGrid) .pageLead p,
+.theme-dark.appShell:has(.homeGrid) .cardText,
+.theme-dark.appShell:has(.homeGrid) .sectionTitle span,
+.theme-dark.appShell:has(.homeGrid) .metricHeader span,
+.theme-dark.appShell:has(.homeGrid) .profileMini small {
+  color: var(--muted);
+}
+
+.theme-dark.appShell:has(.homeGrid) .pageLead h1,
+.theme-dark.appShell:has(.homeGrid) .sectionTitle strong,
+.theme-dark.appShell:has(.homeGrid) .metricHeader strong,
+.theme-dark.appShell:has(.homeGrid) .budgetMiniStats b {
+  color: var(--ink);
+}
+
+.theme-dark.appShell:has(.homeGrid) .budgetMiniStats span {
+  background: rgba(255, 255, 255, .06);
+  border-color: rgba(255, 255, 255, .11);
+}
+
+.theme-dark.appShell:has(.homeGrid) .progressTrack {
+  background: rgba(255, 255, 255, .15);
+}
+
+@media (max-width: 720px) {
+  .themeToggleButton {
+    top: 14px;
+    right: 14px;
+    min-height: 38px;
+    padding-inline: 10px;
+  }
+
+  .themeToggleText {
+    display: none;
+  }
+}
+
+/* Theme completion pass: malangi stays free, light mode covers every screen. */
+.theme-light .sidebar {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, .44), rgba(255, 255, 255, .28)),
+    radial-gradient(circle at 18% 8%, rgba(139, 116, 246, .10), transparent 44%),
+    rgba(246, 246, 250, .24);
+  backdrop-filter: blur(34px) saturate(118%);
+  -webkit-backdrop-filter: blur(34px) saturate(118%);
+  border-right-color: rgba(40, 35, 66, .06);
+  box-shadow:
+    inset -1px 0 0 rgba(255, 255, 255, .34),
+    inset 1px 0 0 rgba(255, 255, 255, .18),
+    16px 0 46px rgba(65, 58, 96, .055);
+}
+
+.theme-light .sidebar::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, .20), transparent 42%),
+    repeating-linear-gradient(135deg, rgba(255, 255, 255, .055) 0 1px, transparent 1px 5px);
+  opacity: .34;
+  mix-blend-mode: soft-light;
+}
+
+.theme-light .homeMalliOnly,
+.theme-light.appShell:has(.homeGrid) .homeMalliOnly,
+.theme-dark.appShell:has(.homeGrid) .homeMalliOnly {
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.theme-light .homeMalliOnly::before,
+.theme-light.appShell:has(.homeGrid) .homeMalliOnly::before {
+  width: min(520px, 86%);
+  opacity: .36;
+  background:
+    radial-gradient(circle at 50% 44%, rgba(255, 255, 255, .95), transparent 20%),
+    radial-gradient(circle at 50% 52%, rgba(201, 178, 244, .34), transparent 62%);
+  filter: blur(28px);
+}
+
+.theme-dark.appShell:has(.homeGrid) .homeMalliOnly::before {
+  opacity: .7;
+}
+
+.theme-light .homeMalliOnlyStage {
+  filter: drop-shadow(0 32px 42px rgba(126, 105, 224, .20));
+}
+
+.theme-light .homeMalliOnly p {
+  color: rgba(31, 32, 54, .58);
+}
+
+.theme-light .calendarMoodPage,
+.theme-light .transactionsDashboard,
+.theme-light .analysisGrid,
+.theme-light .contentGrid,
+.theme-light .pageGrid {
+  color: #17182b;
+}
+
+.theme-light .selectedDayPanel,
+.theme-light .moodCalendarCard,
+.theme-light .transactionHistoryCard,
+.theme-light .transactionSummaryCard,
+.theme-light .analysisHeroCard,
+.theme-light .analysisPanel,
+.theme-light .contentFeatureCard,
+.theme-light .contentPriceReveal,
+.theme-light .contentInsightRail,
+.theme-light .contentStatCard,
+.theme-light .calendarRecordModal,
+.theme-light .calendarRecordInputCard,
+.theme-light .calendarFormTagBox,
+.theme-light .emotionExpenseCard {
+  color: #17182b;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, .78), rgba(255, 255, 255, .52)),
+    radial-gradient(circle at 100% 0%, rgba(139, 116, 246, .075), transparent 44%);
+  border-color: rgba(40, 35, 66, .085);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .88),
+    0 22px 52px rgba(62, 54, 88, .10);
+  backdrop-filter: blur(24px) saturate(150%);
+  -webkit-backdrop-filter: blur(24px) saturate(150%);
+}
+
+.theme-light .selectedDayPanel {
+  background:
+    radial-gradient(380px 280px at 75% 0%, color-mix(in srgb, var(--day-emotion, #9FB0F0) 16%, transparent), transparent 72%),
+    linear-gradient(145deg, rgba(255, 255, 255, .78), rgba(255, 255, 255, .52));
+}
+
+.theme-light .moodDayCell {
+  color: rgba(31, 32, 54, .62);
+  background: rgba(255, 255, 255, .44);
+  border-color: rgba(40, 35, 66, .075);
+}
+
+.theme-light .moodDayCell.empty {
+  background: rgba(255, 255, 255, .30) !important;
+  color: rgba(31, 32, 54, .28);
+  border-color: rgba(40, 35, 66, .055);
+}
+
+.theme-light .moodDayCell.hasEmotion {
+  color: rgba(255, 255, 255, .98);
+  border-color: color-mix(in srgb, var(--day-emotion) 36%, rgba(255, 255, 255, .42));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .20),
+    0 16px 34px -28px color-mix(in srgb, var(--day-emotion) 52%, rgba(65, 58, 96, .40));
+}
+
+.theme-light .moodDayCell.selected {
+  outline-color: rgba(126, 105, 224, .78);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .22),
+    0 0 0 4px rgba(139, 116, 246, .16),
+    0 18px 38px -28px rgba(126, 105, 224, .46);
+}
+
+.theme-light .transactionHistoryItem,
+.theme-light .transactionRow,
+.theme-light .calendarRecordItem,
+.theme-light .selectedRecordItem,
+.theme-light .contentStatRow span,
+.theme-light .analysisCategorySummary > div,
+.theme-light .analysisEmotionGrid > span,
+.theme-light .analysisEmotionSummary > span {
+  color: #17182b;
+  border-color: rgba(40, 35, 66, .075);
+}
+
+.theme-light .transactionDateHeader,
+.theme-light .analysisBarItem i,
+.theme-light .progressTrack,
+.theme-light .budgetTrack {
+  border-color: rgba(40, 35, 66, .075);
+  background: rgba(31, 32, 54, .075);
+}
+
+.theme-light .transactionDateHeader span,
+.theme-light .transactionsDashboard .transactionHistoryItem > b {
+  color: #e6655f;
+}
+
+.theme-light .transactionsDashboard .transactionHistoryItem > b.income {
+  color: #1c9b82;
+}
+
+.theme-light .transactionCategoryIcon,
+.theme-light .recordIcon,
+.theme-light .categoryIcon {
+  background: rgba(126, 105, 224, .13);
+  color: rgba(31, 32, 54, .78);
+}
+
+.theme-light .formInput,
+.theme-light .calendarRecordField,
+.theme-light .modalInput,
+.theme-light .merchantInput input,
+.theme-light .amountInput input {
+  color: #17182b;
+  background: transparent;
+}
+
+.theme-light .modalOverlay {
+  background: rgba(248, 246, 252, .42);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.theme-light .modalPanel {
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, .66), rgba(255, 255, 255, .42));
+  border-color: rgba(40, 35, 66, .12);
+}
+
+.theme-dark .themeToggleButton {
+  color: rgba(255, 255, 255, .88);
+}
+
+.theme-dark .themeToggleTrack {
+  background: rgba(9, 12, 29, .62);
+}
+
+/* Frosted matte sidebar glass, closer to the supplied references. */
+.theme-light .sidebar,
+.theme-dark .sidebar {
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.theme-light .sidebar {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, .34), rgba(255, 255, 255, .18)),
+    radial-gradient(420px 520px at -18% 8%, rgba(111, 160, 255, .14), transparent 64%),
+    radial-gradient(360px 420px at 120% 72%, rgba(244, 112, 170, .10), transparent 60%),
+    rgba(246, 246, 250, .18);
+  backdrop-filter: blur(42px) saturate(112%) contrast(102%);
+  -webkit-backdrop-filter: blur(42px) saturate(112%) contrast(102%);
+  border-right-color: rgba(255, 255, 255, .36);
+  box-shadow:
+    inset -1px 0 0 rgba(255, 255, 255, .38),
+    inset 1px 0 0 rgba(255, 255, 255, .24),
+    18px 0 58px rgba(65, 58, 96, .055);
+}
+
+.theme-dark .sidebar {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, .08), rgba(255, 255, 255, .035)),
+    radial-gradient(420px 520px at -18% 8%, rgba(91, 141, 239, .13), transparent 64%),
+    radial-gradient(360px 420px at 120% 72%, rgba(243, 95, 168, .08), transparent 60%),
+    rgba(6, 8, 20, .34);
+  backdrop-filter: blur(38px) saturate(125%) contrast(104%);
+  -webkit-backdrop-filter: blur(38px) saturate(125%) contrast(104%);
+  border-right-color: rgba(255, 255, 255, .12);
+  box-shadow:
+    inset -1px 0 0 rgba(255, 255, 255, .10),
+    inset 1px 0 0 rgba(255, 255, 255, .06),
+    18px 0 58px rgba(0, 0, 0, .18);
+}
+
+.theme-light .sidebar::before,
+.theme-dark .sidebar::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  border-right: 1px solid rgba(255, 255, 255, .30);
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, .20), transparent 36%),
+    repeating-linear-gradient(135deg, rgba(255, 255, 255, .045) 0 1px, transparent 1px 5px);
+  opacity: .38;
+  mix-blend-mode: soft-light;
+}
+
+.theme-light .sidebar::after,
+.theme-dark .sidebar::after {
+  content: "";
+  position: absolute;
+  inset: 18px 16px;
+  z-index: -1;
+  pointer-events: none;
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255, 255, 255, .18), transparent 58%),
+    linear-gradient(180deg, rgba(255, 255, 255, .10), rgba(255, 255, 255, .02));
+  border: 1px solid rgba(255, 255, 255, .10);
+  filter: blur(.2px);
+  opacity: .36;
+}
+
+.theme-light .sideButton,
+.theme-light .profileMini {
+  background: rgba(255, 255, 255, .34);
+  border-color: rgba(255, 255, 255, .36);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .62),
+    inset 0 -1px 0 rgba(40, 35, 66, .035);
+}
+
+.theme-light .sideButton:not(.active) {
+  background: rgba(255, 255, 255, .16);
+  border-color: rgba(255, 255, 255, .20);
+}
+
+.theme-light .sideButton.active {
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, .48), rgba(255, 255, 255, .26));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .72),
+    0 16px 36px rgba(116, 97, 222, .10);
+}
+
+.theme-dark .sideButton:not(.active),
+.theme-dark .profileMini {
+  background: rgba(255, 255, 255, .045);
+  border-color: rgba(255, 255, 255, .09);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .06);
+}
+
+/* Sidebar shape correction: remove the back rectangle, keep only the rounded glass slab. */
+.theme-light .sidebar,
+.theme-dark .sidebar {
+  margin: 14px 0 14px 14px;
+  height: calc(100vh - 28px);
+  padding: 24px 20px;
+  background: transparent !important;
+  border-right: 0 !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  overflow: visible;
+}
+
+.theme-light .sidebar::before,
+.theme-dark .sidebar::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  border-radius: 28px;
+  border-right: 0;
+  mix-blend-mode: normal;
+  opacity: 1;
+}
+
+.theme-light .sidebar::before {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, .34), rgba(255, 255, 255, .18)),
+    radial-gradient(420px 520px at -18% 8%, rgba(111, 160, 255, .14), transparent 64%),
+    radial-gradient(360px 420px at 120% 72%, rgba(244, 112, 170, .10), transparent 60%),
+    rgba(246, 246, 250, .18);
+  border: 1px solid rgba(255, 255, 255, .38);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .46),
+    inset 0 -1px 0 rgba(40, 35, 66, .035),
+    18px 20px 58px rgba(65, 58, 96, .055);
+  backdrop-filter: blur(42px) saturate(112%) contrast(102%);
+  -webkit-backdrop-filter: blur(42px) saturate(112%) contrast(102%);
+}
+
+.theme-dark .sidebar::before {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, .08), rgba(255, 255, 255, .035)),
+    radial-gradient(420px 520px at -18% 8%, rgba(91, 141, 239, .13), transparent 64%),
+    radial-gradient(360px 420px at 120% 72%, rgba(243, 95, 168, .08), transparent 60%),
+    rgba(6, 8, 20, .34);
+  border: 1px solid rgba(255, 255, 255, .12);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .10),
+    inset 0 -1px 0 rgba(0, 0, 0, .22),
+    18px 20px 58px rgba(0, 0, 0, .18);
+  backdrop-filter: blur(38px) saturate(125%) contrast(104%);
+  -webkit-backdrop-filter: blur(38px) saturate(125%) contrast(104%);
+}
+
+.theme-light .sidebar::after,
+.theme-dark .sidebar::after {
+  inset: 12px;
+  border-radius: 24px;
+  z-index: -1;
+  opacity: .28;
+}
+
+.theme-light .sideMenu,
+.theme-dark .sideMenu {
+  margin-top: 32px;
+}
+
+.theme-light .sideButton,
+.theme-dark .sideButton {
+  border-radius: 19px;
+}
+
+@media (max-width: 980px) {
+  .theme-light .sidebar,
+  .theme-dark .sidebar {
+    margin: 0;
+    height: 100vh;
+  }
+}
+
+/* Common modal: pure frosted matte glass component, no inner aurora/background objects. */
+.modalLayer.glassModalContainer,
+.modalLayer,
+.calendarRecordLayer {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(0, 0, 0, .28) !important;
+  backdrop-filter: blur(12px) saturate(120%);
+  -webkit-backdrop-filter: blur(12px) saturate(120%);
+}
+
+.modalPanel.glassModal,
+.modalPanel,
+.calendarRecordModal {
+  width: min(360px, calc(100vw - 40px));
+  max-height: min(760px, calc(100vh - 40px));
+  overflow-y: auto;
+  padding: 34px 28px;
+  border-radius: 32px;
+  color: #fff !important;
+  background: rgba(255, 255, 255, .15) !important;
+  border: 1px solid rgba(255, 255, 255, .25) !important;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, .20) !important;
+  backdrop-filter: blur(25px) saturate(150%);
+  -webkit-backdrop-filter: blur(25px) saturate(150%);
+}
+
+.modalPanel.modal-large,
+.modalPanel.profileModalPanel,
+.modalPanel.calendarRecordPanel {
+  width: min(520px, calc(100vw - 40px));
+}
+
+.modalHeader,
+.glassModalHeader {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 14px;
+  margin: 0 0 24px;
+}
+
+.modalHeader > div,
+.glassModalHeader > div {
+  min-width: 0;
+}
+
+.modalTitle,
+.modalHeader h2 {
+  margin: 0;
+  color: #fff !important;
+  font-family: Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: clamp(20px, 4vw, 26px);
+  font-weight: 850;
+  line-height: 1.2;
+  letter-spacing: 0;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, .18);
+}
+
+.modalTitle::after,
+.modalHeader h2::after {
+  content: "";
+  display: block;
+  width: 96px;
+  height: 1.5px;
+  margin-top: 16px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .30);
+}
+
+.modalDescription {
+  margin: 10px 0 0;
+  color: rgba(255, 255, 255, .86) !important;
+  font-size: 14px;
+  line-height: 1.6;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, .16);
+}
+
+.modalContent {
+  display: grid;
+  gap: 18px;
+}
+
+.modalCloseButton,
+.modalPanel .iconButton,
+.calendarRecordClose {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  min-height: 36px;
+  padding: 0;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, .20) !important;
+  background: rgba(255, 255, 255, .10) !important;
+  color: rgba(255, 255, 255, .92) !important;
+  box-shadow: none !important;
+  line-height: 1;
+}
+
+.modalCloseButton:hover,
+.modalPanel .iconButton:hover,
+.calendarRecordClose:hover {
+  transform: translateY(-1px);
+  background: rgba(255, 255, 255, .18) !important;
+  border-color: rgba(255, 255, 255, .30) !important;
+  color: #fff !important;
+}
+
+.modalPanel .profileHero,
+.modalPanel .profileHero.compact,
+.modalPanel .profileMenuList,
+.modalPanel .settingGroup,
+.modalPanel .modalSection,
+.modalPanel .calendarRecordInputCard,
+.modalPanel .calendarFormTagBox,
+.modalPanel .goalProgressPreview,
+.modalPanel .info-box {
+  background: rgba(255, 255, 255, .10) !important;
+  border: 1px solid rgba(255, 255, 255, .10) !important;
+  border-radius: 20px;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.modalPanel :is(p, span, small, label, em),
+.modalPanel .profileHero span,
+.modalPanel .profileHero small,
+.modalPanel .profileMenuItem small,
+.modalPanel .settingGroup label,
+.modalPanel .goalProgressPreview,
+.modalPanel .goalProgressPreview b,
+.modalPanel .calendarRecordHeader p,
+.modalPanel .calendarTypeLine span,
+.modalPanel .calendarMemoInput span,
+.modalPanel .calendarAmountInput span,
+.modalPanel .calendarFormTagTitle small {
+  color: rgba(255, 255, 255, .82) !important;
+}
+
+.modalPanel :is(h1, h2, h3, strong, b),
+.modalPanel .profileMenuItem strong,
+.modalPanel .settingGroup strong,
+.modalPanel .calendarFormTagTitle strong {
+  color: #fff !important;
+}
+
+.modalPanel input,
+.modalPanel textarea {
+  color: #fff !important;
+  background: transparent !important;
+  border-color: rgba(255, 255, 255, .18) !important;
+}
+
+.modalPanel input::placeholder,
+.modalPanel textarea::placeholder {
+  color: rgba(255, 255, 255, .46) !important;
+}
+
+.modalFooter {
+  display: grid;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.modalPanel .solidButton,
+.modalPanel .dangerButton,
+.modalPanel .calendarRecordSave,
+.modalPanel .action-button {
+  width: 100%;
+  min-height: 52px;
+  border: 0 !important;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, .88) !important;
+  color: #333 !important;
+  box-shadow: none !important;
+  font-size: 15px;
+  font-weight: 850;
+  transition: transform .22s ease, background .22s ease, box-shadow .22s ease;
+}
+
+.modalPanel .solidButton:hover,
+.modalPanel .dangerButton:hover,
+.modalPanel .calendarRecordSave:hover,
+.modalPanel .action-button:hover {
+  transform: translateY(-2px);
+  background: #fff !important;
+  color: #333 !important;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, .20) !important;
+}
+
+.modalPanel .dangerButton {
+  color: #633 !important;
+}
+
+.modalPanel .profileMenuItem,
+.modalPanel .settingGroup button,
+.modalPanel .calendarFormTag,
+.modalPanel .calendarRecordSelectedTags button,
+.modalPanel .calendarTypeToggle button,
+.modalPanel .auroraThemeButton {
+  color: rgba(255, 255, 255, .88) !important;
+  background: rgba(255, 255, 255, .08) !important;
+  border-color: rgba(255, 255, 255, .12) !important;
+  box-shadow: none !important;
+}
+
+.modalPanel .profileMenuItem:hover,
+.modalPanel .settingGroup button:hover,
+.modalPanel .calendarFormTag:hover,
+.modalPanel .calendarRecordSelectedTags button:hover,
+.modalPanel .calendarTypeToggle button:hover,
+.modalPanel .auroraThemeButton:hover,
+.modalPanel .calendarRecordSelectedTags button.active,
+.modalPanel .calendarTypeToggle button.active,
+.modalPanel .auroraThemeButton.active {
+  color: #fff !important;
+  background: rgba(255, 255, 255, .15) !important;
+  border-color: rgba(255, 255, 255, .22) !important;
+}
+
+.modalPanel .profileMenuIcon,
+.modalPanel .profileMenuIcon.goal,
+.modalPanel .profileMenuIcon.settings,
+.modalPanel .profileEditAvatar span {
+  background: rgba(255, 255, 255, .14) !important;
+  color: #fff !important;
+}
+
+.modalPanel .calendarRecordModal {
+  width: 100%;
+  max-height: none;
+  overflow: visible;
+  padding: 0;
+  border: 0 !important;
+  border-radius: 0;
+  background: transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.modalPanel .calendarRecordClose,
+.modalPanel .calendarRecordHeader {
+  display: none !important;
+}
+
+@media (max-width: 560px) {
+  .modalPanel.glassModal,
+  .modalPanel,
+  .modalPanel.modal-large,
+  .modalPanel.profileModalPanel,
+  .modalPanel.calendarRecordPanel {
+    width: calc(100vw - 40px);
+    padding: 28px 22px;
+    border-radius: 28px;
+  }
+}
+
+/* Sidebar final pass: single slab, no purple border in light, readable hover text. */
+.theme-light .sidebar::after,
+.theme-dark .sidebar::after {
+  content: none !important;
+  display: none !important;
+}
+
+.theme-light .sidebar::before,
+.theme-dark .sidebar::before {
+  inset: 0;
+  border-radius: 28px;
+}
+
+.theme-light .sidebar::before {
+  border-color: rgba(255, 255, 255, .48);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, .40), rgba(255, 255, 255, .20)),
+    radial-gradient(420px 520px at -18% 8%, rgba(111, 160, 255, .11), transparent 64%),
+    radial-gradient(360px 420px at 120% 72%, rgba(244, 112, 170, .08), transparent 60%),
+    rgba(246, 246, 250, .16);
+}
+
+.theme-light .sideButton {
+  color: rgba(31, 32, 54, .68) !important;
+  border-color: rgba(255, 255, 255, .26) !important;
+  background: rgba(255, 255, 255, .18) !important;
+}
+
+.theme-light .sideButton:hover {
+  color: rgba(31, 32, 54, .86) !important;
+  border-color: rgba(255, 255, 255, .42) !important;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, .34), rgba(255, 255, 255, .18)) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .58),
+    0 14px 28px rgba(65, 58, 96, .045) !important;
+}
+
+.theme-light .sideButton.active {
+  color: rgba(31, 32, 54, .92) !important;
+  border-color: rgba(255, 255, 255, .58) !important;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, .48), rgba(255, 255, 255, .24)) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .72),
+    0 16px 32px rgba(65, 58, 96, .07) !important;
+}
+
+.theme-light .sideButton.active svg {
+  color: #7b65f4;
+}
+
+.theme-light .profileMini {
+  color: rgba(31, 32, 54, .92) !important;
+  border-color: rgba(255, 255, 255, .42) !important;
+  background: rgba(255, 255, 255, .26) !important;
+}
+
+.theme-light .profileMini:hover {
+  color: rgba(31, 32, 54, .92) !important;
+  background: rgba(255, 255, 255, .34) !important;
+}
+
+/* Readability pass for theme switching: override fixed dark-screen text colors. */
+.theme-light .moodRidgeCard h3,
+.theme-light .moodRidgeHeader h3,
+.theme-light .homeEmotionWaveHeader h3,
+.theme-light .moodRidgeFrame > div > div:first-child,
+.theme-light .moodRidgeFrame > div h1,
+.theme-light .moodRidgeFrame > div h2,
+.theme-light .moodRidgeFrame > div h3 {
+  color: #17182b !important;
+}
+
+.theme-light .moodRidgeCaption,
+.theme-light .moodRidgeHeader p,
+.theme-light .moodRidgeFrame > div,
+.theme-light .moodRidgeFrame > div p,
+.theme-light .moodRidgeFrame > div div {
+  color: rgba(31, 32, 54, .64) !important;
+}
+
+.theme-light .moodRidgeCaption span {
+  filter: saturate(118%) contrast(104%);
+}
+
+.theme-light .ridgeEmpty,
+.theme-light .moodRidgeFrame > div[style] {
+  color: rgba(31, 32, 54, .64) !important;
+}
+
+.theme-light .pageGrid :is(h1, h2, h3, h4),
+.theme-light .calendarMoodPage :is(h1, h2, h3, h4),
+.theme-light .transactionsDashboard :is(h1, h2, h3, h4),
+.theme-light .analysisGrid :is(h1, h2, h3, h4),
+.theme-light .contentGrid :is(h1, h2, h3, h4) {
+  color: #17182b;
+}
+
+.theme-light .pageGrid :is(p, small, em, label),
+.theme-light .calendarMoodPage :is(p, small, em, label),
+.theme-light .transactionsDashboard :is(p, small, em, label),
+.theme-light .analysisGrid :is(p, small, em, label),
+.theme-light .contentGrid :is(p, small, em, label) {
+  color: rgba(31, 32, 54, .62);
+}
+
+.theme-light .homeBudgetCard .budgetMiniStats span small,
+.theme-light .analysisEmotionSummary small,
+.theme-light .analysisCategorySummary small,
+.theme-light .analysisBarItem span,
+.theme-light .contentStatCard small,
+.theme-light .contentStatCard em,
+.theme-light .contentPriceReveal span,
+.theme-light .contentPriceReveal p,
+.theme-light .selectedDayPanel p,
+.theme-light .calendarRecordMeta,
+.theme-light .recordMemo {
+  color: rgba(31, 32, 54, .56) !important;
+}
+
+.theme-light .analysisEmotionSummary b,
+.theme-light .analysisBudgetValue,
+.theme-light .contentStatCard b,
+.theme-light .contentPriceReveal strong,
+.theme-light .contentPriceReveal .factAttackMain,
+.theme-light .selectedDayPanel h2,
+.theme-light .selectedRecordItem strong,
+.theme-light .calendarRecordHeader strong,
+.theme-light .calendarRecordInputCard strong {
+  color: #17182b !important;
+}
+
+.theme-light .modalPanel :is(h1, h2, h3, strong, b),
+.theme-light .calendarRecordModal :is(h1, h2, h3, strong, b) {
+  color: #17182b !important;
+}
+
+.theme-light .modalPanel :is(p, span, small, label),
+.theme-light .calendarRecordModal :is(p, span, small, label) {
+  color: rgba(31, 32, 54, .62);
+}
+
+.theme-dark .moodRidgeCard h3,
+.theme-dark .moodRidgeHeader h3,
+.theme-dark .homeEmotionWaveHeader h3,
+.theme-dark .moodRidgeFrame > div > div:first-child,
+.theme-dark .moodRidgeFrame > div h1,
+.theme-dark .moodRidgeFrame > div h2,
+.theme-dark .moodRidgeFrame > div h3 {
+  color: rgba(255, 255, 255, .96) !important;
+}
+
+.theme-dark .moodRidgeCaption,
+.theme-dark .moodRidgeHeader p,
+.theme-dark .moodRidgeFrame > div p,
+.theme-dark .moodRidgeFrame > div div {
+  color: rgba(255, 255, 255, .62) !important;
 }

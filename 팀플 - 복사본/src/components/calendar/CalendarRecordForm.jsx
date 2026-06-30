@@ -133,7 +133,7 @@ export default function CalendarRecordForm({ selectedDate, selectedDay, onClose,
   }
 
   return (
-    <Modal title={`${selectedDateLabel} 기록 추가`} onClose={onClose}>
+    <Modal title={`${selectedDateLabel} 기록 추가`} onClose={onClose} size="large" className="calendarRecordPanel">
       <section className="calendarRecordModal" role="dialog" aria-modal="true" aria-label={`${selectedDay}일 기록 추가`} onMouseDown={event => event.stopPropagation()}>
         <button type="button" className="calendarRecordClose" onClick={onClose} aria-label="닫기">×</button>
         <header className="calendarRecordHeader">

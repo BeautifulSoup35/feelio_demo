@@ -4,15 +4,10 @@ import { BlobEmpty, RidgeEmpty } from '../components/home/EmptyStates.jsx';
 import { MoodRidge } from '../components/home/MoodRidge.jsx';
 import { formatMoney } from '../utils/money.js';
 import { formatKoreanDateWithWeekday, toDateKey, todayKey } from '../utils/date.js';
-import { makeEmotionSignalMessage, taggedEmotionData, topEmotion } from '../utils/emotionInsights.js';
+import { taggedEmotionData, topEmotion } from '../utils/emotionInsights.js';
 
 const RIDGE_MIN_TAGS = 5;
-
-function findTagName(tags, tagIds, type) {
-  return tagIds
-    .map(tagId => tags.find(tag => tag.tagId === tagId))
-    .find(tag => tag?.type === type)?.name;
-}
+const MONTHLY_BUDGET = 760000;
 
 export default function HomePage({ state, onProfile }) {
   const mainGoal = state.goals.find(goal => goal.isMain) || state.goals[0];
@@ -23,6 +18,10 @@ export default function HomePage({ state, onProfile }) {
     .filter(item => item.transactionType === 'EXPENSE' && item.tags.some(tagId => /^e\d+$/.test(tagId)))
     .reduce((sum, item) => sum + item.amount, 0);
   const leakRate = expenseTotal ? Math.round((emotionalExpense / expenseTotal) * 100) : 0;
+  const budgetUsedRate = MONTHLY_BUDGET ? Math.round((expenseTotal / MONTHLY_BUDGET) * 100) : 0;
+  const isBudgetOver = expenseTotal > MONTHLY_BUDGET;
+  const remainingBudget = Math.max(0, MONTHLY_BUDGET - expenseTotal);
+  const overBudgetAmount = Math.max(0, expenseTotal - MONTHLY_BUDGET);
   const goalRate = Math.min(100, Math.round((mainGoal.currentAmount / mainGoal.targetAmount) * 100));
   const today = todayKey();
   const monthKey = today.slice(0, 7);
@@ -34,13 +33,7 @@ export default function HomePage({ state, onProfile }) {
     state.tags
   );
   const signalEmotion = totalTags >= 1 ? topEmotion(emotionData) : '평온';
-  const signalCount = emotionData.find(item => item.name === signalEmotion)?.value || 0;
-  const signalPercent = totalTags ? `${Math.round((signalCount / totalTags) * 100)}%` : '0%';
-  const signalMessage = totalTags >= 1
-    ? makeEmotionSignalMessage(signalEmotion, signalPercent)
-    : '소비에 감정 태그가 붙으면 오늘의 소비 신호를 바로 보여드릴게요.';
   const todayLabel = formatKoreanDateWithWeekday(new Date());
-  const recentTransactions = state.transactions.slice(0, 3);
 
   return (
     <div className="pageGrid homeGrid">
@@ -53,43 +46,20 @@ export default function HomePage({ state, onProfile }) {
       </div>
 
       <div className="homeMain">
-        <GlassCard className="homeMoodCard">
-          <div className="sectionTitle compact">
-            <span>오늘의 감정 말랑이</span>
-            <strong>{totalTags >= 1 ? `${signalEmotion} 말랑이가 보여요` : '아직 첫 감정 기록을 기다려요'}</strong>
-          </div>
-          <div className="homeMoodBody">
-            <div className="homeMoodCopy">
-              <p>
-                {totalTags >= 1
-                  ? `${signalEmotion} 태그가 이번 달 소비 흐름에서 가장 크게 보여요. 숫자보다 먼저 오늘의 감정 상태를 가볍게 확인해보세요.`
-                  : '지출/수입 메뉴에서 첫 소비와 감정 태그를 남기면 말랑이가 바로 나타나요.'}
-              </p>
-              <span>입력은 지출/수입 메뉴에서, 홈은 감정 요약만 보여줘요.</span>
-            </div>
-            <div className="homeMalliHouse">
-              <div className="homeMalliStage">
-                {totalTags >= 1
-                  ? <EmotionBlob emotion={signalEmotion} size={190} variant="svg" interactive={true} />
-                  : (
-                    <button type="button" className="defaultBlobButton" aria-label="기본 말랑이 누르기">
-                      <BlobEmpty size={190} />
-                    </button>
-                  )}
-              </div>
-              <div className="homeMoodStats">
-                <span>
-                  <small>이번 달 감정 태그</small>
-                  <b>{totalTags}개</b>
-                </span>
-                <span>
-                  <small>대표 감정</small>
-                  <b>{totalTags >= 1 ? signalEmotion : '대기 중'}</b>
-                </span>
-              </div>
+        <div className="homeMalliOnly" aria-label="감정말랑이">
+          <div className="homeMalliWalker">
+            <div className="homeMalliOnlyStage">
+              {totalTags >= 1
+                ? <EmotionBlob emotion={signalEmotion} size={260} variant="svg" interactive={true} />
+                : (
+                  <button type="button" className="defaultBlobButton" aria-label="기본 말랑이 누르기">
+                    <BlobEmpty size={260} />
+                  </button>
+                )}
             </div>
           </div>
-        </GlassCard>
+          <p>{totalTags >= 1 ? `${signalEmotion} 말랑이` : '첫 감정을 기다리는 말랑이'}</p>
+        </div>
         <div className="moodRidgeFrame">
           {totalTags >= RIDGE_MIN_TAGS
             ? <MoodRidge data={emotionData} />
@@ -98,41 +68,6 @@ export default function HomePage({ state, onProfile }) {
       </div>
 
       <div className="homeAside">
-        <GlassCard className="homeMetricCard">
-          <div className="metricHeader">
-            <span>이번 달 감정소비 누적율</span>
-            <strong>{leakRate}%</strong>
-          </div>
-          <div className="progressTrack"><span style={{ width: `${leakRate}%` }} /></div>
-          <p className="cardText">스트레스가 쌓인 밤마다 배달 소비가 반복되고 있어요. 이번 주는 4번 중 1번만 쉬어가도 목표에 가까워져요.</p>
-        </GlassCard>
-
-        <GlassCard className="aiSignalCard">
-          <div>
-            <div className="sectionTitle compact">
-              <span>AI 코멘트</span>
-              <strong>오늘의 소비 신호</strong>
-            </div>
-            <p className="cardText">{signalMessage}</p>
-          </div>
-          <div className="signalBlobWrap">
-            {totalTags >= 1
-              ? (
-                <EmotionBlob
-                  emotion={signalEmotion}
-                  size={150}
-                  variant="svg"
-                  interactive={true}
-                />
-              )
-              : (
-                <button type="button" className="defaultBlobButton" aria-label="기본 말랑이 누르기">
-                  <BlobEmpty size={150} />
-                </button>
-              )}
-          </div>
-        </GlassCard>
-
         <GlassCard className="homeGoalCard">
           <div className="metricHeader">
             <span>{mainGoal.title}</span>
@@ -146,30 +81,36 @@ export default function HomePage({ state, onProfile }) {
           </p>
         </GlassCard>
 
-        <GlassCard className="homeRecentCard">
+        <GlassCard className="homeMetricCard homeBudgetCard">
           <div className="sectionTitle compact">
-            <span>최근 기록</span>
-            <strong>방금 쌓인 감정소비 흔적</strong>
+            <span>예산</span>
+            <strong>{isBudgetOver ? '예산 초과 · 감정 누수율' : '이번 달 예산'}</strong>
           </div>
-          <div className="homeRecentList">
-            {recentTransactions.length > 0 ? recentTransactions.map(transaction => {
-              const emotionName = findTagName(state.tags, transaction.tags, 'EMOTION') || '무덤덤';
-              const category = findTagName(state.tags, transaction.tags, 'EXPENSE_CATEGORY')
-                || findTagName(state.tags, transaction.tags, 'INCOME_CATEGORY')
-                || transaction.title;
-              return (
-                <article className="homeRecentItem" key={transaction.transactionId}>
-                  <span>{emotionName}</span>
-                  <div>
-                    <b>{category}</b>
-                    <small>{transaction.memo || '메모 없음'}</small>
-                  </div>
-                  <strong>{transaction.transactionType === 'INCOME' ? '+' : '-'}{formatMoney(transaction.amount)}</strong>
-                </article>
-              );
-            }) : (
-              <p className="cardText">첫 기록을 남기면 홈에서도 최근 기록이 바로 보여요.</p>
-            )}
+          <div className="metricHeader budgetMetricHeader">
+            <span>{isBudgetOver ? '초과 구간 감정소비 비중' : '예산 사용률'}</span>
+            <strong>{isBudgetOver ? leakRate : budgetUsedRate}%</strong>
+          </div>
+          <div className={`progressTrack budgetTrack ${isBudgetOver ? 'over' : ''}`}>
+            <span style={{ width: `${Math.min(100, budgetUsedRate)}%` }} />
+          </div>
+          <p className="cardText">
+            {isBudgetOver
+              ? `예산을 ${formatMoney(overBudgetAmount)} 초과했어요. 초과 소비 중 감정 태그가 붙은 흐름을 먼저 확인해봐요.`
+              : `이번 달 예산 ${formatMoney(MONTHLY_BUDGET)} 중 ${formatMoney(expenseTotal)}을 사용했어요.`}
+          </p>
+          <div className="budgetMiniStats">
+            <span>
+              <small>남은 예산</small>
+              <b>{formatMoney(remainingBudget)}</b>
+            </span>
+            <span>
+              <small>{isBudgetOver ? '초과 금액' : '총 지출'}</small>
+              <b>{formatMoney(isBudgetOver ? overBudgetAmount : expenseTotal)}</b>
+            </span>
+            <span>
+              <small>감정소비</small>
+              <b>{formatMoney(emotionalExpense)}</b>
+            </span>
           </div>
         </GlassCard>
       </div>

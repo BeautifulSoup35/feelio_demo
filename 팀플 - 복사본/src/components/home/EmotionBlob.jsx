@@ -123,7 +123,11 @@ export function EmotionBlob({ emotion = "평온", size = 140, variant = "svg", i
   const idRef = useRef(`eb${_uid++}`);
   const turbRef = useRef(null);
   const squishTimer = useRef(null);
+  const physicsRef = useRef({ val: 1, vel: 0 });
+  const lastDragDistRef = useRef(0);
   const [squishing, setSquishing] = useState(false);
+  const [springScale, setSpringScale] = useState({ x: 1, y: 1 });
+  const [drag, setDrag] = useState({ isDragging: false, startX: 0, startY: 0, dx: 0, dy: 0 });
   const prev = useRef(emotion);
 
   useEffect(() => {
@@ -145,7 +149,84 @@ export function EmotionBlob({ emotion = "평온", size = 140, variant = "svg", i
     return () => cancelAnimationFrame(raf);
   }, [variant]);
 
+  useEffect(() => {
+    let raf;
+    const tick = () => {
+      if (!drag.isDragging) {
+        const k = 0.15;
+        const d = 0.77;
+        const force = (1 - physicsRef.current.val) * k;
+        physicsRef.current.vel = (physicsRef.current.vel + force) * d;
+        physicsRef.current.val += physicsRef.current.vel;
+
+        const y = physicsRef.current.val;
+        const x = 1 + (1 - y) * 0.75;
+        setSpringScale({ x, y });
+      }
+      raf = requestAnimationFrame(tick);
+    };
+
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [drag.isDragging]);
+
+  useEffect(() => {
+    if (!drag.isDragging) return;
+
+    const clampDrag = (clientX, clientY) => {
+      const dx = clientX - drag.startX;
+      const dy = clientY - drag.startY;
+      const dist = Math.hypot(dx, dy);
+      const maxDist = 140;
+
+      if (dist > maxDist) {
+        const angle = Math.atan2(dy, dx);
+        setDrag(prevDrag => ({
+          ...prevDrag,
+          dx: Math.cos(angle) * maxDist,
+          dy: Math.sin(angle) * maxDist
+        }));
+        return;
+      }
+
+      setDrag(prevDrag => ({ ...prevDrag, dx, dy }));
+    };
+
+    const releaseDrag = () => {
+      setDrag(prevDrag => {
+        if (prevDrag.isDragging) {
+          const dist = Math.hypot(prevDrag.dx, prevDrag.dy);
+          lastDragDistRef.current = dist;
+          physicsRef.current.val = 1 - Math.min(0.25, dist * 0.0018);
+          physicsRef.current.vel = Math.min(0.2, dist * 0.0035);
+        }
+        return { isDragging: false, startX: 0, startY: 0, dx: 0, dy: 0 };
+      });
+    };
+
+    const onMouseMove = event => clampDrag(event.clientX, event.clientY);
+    const onTouchMove = event => {
+      if (event.touches.length === 0) return;
+      const touch = event.touches[0];
+      clampDrag(touch.clientX, touch.clientY);
+    };
+
+    window.addEventListener("mousemove", onMouseMove);
+    window.addEventListener("mouseup", releaseDrag);
+    window.addEventListener("touchmove", onTouchMove, { passive: false });
+    window.addEventListener("touchend", releaseDrag);
+
+    return () => {
+      window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("mouseup", releaseDrag);
+      window.removeEventListener("touchmove", onTouchMove);
+      window.removeEventListener("touchend", releaseDrag);
+    };
+  }, [drag.isDragging, drag.startX, drag.startY]);
+
   function poke() {
+    physicsRef.current.val = 0.68;
+    physicsRef.current.vel = -0.16;
     setSquishing(false);
     requestAnimationFrame(() => {
       setSquishing(true);
@@ -154,14 +235,35 @@ export function EmotionBlob({ emotion = "평온", size = 140, variant = "svg", i
     });
   }
 
+  function startDrag(clientX, clientY) {
+    if (!interactive) return;
+    lastDragDistRef.current = 0;
+    setDrag({ isDragging: true, startX: clientX, startY: clientY, dx: 0, dy: 0 });
+  }
+
   const W = size, H = size * 1.025;
   const gradId = `${idRef.current}-grad`;
   const filtId = `${idRef.current}-goo`;
+  const dragDist = Math.hypot(drag.dx, drag.dy);
+  const dragAngle = dragDist > 0 ? Math.atan2(drag.dy, drag.dx) : 0;
+  const dragStretchX = 1 + dragDist * 0.0022;
+  const dragStretchY = Math.max(0.65, 1 - dragDist * 0.0012);
+  const physicsTransform = drag.isDragging
+    ? `translate(${drag.dx * 0.38}px, ${drag.dy * 0.38}px) rotate(${dragAngle}rad) scaleX(${dragStretchX}) scaleY(${dragStretchY}) rotate(${-dragAngle}rad)`
+    : `scaleX(${springScale.x}) scaleY(${springScale.y})`;
+  const physicsTransition = drag.isDragging ? "none" : "transform 0.06s linear";
 
   return (
     <div
-      onClick={interactive ? poke : undefined}
-      style={{ width: W, height: H, position: "relative", cursor: interactive ? "pointer" : "default", animation: "eb-float 5s ease-in-out infinite", userSelect: "none" }}
+      onMouseDown={event => startDrag(event.clientX, event.clientY)}
+      onTouchStart={event => {
+        if (event.touches.length > 0) startDrag(event.touches[0].clientX, event.touches[0].clientY);
+      }}
+      onClick={interactive ? () => {
+        if (lastDragDistRef.current < 5) poke();
+        window.setTimeout(() => { lastDragDistRef.current = 0; }, 0);
+      } : undefined}
+      style={{ width: W, height: H, position: "relative", cursor: interactive ? "pointer" : "default", animation: "eb-float 5s ease-in-out infinite", userSelect: "none", touchAction: interactive ? "none" : "auto" }}
     >
       <div style={{
         position: "absolute", left: "50%", top: "52%", width: W * 0.95, height: H * 0.9,
@@ -171,43 +273,49 @@ export function EmotionBlob({ emotion = "평온", size = 140, variant = "svg", i
 
       <div style={{
         position: "absolute", inset: 0, transformOrigin: "50% 88%",
-        animation: squishing ? "eb-squish .6s cubic-bezier(.2,.8,.2,1)" : "eb-breathe 4s ease-in-out infinite",
+        transform: physicsTransform,
+        transition: physicsTransition,
       }}>
-        {variant === "svg" ? (
-          <svg width={W} height={H} viewBox="0 0 200 205" style={{ position: "absolute", inset: 0, display: "block" }}>
-            <defs>
-              <radialGradient id={gradId} cx="38%" cy="26%" r="80%">
-                <stop offset="0%" stopColor={e.light} />
-                <stop offset="44%" stopColor={e.base} />
-                <stop offset="100%" stopColor={e.dark} />
-              </radialGradient>
-              <radialGradient id={`${gradId}-sheen`} cx="34%" cy="22%" r="42%">
-                <stop offset="0%" stopColor="#ffffff" stopOpacity="0.7" />
-                <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
-              </radialGradient>
-              <filter id={filtId} x="-25%" y="-25%" width="150%" height="150%">
-                <feTurbulence ref={turbRef} type="fractalNoise" baseFrequency="0.012 0.0096" numOctaves="2" seed="4" result="n" />
-                <feDisplacementMap in="SourceGraphic" in2="n" scale="16" xChannelSelector="R" yChannelSelector="G" />
-              </filter>
-            </defs>
-            <g filter={`url(#${filtId})`}>
-              <path d={SILHOUETTE} fill={`url(#${gradId})`} style={{ transition: "fill .45s ease" }} />
-            </g>
-          </svg>
-        ) : (
-          <div style={{
-            position: "absolute", left: "50%", top: "47%", width: W * 0.82, height: W * 0.84,
-            transform: "translate(-50%,-50%)",
-            background: `radial-gradient(circle at 42% 30%, ${e.light}, ${e.base} 55%, ${e.dark})`,
-            transition: "background .45s ease",
-            borderRadius: "46% 54% 60% 40% / 58% 52% 48% 42%",
-            animation: "eb-morph 8s ease-in-out infinite",
-          }} />
-        )}
+        <div style={{
+          position: "absolute", inset: 0, transformOrigin: "50% 88%",
+          animation: squishing ? "eb-squish .6s cubic-bezier(.2,.8,.2,1)" : "eb-breathe 4s ease-in-out infinite",
+        }}>
+          {variant === "svg" ? (
+            <svg width={W} height={H} viewBox="0 0 200 205" style={{ position: "absolute", inset: 0, display: "block" }}>
+              <defs>
+                <radialGradient id={gradId} cx="38%" cy="26%" r="80%">
+                  <stop offset="0%" stopColor={e.light} />
+                  <stop offset="44%" stopColor={e.base} />
+                  <stop offset="100%" stopColor={e.dark} />
+                </radialGradient>
+                <radialGradient id={`${gradId}-sheen`} cx="34%" cy="22%" r="42%">
+                  <stop offset="0%" stopColor="#ffffff" stopOpacity="0.7" />
+                  <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
+                </radialGradient>
+                <filter id={filtId} x="-25%" y="-25%" width="150%" height="150%">
+                  <feTurbulence ref={turbRef} type="fractalNoise" baseFrequency="0.012 0.0096" numOctaves="2" seed="4" result="n" />
+                  <feDisplacementMap in="SourceGraphic" in2="n" scale="16" xChannelSelector="R" yChannelSelector="G" />
+                </filter>
+              </defs>
+              <g filter={`url(#${filtId})`}>
+                <path d={SILHOUETTE} fill={`url(#${gradId})`} style={{ transition: "fill .45s ease" }} />
+              </g>
+            </svg>
+          ) : (
+            <div style={{
+              position: "absolute", left: "50%", top: "47%", width: W * 0.82, height: W * 0.84,
+              transform: "translate(-50%,-50%)",
+              background: `radial-gradient(circle at 42% 30%, ${e.light}, ${e.base} 55%, ${e.dark})`,
+              transition: "background .45s ease",
+              borderRadius: "46% 54% 60% 40% / 58% 52% 48% 42%",
+              animation: "eb-morph 8s ease-in-out infinite",
+            }} />
+          )}
 
-        <svg width={W} height={H} viewBox="0 0 200 205" style={{ position: "absolute", inset: 0, display: "block" }}>
-          <Face face={e.face} ink={e.ink} />
-        </svg>
+          <svg width={W} height={H} viewBox="0 0 200 205" style={{ position: "absolute", inset: 0, display: "block" }}>
+            <Face face={e.face} ink={e.ink} />
+          </svg>
+        </div>
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import LoginPage from './components/auth/LoginPage.jsx';
 import BottomNav from './components/common/BottomNav.jsx';
 import Sidebar from './components/common/Sidebar.jsx';
@@ -25,6 +25,9 @@ export default function App() {
   const { state, actions } = useAppStore();
   const [currentTab, setCurrentTab] = useState('home');
   const [profileOpen, setProfileOpen] = useState(false);
+  const [theme, setTheme] = useState(() => (
+    localStorage.getItem('feelio_theme') || 'dark'
+  ));
   const [onboardingCompleted, setOnboardingCompleted] = useState(() => (
     localStorage.getItem('feelio_onboarding_completed') === 'true'
   ));
@@ -36,6 +39,10 @@ export default function App() {
     '--aurora-2': auroraColors[1],
     '--aurora-3': auroraColors[2]
   };
+
+  useEffect(() => {
+    localStorage.setItem('feelio_theme', theme);
+  }, [theme]);
 
   if (!state.isLoggedIn) {
     return <LoginPage onLogin={actions.login} />;
@@ -55,7 +62,7 @@ export default function App() {
   }
 
   return (
-    <div className="appShell" style={auroraStyle}>
+    <div className={`appShell theme-${theme}`} style={auroraStyle}>
       <div className="aurora a1" />
       <div className="aurora a2" />
       <div className="aurora a3" />
@@ -65,6 +72,18 @@ export default function App() {
         <span className="mascotMouth" />
       </div>
       <Sidebar currentTab={currentTab} onChange={setCurrentTab} user={state.user} onProfile={() => setProfileOpen(true)} />
+      <button
+        type="button"
+        className="themeToggleButton"
+        onClick={() => setTheme(prev => (prev === 'dark' ? 'light' : 'dark'))}
+        aria-label={theme === 'dark' ? '라이트 모드로 변경' : '다크 모드로 변경'}
+        title={theme === 'dark' ? '라이트 모드' : '다크 모드'}
+      >
+        <span className="themeToggleTrack">
+          <span className="themeToggleThumb" />
+        </span>
+        <span className="themeToggleText">{theme === 'dark' ? 'Dark' : 'Light'}</span>
+      </button>
       <main className="mainSurface">
         {currentTab === 'home' && (
           <HomePage state={state} onProfile={() => setProfileOpen(true)} />

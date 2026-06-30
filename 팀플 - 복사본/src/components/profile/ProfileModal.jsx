@@ -54,7 +54,7 @@ export default function ProfileModal({ user, goal, onClose, onUserSave, onGoalSa
   }
 
   return (
-    <Modal title={title} onClose={onClose}>
+    <Modal title={title} onClose={onClose} size="large" className="profileModalPanel">
       <div className={`profilePanel page-${view}`}>
         <HeaderBack />
 
