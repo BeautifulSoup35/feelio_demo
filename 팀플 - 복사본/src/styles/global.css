@@ -2085,6 +2085,7 @@ input, textarea {
     0 18px 40px -26px rgba(91, 141, 239, .86);
 }
 .contentFeatureCard {
+  grid-column: 1 / -1;
   background:
     radial-gradient(420px 220px at 72% 112%, rgba(243, 95, 168, .12), transparent 72%),
     rgba(255, 255, 255, .055);
@@ -8714,4 +8715,282 @@ input, textarea {
     linear-gradient(135deg, rgba(255, 255, 255, .36), transparent 42%),
     repeating-linear-gradient(135deg, rgba(255, 255, 255, .055) 0 1px, transparent 1px 5px) !important;
   opacity: .48 !important;
+}
+
+/* ========================================================
+   ContentPage: 소비 일과표 타임라인 & 말랑이 편지 CSS
+   ======================================================== */
+
+.contentExtraRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-top: 24px;
+  width: 100%;
+  grid-column: 1 / -1; /* 상위 .contentGrid의 전체 폭을 사용하도록 강제 */
+}
+
+.timelineCard, .mailTriggerCard {
+  min-height: 480px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 타임라인 스타일 */
+.timelineContainer {
+  position: relative;
+  padding-left: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-top: 16px;
+}
+.timelineLine {
+  position: absolute;
+  left: 6px;
+  top: 10px;
+  bottom: 10px;
+  width: 2px;
+  background: rgba(255, 255, 255, 0.15);
+}
+.timelineItem {
+  position: relative;
+  width: 100%;
+}
+.timelineDot {
+  position: absolute;
+  left: -28px;
+  top: 16px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 3px solid #1c1d30;
+  z-index: 2;
+}
+.timelineDot.blue { background: #4D96FF; }
+.timelineDot.green { background: #2FBFA6; }
+.timelineDot.orange { background: #FF9F43; }
+.timelineDot.purple { background: #8A6CFF; }
+.timelineDot.red { background: #FF4757; }
+
+.timelineBox {
+  background: rgba(255, 255, 255, 0.04);
+  padding: 16px 20px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
+}
+.timelineBox:hover {
+  transform: translateX(4px);
+  background: rgba(255, 255, 255, 0.08);
+}
+.timeText {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 500;
+}
+.timelineBox strong {
+  font-size: 17px;
+  color: #fff;
+  font-weight: 700;
+}
+.saveText {
+  font-size: 14px;
+  color: #2FBFA6;
+  font-weight: 600;
+  margin-top: 4px;
+}
+.saveText.danger {
+  color: #FF4757;
+}
+
+/* 편지 트리거 카드 (닫힌 편지봉투) */
+.mailTriggerCard {
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  cursor: pointer;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s;
+}
+.mailTriggerCard:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.2);
+}
+.mailTriggerCard strong {
+  font-size: 22px;
+  color: #fff;
+}
+.mailTriggerCard p {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 15px;
+}
+
+.mailEnvelopeClosed {
+  width: 220px;
+  height: 150px;
+  background: linear-gradient(135deg, #A881FF, #7044DB);
+  border-radius: 12px;
+  position: relative;
+  box-shadow: 0 16px 32px rgba(112, 68, 219, 0.3);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+.mailEnvelopeClosed::before, .mailEnvelopeClosed::after {
+  content: '';
+  position: absolute;
+  width: 140%;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.2);
+}
+.mailEnvelopeClosed::before {
+  transform: rotate(30deg);
+  top: 50%;
+}
+.mailEnvelopeClosed::after {
+  transform: rotate(-30deg);
+  top: 50%;
+}
+.envelopeTop {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 60%;
+  background: linear-gradient(to bottom, #C09FFF, #A881FF);
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  z-index: 1;
+}
+.envelopeRibbon {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 24px;
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-50%);
+  z-index: 2;
+}
+.envelopeSeal {
+  position: relative;
+  z-index: 3;
+  width: 54px;
+  height: 54px;
+  background: #EEDDFF;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  border: 4px solid #fff;
+}
+
+/* 편지 모달 디자인 (화면 70% 크기) */
+.mailModalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 10, 20, 0.7);
+  backdrop-filter: blur(12px);
+  z-index: 9999;
+  display: grid;
+  place-items: center;
+  animation: fadeIn 0.3s ease;
+}
+.mailModalContent {
+  position: relative;
+  width: 70vw;
+  max-width: 900px;
+  height: 80vh;
+  max-height: 850px;
+  border-radius: 32px;
+  overflow: hidden;
+  box-shadow: 0 40px 100px rgba(0, 0, 0, 0.4);
+  animation: scaleUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.mailCloseBtn {
+  position: absolute;
+  right: 32px;
+  top: 32px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.05);
+  border: none;
+  font-size: 24px;
+  color: #4a3b4c;
+  cursor: pointer;
+  z-index: 100;
+  transition: background 0.2s;
+  display: grid;
+  place-items: center;
+}
+.mailCloseBtn:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+.mailModalBackground {
+  width: 100%;
+  height: 100%;
+  background: #FFF5F0; /* 따뜻한 편지지 배경 */
+  position: relative;
+}
+/* 편지지 디자인 (열린 봉투, 뒷배경) */
+.mailModalBackground::before {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 45%;
+  background: linear-gradient(135deg, #B18AFF, #8247E5);
+  clip-path: polygon(0 40%, 50% 0%, 100% 40%, 100% 100%, 0% 100%);
+  z-index: 5;
+}
+/* 말랑이 캐릭터 시뮬레이션 */
+.mailModalBackground::after {
+  content: '💜 편지 쓰는 말랑이 💜';
+  position: absolute;
+  top: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 24px;
+  font-weight: 800;
+  color: #8A6CFF;
+  background: #EEDDFF;
+  padding: 16px 32px;
+  border-radius: 999px;
+  box-shadow: 0 12px 24px rgba(138, 108, 255, 0.2);
+}
+
+/* 편지 본문 가이드라인 영역 (빨간 박스에 해당하는 부분) */
+.mailLetterArea {
+  position: absolute;
+  top: 140px;
+  bottom: 12%;
+  left: 12%;
+  right: 12%;
+  background: rgba(255, 255, 255, 0.6);
+  border: 2px dashed rgba(255, 71, 87, 0.3); /* 가이드라인 느낌 */
+  border-radius: 16px;
+  padding: 40px 60px;
+  z-index: 10;
+  font-size: 19px;
+  line-height: 1.8;
+  color: #3D3540;
+  font-family: Pretendard, sans-serif;
+  font-weight: 500;
+  overflow-y: auto;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.04);
+}
+.mailLetterArea p {
+  margin: 0;
+}
+.mailSign {
+  margin-top: 48px;
+  text-align: right;
+  font-size: 22px;
+  font-weight: 800;
+  font-family: Fredoka, Pretendard, sans-serif;
+  color: #8A6CFF;
 }
