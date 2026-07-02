@@ -60,13 +60,16 @@ const titles = {
 export default function App() {
   const { state, actions } = useFeelioStore();
   const [route, setRoute] = useState('home');
+  const [homeDate, setHomeDate] = useState(() => new Date(2026, 6, 1));
   const [profileOpen, setProfileOpen] = useState(false);
   const [selectedTxn, setSelectedTxn] = useState(null);
   const colors = getAurora(state.aurora).colors;
 
   const content = {
-    home: <HomePageDesign state={state} onRoute={setRoute} />,
-    record: <RecordPageDc state={state} actions={actions} />,
+    home: <HomePageDesign state={state} onRoute={setRoute} selectedDate={homeDate} onSelectDate={setHomeDate} />,
+    record: <RecordPageDc state={state} actions={actions} onSaved={(date) => {
+      setHomeDate(new Date(date));
+    }} />,
     transactions: <TransactionsPageDesign state={state} onSelect={setSelectedTxn} />,
     analysis: <AnalysisPageDc state={state} />,
     universe: <UniversePageDc state={state} />

@@ -157,7 +157,7 @@ const SaveButton = styled.button`
   cursor: ${({ disabled }) => disabled ? 'default' : 'pointer'};
 `;
 
-export default function RecordPageDc({ actions }) {
+export default function RecordPageDc({ actions, onSaved }) {
   const [form, setForm] = useState({
     type: 'expense',
     amount: '',
@@ -189,6 +189,7 @@ export default function RecordPageDc({ actions }) {
       memo: form.memo || '감정 기록',
       date: form.date
     });
+    onSaved?.(form.date);
     setForm(prev => ({ ...prev, amount: '', category: null, emotion: null, situation: [], memo: '' }));
   };
 

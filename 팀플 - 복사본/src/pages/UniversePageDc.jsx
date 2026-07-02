@@ -3,6 +3,7 @@ import { useState } from 'react';
 import styled from '@emotion/styled';
 import { GlassCard } from '../components/common/GlassCard.jsx';
 import { getEmotion } from '../data/emotions.js';
+import PlanetTest from '../components/universe/PlanetTest.jsx';
 
 const Page = styled.div`
   display: flex;
@@ -175,6 +176,8 @@ export default function UniversePageDc() {
         </svg>
         <div css={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, fontWeight: 900, marginTop: 4 }}><span css={{ color: 'rgba(255,255,255,.55)' }}>지금</span><span css={{ color: '#8FDAC0' }}>목표 도착 ★</span></div>
       </Cosmic>
+
+      <PlanetTest />
 
       <Duo>
         <FlipContainer onClick={() => setSelectedUniverse(selectedUniverse === 'current' ? null : 'current')}>
