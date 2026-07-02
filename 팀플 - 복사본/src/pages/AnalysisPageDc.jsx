@@ -1,4 +1,5 @@
 /** @jsxImportSource @emotion/react */
+import { useState } from 'react';
 import styled from '@emotion/styled';
 import { GlassCard } from '../components/common/GlassCard.jsx';
 import { getEmotion } from '../data/emotions.js';
@@ -51,11 +52,17 @@ const kpis = [
   { label: '감정소비', value: '186,000', unit: '원', sub: '전체 지출의 38%', tone: '#7960b8', subColor: '#7960b8' }
 ];
 
-const categoryBars = [
-  ['배달', '82,000원', '43%', '스트레스', 100],
-  ['카페', '54,000원', '28%', '설렘', 66],
-  ['쇼핑', '39,000원', '21%', '설렘', 48],
-  ['편의점', '15,000원', '8%', '평온', 18]
+const categoryData = [
+  { name: '배달', amount: 82000, prevAmount: 100000, emotion: '스트레스', pctText: '43%' },
+  { name: '카페', amount: 54000, prevAmount: 50000, emotion: '설렘', pctText: '28%' },
+  { name: '쇼핑', amount: 39000, prevAmount: 48000, emotion: '설렘', pctText: '21%' },
+  { name: '편의점', amount: 15000, prevAmount: 20000, emotion: '평온', pctText: '8%' }
+];
+
+const aiInsights = [
+  { emotion: '외로움', percent: 61, color: '#5b7db1', title: '새벽 1시, 외로우면 지갑이 샌다', desc: '자정~새벽 소비의 78%가 \'외로움\' 태그' },
+  { emotion: '불안', percent: 22, color: '#a68b55', title: '월급날 다음 3일이 제일 위험해', desc: '불안 소비가 평소의 2.3배로 튐' },
+  { emotion: '신남', percent: 17, color: '#b15b76', title: '기분이 들뜨면 지출도 들뜬다', desc: '신남 태그 날 하루 평균 지출 49,200원' }
 ];
 
 const emotionDist = [
@@ -74,6 +81,9 @@ const evidence = [
 ];
 
 export default function AnalysisPageDc() {
+  const [activeInsight, setActiveInsight] = useState(aiInsights[0]);
+  const [isSaveMode, setIsSaveMode] = useState(false);
+
   const points = times.map(([label, value], index) => {
     const x = ((index + .5) / times.length) * 100;
     const y = 90 - (value / 40) * 74;
@@ -105,35 +115,130 @@ export default function AnalysisPageDc() {
 
       <Duo>
         <Card>
-          <h3 css={{ margin: '0 0 4px', fontSize: 16 }}>카테고리별 지출</h3>
-          <p css={{ margin: '0 0 22px', color: 'var(--sub)', fontSize: 12 }}>가장 큰 지출은 <b css={{ color: 'var(--text)' }}>배달</b>이에요</p>
-          <div css={{ display: 'grid', gap: 20 }}>{categoryBars.map(([name, amount, pct, emotion, width]) => {
-            const emo = getEmotion(emotion);
-            return <div key={name}>
-              <div css={{ display: 'flex', justifyContent: 'space-between', gap: 10, marginBottom: 9 }}>
-              <div css={{ display: 'flex', alignItems: 'center', gap: 9 }}><b>{name}</b><span css={{ fontSize: 11, fontWeight: 800, color: emo.text || emo.color, background: `${emo.color}26`, padding: '2px 9px', borderRadius: 99 }}>{emotion}</span></div>
-                <div css={{ display: 'flex', gap: 10 }}><b>{amount}</b><b css={{ color: 'var(--sub)', width: 38, textAlign: 'right' }}>{pct}</b></div>
+          <div css={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+            <div>
+              <h3 css={{ margin: '0 0 4px', fontSize: 16 }}>카테고리별 지출</h3>
+              <p css={{ margin: '0 0 22px', color: 'var(--sub)', fontSize: 12 }}>
+                {isSaveMode ? '저번달 대비 5% 절감 예산을 목표로 달리고 있어요' : <span>가장 큰 지출은 <b css={{ color: 'var(--text)' }}>배달</b>이에요</span>}
+              </p>
+            </div>
+            {/* 절약모드 토글 */}
+            <div 
+              onClick={() => setIsSaveMode(!isSaveMode)}
+              css={{
+                display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer',
+                background: isSaveMode ? '#3E95781a' : 'var(--line)', 
+                padding: '6px 12px', borderRadius: 99, transition: '0.3s'
+              }}
+            >
+              <span css={{ fontSize: 12, fontWeight: 800, color: isSaveMode ? '#3E9578' : 'var(--sub)' }}>절약모드</span>
+              <div css={{
+                width: 32, height: 18, borderRadius: 99, background: isSaveMode ? '#3E9578' : 'var(--sub)',
+                position: 'relative', transition: '0.3s'
+              }}>
+                <div css={{
+                  width: 14, height: 14, background: '#FFF', borderRadius: '50%',
+                  position: 'absolute', top: 2, left: isSaveMode ? 16 : 2, transition: 'transform 0.3s'
+                }}/>
               </div>
-              <BarTrack><div css={{ width: `${width}%`, height: '100%', borderRadius: 99, background: `linear-gradient(90deg, ${emo.color}9e, ${emo.color})` }} /></BarTrack>
+            </div>
+          </div>
+
+          <div css={{ display: 'grid', gap: 20 }}>{categoryData.map(data => {
+            const emo = getEmotion(data.emotion);
+            const budget = data.prevAmount * 0.95;
+            const progress = (data.amount / budget) * 100;
+            const isOver = progress > 100;
+            // 일반 모드일 때의 바 길이 (제일 큰 배달을 100%로 잡기 위한 로직)
+            const maxAmount = categoryData[0].amount;
+            const normalWidth = (data.amount / maxAmount) * 100;
+
+            return <div key={data.name}>
+              <div css={{ display: 'flex', justifyContent: 'space-between', gap: 10, marginBottom: 9 }}>
+                <div css={{ display: 'flex', alignItems: 'center', gap: 9 }}>
+                  <b>{data.name}</b>
+                  <span css={{ fontSize: 11, fontWeight: 800, color: emo.text || emo.color, background: `${emo.color}26`, padding: '2px 9px', borderRadius: 99 }}>{data.emotion}</span>
+                </div>
+                <div css={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+                  <b>{data.amount.toLocaleString()}원</b>
+                  {isSaveMode ? (
+                    <span css={{ 
+                      fontSize: 12, fontWeight: 800, width: 44, textAlign: 'right', 
+                      color: isOver ? '#FF4757' : 'var(--sub)' 
+                    }}>
+                      {Math.round(progress)}%
+                    </span>
+                  ) : (
+                    <b css={{ color: 'var(--sub)', width: 38, textAlign: 'right' }}>{data.pctText}</b>
+                  )}
+                </div>
+              </div>
+              <BarTrack css={{ background: isSaveMode ? 'rgba(255,255,255,0.06)' : 'var(--line)' }}>
+                <div css={{ 
+                  width: isSaveMode ? `${Math.min(progress, 100)}%` : `${normalWidth}%`, 
+                  height: '100%', 
+                  borderRadius: 99, 
+                  background: isSaveMode && isOver ? '#FF4757' : `linear-gradient(90deg, ${emo.color}9e, ${emo.color})`,
+                  transition: 'width 0.4s ease, background 0.4s ease'
+                }} />
+              </BarTrack>
+              {isSaveMode && (
+                <div css={{ display: 'flex', justifyContent: 'space-between', marginTop: 6, fontSize: 11, color: 'var(--sub)' }}>
+                  <span>{isOver ? <b css={{ color: '#FF4757' }}>예산 초과!</b> : '목표 예산'}</span>
+                  <span>{budget.toLocaleString()}원</span>
+                </div>
+              )}
             </div>;
           })}</div>
         </Card>
 
         <Card>
-          <h3 css={{ margin: '0 0 4px', fontSize: 16 }}>감정별 지출 지분</h3>
-          <p css={{ margin: '0 0 20px', color: 'var(--sub)', fontSize: 12 }}>어떤 마음이 지갑을 열었나</p>
-          <div css={{ display: 'flex', height: 32, borderRadius: 99, overflow: 'hidden', boxShadow: 'inset 0 0 0 1px var(--line)', marginBottom: 22 }}>
-            {emotionDist.map(([name, pct]) => <div key={name} css={{ width: pct, background: getEmotion(name).color }} />)}
+          <div css={{ display: 'flex', flexDirection: 'column', gap: 24, height: '100%', justifyContent: 'center' }}>
+            {/* 가장 주된 지출 감정 */}
+            <div>
+              <h3 css={{ margin: '0 0 4px', fontSize: 16 }}>가장 주된 지출 감정</h3>
+              <p css={{ margin: '0 0 12px', color: 'var(--sub)', fontSize: 12 }}>이번 달 가장 많이 느낀 감정소비예요</p>
+              {(() => {
+                const [name, pct, desc, amount] = emotionDist[0];
+                const emo = getEmotion(name);
+                return (
+                  <div css={{ display: 'flex', alignItems: 'center', gap: 11, background: 'var(--line)', padding: '14px 16px', borderRadius: 12 }}>
+                    <span css={{ width: 14, height: 14, borderRadius: '50%', background: emo.color }} />
+                    <div css={{ flex: 1, minWidth: 0 }}>
+                      <b css={{ fontSize: 15 }}>{name}</b>
+                      <div css={{ color: 'var(--sub)', fontSize: 12, marginTop: 2 }}>{desc}</div>
+                    </div>
+                    <div css={{ textAlign: 'right' }}>
+                      <b css={{ color: emo.color, fontSize: 18, display: 'block' }}>{pct}</b>
+                      <span css={{ color: 'var(--sub)', fontSize: 12, fontWeight: 800 }}>{amount}</span>
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
+
+            {/* 가장 주된 소비 시간 */}
+            <div>
+              <h3 css={{ margin: '0 0 4px', fontSize: 16 }}>가장 주된 소비 시간</h3>
+              <p css={{ margin: '0 0 12px', color: 'var(--sub)', fontSize: 12 }}>이 시간대에 지갑이 가장 쉽게 열려요</p>
+              {(() => {
+                const peakPoint = points.find(p => p.peak) || points[0];
+                return (
+                  <div css={{ display: 'flex', alignItems: 'center', gap: 11, background: 'var(--line)', padding: '14px 16px', borderRadius: 12 }}>
+                    <span css={{ width: 32, height: 32, borderRadius: '50%', background: '#9E96EE26', color: '#6A61C4', display: 'grid', placeItems: 'center', fontSize: 16 }}>🌙</span>
+                    <div css={{ flex: 1, minWidth: 0 }}>
+                      <b css={{ fontSize: 15 }}>밤 ({peakPoint.label})</b>
+                      <div css={{ color: 'var(--sub)', fontSize: 12, marginTop: 2 }}>감정소비의 대부분이 몰려있어요</div>
+                    </div>
+                    <div css={{ textAlign: 'right' }}>
+                      <b css={{ color: '#6A61C4', fontSize: 18, display: 'block' }}>{peakPoint.value}%</b>
+                      <span css={{ color: 'var(--sub)', fontSize: 12, fontWeight: 800 }}>가장 높음</span>
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
           </div>
-          <div css={{ display: 'grid', gap: 14 }}>{emotionDist.map(([name, pct, desc, amount]) => {
-            const emo = getEmotion(name);
-            return <div key={name} css={{ display: 'flex', alignItems: 'center', gap: 11 }}>
-              <span css={{ width: 11, height: 11, borderRadius: '50%', background: emo.color }} />
-              <div css={{ flex: 1, minWidth: 0 }}><b>{name}</b><div css={{ color: 'var(--sub)', fontSize: 11.5 }}>{desc}</div></div>
-              <span css={{ color: 'var(--sub)', fontSize: 12, fontWeight: 800 }}>{amount}</span>
-              <b css={{ color: emo.color, fontSize: 17, width: 44, textAlign: 'right' }}>{pct}</b>
-            </div>;
-          })}</div>
         </Card>
       </Duo>
 
@@ -145,24 +250,54 @@ export default function AnalysisPageDc() {
             const current = index === monthly.length - 1;
             return <div key={label} css={{ flex: 1, height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end' }}>
               <span css={{ color: current ? '#6A61C4' : 'var(--sub)', fontSize: 10, fontWeight: 800, marginBottom: 7 }}>{(value / 100).toFixed(1)}만</span>
-              <div css={{ width: '72%', maxWidth: 34, height: `${value / 520 * 100}%`, minHeight: 6, borderRadius: '7px 7px 3px 3px', background: current ? 'linear-gradient(180deg,#9E96EE,#B7B0F2)' : 'var(--line)' }} />
+              <div css={{ width: '100%', maxWidth: 40, height: `${value / 520 * 100}%`, minHeight: 6, borderRadius: '7px 7px 3px 3px', background: current ? 'linear-gradient(180deg,#9E96EE,#B7B0F2)' : 'var(--line)' }} />
               <span css={{ color: current ? 'var(--text)' : 'var(--sub)', fontSize: 11, fontWeight: current ? 900 : 700, marginTop: 9 }}>{label}</span>
             </div>;
           })}</div>
         </Card>
 
-        <Card>
-          <div css={{ display: 'flex', justifyContent: 'space-between', gap: 10 }}><h3 css={{ margin: 0, fontSize: 16 }}>시간대별 소비</h3><span css={{ fontSize: 12, fontWeight: 900, color: '#6A61C4', background: '#9E96EE1f', padding: '6px 12px', borderRadius: 99 }}>밤에 소비가 몰려요</span></div>
-          <p css={{ color: 'var(--sub)', fontSize: 12 }}>감정소비의 <b css={{ color: 'var(--text)' }}>64%</b>가 저녁·밤에 일어나요</p>
-          <div css={{ position: 'relative', height: 132 }}>
-            <svg viewBox="0 0 100 100" preserveAspectRatio="none" width="100%" height="132" css={{ position: 'absolute', inset: 0 }}>
-              <defs><linearGradient id="analysisRidge" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#9E96EE" stopOpacity=".4" /><stop offset="1" stopColor="#9E96EE" stopOpacity="0" /></linearGradient></defs>
-              <path d={area} fill="url(#analysisRidge)" />
-              <path d={curve} fill="none" stroke="#9E96EE" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
-            </svg>
-            {points.map(point => <span key={point.label} css={{ position: 'absolute', left: `${point.x}%`, bottom: `${100 - point.y}%`, transform: 'translate(-50%,50%)', width: point.peak ? 13 : 8, height: point.peak ? 13 : 8, borderRadius: '50%', background: point.peak ? '#9E96EE' : 'var(--card-strong)', border: `2px solid ${point.peak ? '#fff' : '#9E96EE'}` }} />)}
+        <Card css={{ display: 'flex', flexDirection: 'column' }}>
+          <div css={{ display: 'flex', alignItems: 'center', gap: 9, marginBottom: 16 }}><span css={{ width: 24, height: 24, borderRadius: 8, background: 'var(--ink)', color: 'var(--on-ink)', display: 'grid', placeItems: 'center', fontSize: 10, fontWeight: 900 }}>AI</span><b css={{ fontSize: 16 }}>감정소비 분석</b></div>
+          <p css={{ color: 'var(--sub)', fontSize: 12, marginBottom: 20 }}>이번 달 지출에 가장 큰 영향을 미친 감정들이에요.</p>
+          
+          <div css={{ display: 'flex', gap: 10, marginBottom: 24 }}>
+            {aiInsights.map(insight => {
+               const isActive = activeInsight.emotion === insight.emotion;
+               return (
+                 <button 
+                   key={insight.emotion}
+                   onClick={() => setActiveInsight(insight)}
+                   css={{ 
+                     flex: 1, 
+                     padding: '16px 14px', 
+                     borderRadius: 14, 
+                     border: `1px solid ${isActive ? insight.color : insight.color + '40'}`, 
+                     background: isActive ? insight.color + '26' : 'transparent',
+                     cursor: 'pointer',
+                     transition: 'all 0.2s',
+                     display: 'flex',
+                     flexDirection: 'column',
+                     alignItems: 'flex-start',
+                     gap: 6
+                   }}
+                 >
+                   <span css={{ fontSize: 13, color: 'var(--sub)', fontWeight: 800 }}>{insight.emotion}</span>
+                   <b css={{ fontSize: 24, color: 'var(--text)' }}>{insight.percent}%</b>
+                 </button>
+               )
+            })}
           </div>
-          <div css={{ display: 'flex', marginTop: 10 }}>{points.map(point => <div key={point.label} css={{ flex: 1, textAlign: 'center' }}><b css={{ color: point.peak ? '#6A61C4' : 'var(--sub)', fontSize: 12 }}>{point.label}</b><div css={{ color: 'var(--sub)', fontSize: 11 }}>{point.value}%</div></div>)}</div>
+
+          <div css={{ 
+            marginTop: 'auto', 
+            padding: '20px', 
+            borderRadius: 16, 
+            border: `1px solid ${activeInsight.color}80`, 
+            background: `linear-gradient(145deg, ${activeInsight.color}1a, transparent)` 
+          }}>
+            <div css={{ fontSize: 16, fontWeight: 900, marginBottom: 8, color: 'var(--text)' }}>{activeInsight.title}</div>
+            <div css={{ fontSize: 13, color: 'var(--sub)', lineHeight: 1.5 }}>{activeInsight.desc}</div>
+          </div>
         </Card>
       </Duo>
 

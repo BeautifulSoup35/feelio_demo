@@ -82,6 +82,13 @@ button, input, textarea { color: inherit; }
   50% { transform: translate(20px, -24px) scale(1.08); }
 }
 
+@keyframes ping {
+  75%, 100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
 .moodMascot {
   position: fixed;
   top: 26px;
