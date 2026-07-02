@@ -55,7 +55,7 @@ const Top = styled.header`
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  width: min(100%, 1380px);
+  width: min(100%, 1420px);
   margin: 0 auto 10px;
 
   p {

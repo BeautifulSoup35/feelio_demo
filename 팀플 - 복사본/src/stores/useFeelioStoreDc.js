@@ -1,8 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { mockGoals } from '../data/mockGoals.js';
-import { mockTransactions } from '../data/mockTransactions.js';
 
-const STORAGE_KEY = 'feelio-dc-react-state-v2';
+const STORAGE_KEY = 'feelio-dc-react-state-v3';
 
 const initialState = {
   isLoggedIn: false,
@@ -11,7 +10,7 @@ const initialState = {
   aurora: '블루',
   user: { nickname: '서연', provider: 'Google' },
   goals: mockGoals,
-  transactions: mockTransactions,
+  transactions: [],
   toast: ''
 };
 
@@ -33,7 +32,14 @@ export function useFeelioStore() {
 
   const actions = useMemo(() => ({
     login(provider = 'Google') {
-      setState(prev => ({ ...prev, isLoggedIn: true, user: { ...prev.user, provider } }));
+      setState(prev => ({
+        ...prev,
+        isLoggedIn: true,
+        user: { ...prev.user, provider },
+        goals: mockGoals,
+        transactions: [],
+        toast: ''
+      }));
     },
     completeOnboarding(goalPatch) {
       setState(prev => ({

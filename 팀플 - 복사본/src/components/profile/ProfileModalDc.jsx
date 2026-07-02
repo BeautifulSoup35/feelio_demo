@@ -78,6 +78,14 @@ const Logout = styled.button`
   cursor: pointer;
 `;
 
+const FixedShell = styled.div`
+  height: 100%;
+  box-sizing: border-box;
+  padding: 30px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+`;
+
 export default function ProfileModalDc({ state, actions, onClose }) {
   const [view, setView] = useState('main');
   const [nickname, setNickname] = useState(state.user.nickname);
@@ -90,8 +98,14 @@ export default function ProfileModalDc({ state, actions, onClose }) {
   }
 
   return (
-    <Modal onClose={onClose}>
-      <div css={{ padding: '30px' }}>
+    <Modal
+      onClose={onClose}
+      width="min(560px, calc(100vw - 40px))"
+      height="min(668px, calc(100vh - 40px))"
+      maxHeight="calc(100vh - 40px)"
+      overflow="hidden"
+    >
+      <FixedShell>
         {view === 'main' && (
           <>
             <Header>
@@ -183,7 +197,7 @@ export default function ProfileModalDc({ state, actions, onClose }) {
         )}
         {view === 'data' && <Sub title="데이터 관리" back={() => setView('main')}><p css={{ color: 'var(--sub)' }}>모든 거래와 감정 기록을 초기화할 수 있어요.</p><button onClick={actions.resetData} css={{ ...primaryButton, background: '#E87573' }}>전체 기록 초기화</button></Sub>}
         {view === 'account' && <Sub title="계정 관리" back={() => setView('main')}><p css={{ color: 'var(--sub)' }}>탈퇴하면 지금까지 기록한 감정과 거래, 목표가 사라져요.</p><button onClick={actions.logout} css={{ ...primaryButton, background: '#E87573' }}>탈퇴 진행</button></Sub>}
-      </div>
+      </FixedShell>
     </Modal>
   );
 }
