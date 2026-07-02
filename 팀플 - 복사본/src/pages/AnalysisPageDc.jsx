@@ -5,6 +5,8 @@ import { GlassCard } from '../components/common/GlassCard.jsx';
 import { getEmotion } from '../data/emotions.js';
 
 const Page = styled.div`
+  width: min(100%, 1420px);
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -192,51 +194,39 @@ export default function AnalysisPageDc() {
           })}</div>
         </Card>
 
-        <Card>
-          <div css={{ display: 'flex', flexDirection: 'column', gap: 24, height: '100%', justifyContent: 'center' }}>
-            {/* 가장 주된 지출 감정 */}
-            <div>
-              <h3 css={{ margin: '0 0 4px', fontSize: 16 }}>가장 주된 지출 감정</h3>
-              <p css={{ margin: '0 0 12px', color: 'var(--sub)', fontSize: 12 }}>이번 달 가장 많이 느낀 감정소비예요</p>
-              {(() => {
-                const [name, pct, desc, amount] = emotionDist[0];
-                const emo = getEmotion(name);
-                return (
-                  <div css={{ display: 'flex', alignItems: 'center', gap: 11, background: 'var(--line)', padding: '14px 16px', borderRadius: 12 }}>
-                    <span css={{ width: 14, height: 14, borderRadius: '50%', background: emo.color }} />
-                    <div css={{ flex: 1, minWidth: 0 }}>
-                      <b css={{ fontSize: 15 }}>{name}</b>
-                      <div css={{ color: 'var(--sub)', fontSize: 12, marginTop: 2 }}>{desc}</div>
-                    </div>
-                    <div css={{ textAlign: 'right' }}>
-                      <b css={{ color: emo.color, fontSize: 18, display: 'block' }}>{pct}</b>
-                      <span css={{ color: 'var(--sub)', fontSize: 12, fontWeight: 800 }}>{amount}</span>
-                    </div>
-                  </div>
-                );
-              })()}
+        <Card css={{ padding: 0, overflow: 'hidden' }}>
+          <div css={{ display: 'flex', height: '100%', alignItems: 'center' }}>
+            {/* 왼쪽: 스트레스 */}
+            <div css={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '36px 20px' }}>
+              <div css={{ position: 'relative', width: 130, height: 130, marginBottom: 20 }}>
+                <svg viewBox="0 0 36 36" css={{ width: '100%', height: '100%' }}>
+                  <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#D3D6FF" strokeWidth="3.5" />
+                  <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#5042B3" strokeWidth="3.5" strokeDasharray="43, 100" strokeLinecap="round" />
+                </svg>
+                <div css={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#5042B3' }}>
+                  <span css={{ fontSize: 26, fontWeight: 900, marginBottom: 2 }}>43%</span>
+                  <span css={{ fontSize: 20 }}>{getEmotion('스트레스').icon}</span>
+                </div>
+              </div>
+              <span css={{ color: '#5042B3', fontSize: 16, fontWeight: 800 }}>스트레스</span>
             </div>
 
-            {/* 가장 주된 소비 시간 */}
-            <div>
-              <h3 css={{ margin: '0 0 4px', fontSize: 16 }}>가장 주된 소비 시간</h3>
-              <p css={{ margin: '0 0 12px', color: 'var(--sub)', fontSize: 12 }}>이 시간대에 지갑이 가장 쉽게 열려요</p>
-              {(() => {
-                const peakPoint = points.find(p => p.peak) || points[0];
-                return (
-                  <div css={{ display: 'flex', alignItems: 'center', gap: 11, background: 'var(--line)', padding: '14px 16px', borderRadius: 12 }}>
-                    <span css={{ width: 32, height: 32, borderRadius: '50%', background: '#9E96EE26', color: '#6A61C4', display: 'grid', placeItems: 'center', fontSize: 16 }}>🌙</span>
-                    <div css={{ flex: 1, minWidth: 0 }}>
-                      <b css={{ fontSize: 15 }}>밤 ({peakPoint.label})</b>
-                      <div css={{ color: 'var(--sub)', fontSize: 12, marginTop: 2 }}>감정소비의 대부분이 몰려있어요</div>
-                    </div>
-                    <div css={{ textAlign: 'right' }}>
-                      <b css={{ color: '#6A61C4', fontSize: 18, display: 'block' }}>{peakPoint.value}%</b>
-                      <span css={{ color: 'var(--sub)', fontSize: 12, fontWeight: 800 }}>가장 높음</span>
-                    </div>
-                  </div>
-                );
-              })()}
+            {/* 가운데 구분선 */}
+            <div css={{ width: 1, height: '70%', background: 'var(--line)' }} />
+
+            {/* 오른쪽: 밤 */}
+            <div css={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '36px 20px' }}>
+              <div css={{ position: 'relative', width: 130, height: 130, marginBottom: 20 }}>
+                <svg viewBox="0 0 36 36" css={{ width: '100%', height: '100%' }}>
+                  <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#FFD1DF" strokeWidth="3.5" />
+                  <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#9E355B" strokeWidth="3.5" strokeDasharray="33, 100" strokeLinecap="round" />
+                </svg>
+                <div css={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#9E355B' }}>
+                  <span css={{ fontSize: 26, fontWeight: 900, marginBottom: 2 }}>33%</span>
+                  <span css={{ fontSize: 20 }}>🌙</span>
+                </div>
+              </div>
+              <span css={{ color: '#9E355B', fontSize: 16, fontWeight: 800 }}>밤</span>
             </div>
           </div>
         </Card>

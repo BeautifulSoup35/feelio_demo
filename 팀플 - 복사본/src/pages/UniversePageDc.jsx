@@ -5,6 +5,8 @@ import { GlassCard } from '../components/common/GlassCard.jsx';
 import { getEmotion } from '../data/emotions.js';
 
 const Page = styled.div`
+  width: min(100%, 1420px);
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
   gap: 20px;
