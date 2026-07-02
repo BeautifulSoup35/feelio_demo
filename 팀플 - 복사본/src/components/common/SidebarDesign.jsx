@@ -11,13 +11,13 @@ const Aside = styled.aside`
   width: 224px;
   display: flex;
   flex-direction: column;
-  gap: 18px;
   padding: 20px 16px;
   border-radius: 28px;
   background: var(--card-strong);
   border: 1px solid var(--card-border);
   box-shadow: var(--shadow);
   backdrop-filter: blur(30px) saturate(1.3);
+  -webkit-backdrop-filter: blur(30px) saturate(1.3);
 
   @media (max-width: 820px) {
     display: none;
@@ -33,7 +33,8 @@ const Brand = styled.div`
   strong {
     display: block;
     font-size: 20px;
-    letter-spacing: -.02em;
+    font-weight: 900;
+    letter-spacing: 0;
   }
 
   span {
@@ -45,25 +46,26 @@ const Brand = styled.div`
 `;
 
 const Nav = styled.nav`
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: 5px;
+  margin-top: 20px;
 `;
 
 const NavButton = styled.button`
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 11px;
   width: 100%;
-  border: 0;
-  border-radius: 16px;
-  padding: 13px 14px;
-  background: ${({ active }) => active ? 'var(--card-strong)' : 'transparent'};
+  border-radius: 15px;
+  border: 1px solid ${({ active }) => active ? 'var(--card-border)' : 'transparent'};
+  padding: 12px 14px;
+  background: ${({ active }) => active ? 'var(--card)' : 'transparent'};
   color: ${({ active }) => active ? 'var(--text)' : 'var(--sub)'};
-  font-size: 14.5px;
+  font-size: 15.5px;
   font-weight: 800;
   text-align: left;
   cursor: pointer;
-  box-shadow: ${({ active }) => active ? '0 12px 28px rgba(0,0,0,.06)' : 'none'};
 `;
 
 const Profile = styled.button`
@@ -77,6 +79,7 @@ const Profile = styled.button`
   background: var(--card);
   cursor: pointer;
   text-align: left;
+  color: var(--text);
 
   i {
     width: 38px;
@@ -85,23 +88,34 @@ const Profile = styled.button`
     display: grid;
     place-items: center;
     flex: 0 0 auto;
-    background: linear-gradient(135deg,#FF8A62,#F2C766);
+    background: linear-gradient(135deg, #FF8A62, #F2C766);
     color: #fff;
     font-style: normal;
-    font-weight: 800;
+    font-weight: 900;
   }
 
-  strong, small {
+  strong,
+  small {
     display: block;
   }
 
   small {
     color: var(--sub);
     margin-top: 2px;
+    font-size: 11.5px;
   }
 `;
 
-export function Sidebar({ route, onRoute, user, onProfile }) {
+function MenuIcon({ name }) {
+  const common = { width: 18, height: 18, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 1.8 };
+  if (name === 'home') return <svg {...common} strokeLinejoin="round"><path d="M4 11 12 4l8 7" /><path d="M6 10v9h12v-9" /></svg>;
+  if (name === 'record') return <svg {...common} strokeLinecap="round"><circle cx="12" cy="12" r="8.5" /><path d="M12 8v8M8 12h8" /></svg>;
+  if (name === 'transactions') return <svg {...common} strokeLinecap="round"><path d="M5 6h14M5 12h14M5 18h9" /></svg>;
+  if (name === 'analysis') return <svg {...common} strokeLinecap="round"><path d="M5 19V9M12 19V5M19 19v-6" /></svg>;
+  return <svg {...common}><circle cx="11" cy="12" r="4" /><ellipse cx="11" cy="12" rx="10" ry="4.3" transform="rotate(28 11 12)" /><path d="M18.5 5.2l.5 1.4 1.4.5-1.4.5-.5 1.4-.5-1.4L16.6 7l1.4-.5z" fill="currentColor" stroke="none" /></svg>;
+}
+
+export function SidebarDesign({ route, onRoute, user, onProfile }) {
   return (
     <Aside>
       <Brand>
@@ -111,7 +125,8 @@ export function Sidebar({ route, onRoute, user, onProfile }) {
       <Nav>
         {routes.map(item => (
           <NavButton key={item.key} type="button" active={route === item.key} onClick={() => onRoute(item.key)}>
-            <span>{item.icon}</span>{item.label}
+            <MenuIcon name={item.key} />
+            {item.label}
           </NavButton>
         ))}
       </Nav>
@@ -122,4 +137,3 @@ export function Sidebar({ route, onRoute, user, onProfile }) {
     </Aside>
   );
 }
-

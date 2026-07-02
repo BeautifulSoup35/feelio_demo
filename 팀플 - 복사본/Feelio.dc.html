@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics="">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{font-family:Inter,'Pretendard','Pretendard Variable',-apple-system,system-ui,sans-serif;color:#1F1F1F;-webkit-font-smoothing:antialiased;word-break:keep-all}
+  :root{
+    --bg1:#f6f2eb; --bg2:#ede6dc;
+    --card:rgba(255,255,255,.34); --card2:rgba(255,255,255,.5); --cardbrd:rgba(255,255,255,.55);
+    --text:#3a352f; --sub:#8a837a; --ink:#2b2723; --onInk:#fbf9f6; --line:rgba(50,42,32,.10);
+    --shadow:0 22px 54px -34px rgba(70,55,44,.32); --pebbleEmpty:rgba(255,255,255,.30); --pebbleBrd:rgba(255,255,255,.5);
+    --modalbg:rgba(248,245,240,.46); --scrim:rgba(40,32,24,.22);
+  }
+  [data-mode="dark"]{
+    --bg1:#12141e; --bg2:#0b0d15;
+    --card:rgba(255,255,255,.055); --card2:rgba(255,255,255,.085); --cardbrd:rgba(255,255,255,.12);
+    --text:#ECEBF0; --sub:#9a97a8; --ink:#ECEBF0; --onInk:#141220; --line:rgba(255,255,255,.1);
+    --shadow:0 26px 62px -30px rgba(0,0,0,.6); --pebbleEmpty:rgba(255,255,255,.05); --pebbleBrd:rgba(255,255,255,.1);
+    --modalbg:rgba(22,24,34,.52); --scrim:rgba(5,6,12,.4);
+  }
+  ::-webkit-scrollbar{width:9px;height:9px}
+  ::-webkit-scrollbar-thumb{background:rgba(120,110,100,.22);border-radius:9px;border:2px solid transparent;background-clip:padding-box}
+  input,textarea,button{font-family:inherit}
+  input::placeholder{color:var(--sub);opacity:.7}
+  input[type=range]{-webkit-appearance:none;appearance:none;height:6px;border-radius:99px;outline:none}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:#fff;border:none;box-shadow:0 2px 8px rgba(0,0,0,.35);cursor:pointer}
+  @keyframes eb-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-11px)}}
+  @keyframes caretBlink{0%,49%{opacity:1}50%,100%{opacity:0}}
+  @keyframes eb-breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.03,.985)}}
+  @keyframes eb-squish{0%{transform:scale(1)}28%{transform:scale(1.22,.72)}55%{transform:scale(.9,1.14)}78%{transform:scale(1.05,.96)}100%{transform:scale(1)}}
+  @keyframes eb-morph{0%,100%{border-radius:46% 54% 60% 40% / 58% 52% 48% 42%}50%{border-radius:56% 44% 44% 56% / 46% 58% 42% 54%}}
+  @keyframes eb-mouth{0%,100%{transform:scaleY(.72)}50%{transform:scaleY(1)}}
+  @keyframes eb-mouth2{0%,100%{transform:scaleY(.88)}50%{transform:scaleY(1.06)}}
+  @keyframes drift1{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(60px,-40px) scale(1.15)}}
+  @keyframes drift2{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-50px,40px) scale(1.1)}}
+  @keyframes drift3{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(30px,50px) scale(1.12)}}
+  @keyframes toastIn{from{opacity:0;transform:translate(-50%,14px)}to{opacity:1;transform:translate(-50%,0)}}
+  @keyframes modalIn{from{opacity:0;transform:translateY(18px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+  @keyframes ovIn{from{opacity:0}to{opacity:1}}
+  @keyframes rewardPop{0%{transform:scale(.4);opacity:0}45%{transform:scale(1.12)}70%{transform:scale(.96)}100%{transform:scale(1);opacity:1}}
+  @keyframes stepIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes stepInX{from{opacity:.3;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+  @keyframes wordIn{0%{opacity:0;transform:translateY(14px)}12%,84%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-14px)}}
+  @keyframes ringGrow{from{stroke-dashoffset:var(--c)}to{stroke-dashoffset:var(--o)}}
+  @keyframes floatUp{from{opacity:0;transform:translateY(24px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
+  @keyframes cycle5{0%{opacity:0;transform:translateY(12px)}3%{opacity:1;transform:translateY(0)}17%{opacity:1;transform:translateY(0)}20%{opacity:0;transform:translateY(-12px)}100%{opacity:0;transform:translateY(-12px)}}
+  @keyframes haloPulse{0%,100%{opacity:.5;transform:translate(-50%,-50%) scale(1)}50%{opacity:.85;transform:translate(-50%,-50%) scale(1.12)}}
+</style>
+</helmet>
+
+<div style="{{ rootStyle }}" data-mode="{{ mode }}">
+
+  <!-- ===== BACKGROUND (unified, mode-aware) ===== -->
+  <div style="position:absolute;inset:0;overflow:hidden;pointer-events:none;background:linear-gradient(160deg,var(--bg1),var(--bg2))">
+    <div style="{{ auroraOrb1 }}"></div>
+    <div style="{{ auroraOrb2 }}"></div>
+    <div style="{{ auroraOrb3 }}"></div>
+    <div style="{{ auroraVeil }}"></div>
+  </div>
+
+  <!-- ===== TOAST ===== -->
+  <sc-if value="{{ showToast }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;left:50%;bottom:40px;z-index:200;transform:translateX(-50%);animation:toastIn .3s ease;background:var(--ink);color:var(--onInk);padding:14px 22px;border-radius:999px;font-size:14px;font-weight:600;box-shadow:0 14px 38px rgba(0,0,0,.28);display:flex;align-items:center;gap:10px">
+      <span style="width:8px;height:8px;border-radius:50%;background:#83C9B0"></span>{{ toast }}
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ saved }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;inset:0;z-index:210;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(20,18,26,.28);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);animation:ovIn .25s ease">
+      <div style="animation:rewardPop .6s cubic-bezier(.2,1.1,.3,1)"><div style="width:150px;height:150px"><x-import component="EmotionBlob" from="./EmotionBlob.jsx" emotion="{{ savedEmo }}" size="{{ 150 }}" interactive="{{ false }}" hint-size="150px,150px"></x-import></div></div>
+      <div style="font-size:22px;font-weight:700;color:#fff;margin-top:14px;letter-spacing:-.01em">기록했어요</div>
+      <div style="font-size:14px;color:rgba(255,255,255,.72);margin-top:6px;font-weight:500">{{ savedInfo }}</div>
+    </div>
+  </sc-if>
+
+  <!-- ===== LOGIN ===== -->
+  <sc-if value="{{ isAuth }}" hint-placeholder-val="{{ true }}">
+    <div style="position:relative;z-index:1;min-height:100vh;display:flex">
+      <button onClick="{{ toggleMode }}" title="다크모드 전환" style="position:fixed;top:22px;right:22px;z-index:6;width:44px;height:44px;border-radius:50%;background:var(--card);border:1px solid var(--cardbrd);cursor:pointer;color:var(--text);font-size:16px;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)">{{ modeIcon }}</button>
+      <div style="{{ loginSplit }}">
+        <!-- LEFT: editorial hero -->
+        <div style="flex:1.15 1 420px;display:flex;flex-direction:column;justify-content:center;padding:clamp(28px,3.4vw,52px) clamp(40px,6vw,88px);min-height:100vh">
+          <div style="font-size:23px;font-weight:600;letter-spacing:-.03em;color:var(--text);margin-bottom:auto;padding-top:12px">feelio</div>
+          <div style="margin:auto 0">
+            <div style="position:relative;width:150px;height:150px;margin-bottom:22px">
+              <div style="{{ loginHalo }}"></div>
+              <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:134px;height:134px"><x-import component="EmotionBlob" from="./EmotionBlob.jsx" emotion="{{ cycBlob }}" size="{{ 134 }}" hint-size="134px,134px"></x-import></div>
+              <span style="position:absolute;top:8px;right:6px;width:11px;height:11px;border-radius:50%;background:#F28AB7;filter:blur(.5px);animation:eb-float 3.4s ease-in-out infinite"></span>
+              <span style="position:absolute;bottom:20px;right:-6px;width:8px;height:8px;border-radius:50%;background:#83C9B0;filter:blur(.5px);animation:eb-float 4.2s ease-in-out .6s infinite"></span>
+              <span style="position:absolute;top:26px;left:-8px;width:9px;height:9px;border-radius:50%;background:#F2C766;filter:blur(.5px);animation:eb-float 3.8s ease-in-out .3s infinite"></span>
+            </div>
+            <div style="font-size:clamp(30px,4.8vw,46px);font-weight:600;letter-spacing:-.03em;line-height:1.16;color:var(--text)"><span style="{{ cycWordStyle }}">{{ cycWord }}</span><br>그 소비의 이유를 읽어드릴게요</div>
+            <div style="font-size:15.5px;color:var(--sub);line-height:1.65;margin-top:16px;max-width:440px">feelio는 감정에 따라 반복되는 소비 패턴을 분석해, 나도 몰랐던 소비의 이유를 인사이트로 건네는 감정 가계부예요.</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:20px"><sc-for list="{{ loginPills }}" as="p" hint-placeholder-count="3"><span style="display:flex;align-items:center;gap:7px;white-space:nowrap;font-size:12.5px;font-weight:600;color:var(--sub);background:var(--card);border:1px solid var(--line);border-radius:99px;padding:8px 14px;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)"><span style="width:7px;height:7px;border-radius:50%;background:{{ p.c }}"></span>{{ p.k }}</span></sc-for></div>
+          </div>
+          <div style="margin-top:auto;padding-bottom:12px;font-size:12px;color:var(--sub)">Feel + I/O · 감정 기반 소비 인사이트</div>
+        </div>
+        <!-- RIGHT: auth panel (no blob) -->
+        <div style="{{ loginAuthPanel }}">
+          <div style="width:100%;max-width:352px">
+            <div style="font-size:22px;font-weight:600;letter-spacing:-.02em;color:var(--text);text-align:center">feelio 시작하기</div>
+            <div style="font-size:13.5px;color:var(--sub);text-align:center;margin-top:8px;line-height:1.6">소셜 계정으로 3초 만에 시작해요.<br>따로 가입할 필요 없어요.</div>
+            <div style="display:flex;flex-direction:column;gap:11px;margin-top:28px">
+              <button onClick="{{ oauth }}" style="position:relative;display:flex;align-items:center;justify-content:center;gap:10px;width:100%;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:15px;cursor:pointer;color:var(--text);font-size:15px;font-weight:600"><span style="position:absolute;left:16px;width:26px;height:26px;border-radius:50%;background:#fff;border:1px solid rgba(0,0,0,.08);display:flex;align-items:center;justify-content:center;font-weight:700;color:#4285F4;font-size:15px">G</span>Google로 계속하기</button>
+              <button onClick="{{ oauth }}" style="position:relative;display:flex;align-items:center;justify-content:center;gap:10px;width:100%;background:#FEE500;border:none;border-radius:14px;padding:15px;cursor:pointer;color:#3A1D1D;font-size:15px;font-weight:600"><span style="position:absolute;left:18px;font-size:16px">💬</span>Kakao로 계속하기</button>
+              <button onClick="{{ oauth }}" style="position:relative;display:flex;align-items:center;justify-content:center;gap:10px;width:100%;background:#03C75A;border:none;border-radius:14px;padding:15px;cursor:pointer;color:#fff;font-size:15px;font-weight:600"><span style="position:absolute;left:18px;font-weight:700;font-size:15px">N</span>Naver로 계속하기</button>
+            </div>
+            <div style="font-size:11.5px;color:var(--sub);line-height:1.6;margin-top:20px;text-align:center">가입하면 feelio의 서비스 약관과 개인정보 처리방침에 동의하게 돼요.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ===== ONBOARDING ===== -->
+  <sc-if value="{{ isOnboard }}" hint-placeholder-val="{{ false }}">
+    <div style="position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:36px 20px">
+      <button onClick="{{ toggleMode }}" title="다크모드 전환" style="position:fixed;top:22px;right:22px;z-index:6;width:44px;height:44px;border-radius:50%;background:var(--card);border:1px solid var(--cardbrd);cursor:pointer;color:var(--text);font-size:16px;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)">{{ modeIcon }}</button>
+      <div style="width:100%;max-width:560px;height:min(576px,90vh);display:flex;flex-direction:column;background:var(--card2);backdrop-filter:blur(32px) saturate(1.35);-webkit-backdrop-filter:blur(32px) saturate(1.35);border:1px solid var(--cardbrd);border-radius:30px;box-shadow:var(--shadow);padding:34px 38px 30px;overflow:hidden">
+        <div style="flex-shrink:0">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px"><span style="font-size:11.5px;font-weight:700;letter-spacing:.12em;color:var(--sub)">초기 설정</span><span style="font-size:12px;font-weight:600;color:var(--sub)">{{ obStepLabel }}</span></div>
+          <div style="height:6px;border-radius:99px;background:var(--line);overflow:hidden"><div style="height:100%;border-radius:99px;background:var(--ink);width:{{ obProgress }};transition:width .55s cubic-bezier(.2,.8,.2,1)"></div></div>
+          <div style="font-size:12.5px;color:var(--sub);margin-top:12px;min-height:18px;letter-spacing:-.01em">{{ obSummaryLine }}</div>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;justify-content:center;overflow:hidden auto;padding:2px">
+          <div>
+          <sc-if value="{{ ob0 }}" hint-placeholder-val="{{ true }}">
+            <div><div style="font-size:23px;font-weight:600;color:var(--text);letter-spacing:-.02em">어떤 목표를 이루고 싶나요?</div><div style="font-size:13px;color:var(--sub);margin:7px 0 12px">가장 가까운 목표 하나만 알려주세요.</div>
+              <div><sc-for list="{{ obGoalOpts }}" as="g" hint-placeholder-count="5"><div onClick="{{ g.onClick }}" style="{{ g.wrap }}"><span style="width:38px;height:38px;border-radius:11px;background:{{ g.tint }};display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0">{{ g.icon }}</span><span style="flex:1"><span style="display:block;font-size:14.5px;font-weight:600;color:var(--text)">{{ g.k }}</span><span style="display:block;font-size:12px;color:var(--sub);margin-top:1px">{{ g.d }}</span></span><span style="{{ g.radio }}"></span></div></sc-for></div>
+            </div>
+          </sc-if>
+          <sc-if value="{{ ob1 }}" hint-placeholder-val="{{ false }}">
+            <div><div style="font-size:24px;font-weight:600;color:var(--text);letter-spacing:-.02em">얼마를 모으고 싶나요?</div><div style="font-size:13.5px;color:var(--sub);margin:8px 0 28px">대략적인 금액이어도 충분해요.</div>
+              <div style="display:flex;align-items:baseline;justify-content:center;gap:8px;padding-bottom:12px;border-bottom:2px solid var(--line);margin-bottom:20px"><input value="{{ obAmountStr }}" onInput="{{ setObAmount }}" inputmode="numeric" style="width:auto;max-width:78%;text-align:center;font-size:clamp(36px,9vw,48px);font-weight:600;color:var(--text);background:transparent;border:none;outline:none;letter-spacing:-.02em"><span style="font-size:26px;font-weight:600;color:var(--sub)">원</span></div>
+              <div style="display:flex;gap:10px"><sc-for list="{{ obAmountChips }}" as="c" hint-placeholder-count="4"><div onClick="{{ c.onClick }}" style="{{ c.style }}">{{ c.name }}</div></sc-for></div>
+            </div>
+          </sc-if>
+          <sc-if value="{{ ob2 }}" hint-placeholder-val="{{ false }}">
+            <div><div style="font-size:24px;font-weight:600;color:var(--text);letter-spacing:-.02em">언제까지 이루고 싶나요?</div><div style="font-size:13.5px;color:var(--sub);margin:8px 0 20px">대략적인 기간만 있어도 흐름을 읽을 수 있어요.</div>
+              <div style="display:flex;flex-wrap:wrap;gap:10px"><sc-for list="{{ obPeriodOpts }}" as="p" hint-placeholder-count="5"><div onClick="{{ p.onClick }}" style="{{ p.style }}">{{ p.name }}</div></sc-for></div>
+            </div>
+          </sc-if>
+          <sc-if value="{{ ob3 }}" hint-placeholder-val="{{ false }}">
+            <div><div style="font-size:24px;font-weight:600;color:var(--text);letter-spacing:-.02em">지금 어느 정도 모았나요?</div><div style="font-size:13.5px;color:var(--sub);margin:8px 0 28px">현재 위치를 알면 목표까지의 속도를 볼 수 있어요.</div>
+              <div style="text-align:center;font-size:clamp(36px,9vw,48px);font-weight:600;color:var(--text);letter-spacing:-.02em;margin-bottom:22px">{{ obCurrentStr }}</div>
+              <input type="range" min="0" max="{{ obAmount }}" value="{{ obCurrent }}" onInput="{{ setObCurrent }}" style="width:100%;background:var(--line);accent-color:var(--ink)">
+              <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--sub);margin-top:10px"><span>0원</span><span>{{ obAmountStr }}</span></div>
+            </div>
+          </sc-if>
+          <sc-if value="{{ ob4 }}" hint-placeholder-val="{{ false }}">
+            <div style="text-align:center"><div style="font-size:26px;font-weight:600;color:var(--text);letter-spacing:-.02em">이 정도면 충분해요</div><div style="font-size:13.5px;color:var(--sub);margin:10px 0 26px;line-height:1.6">이제 소비 흐름을 목표에 맞춰 더 나답게 분석해볼게요.<br>설정은 나중에 언제든 바꿀 수 있어요.</div>
+              <div style="display:flex;flex-direction:column;gap:1px;text-align:left"><sc-for list="{{ obSummary }}" as="r" hint-placeholder-count="4"><div style="display:flex;align-items:center;justify-content:space-between;padding:13px 2px;border-bottom:1px solid var(--line)"><span style="font-size:13px;color:var(--sub)">{{ r.label }}</span><span style="font-size:14.5px;font-weight:600;color:var(--text)">{{ r.value }}</span></div></sc-for></div>
+            </div>
+          </sc-if>
+          </div>
+        </div>
+        <div style="flex-shrink:0;display:flex;gap:10px;margin-top:18px;justify-content:flex-end">
+          <sc-if value="{{ obCanPrev }}" hint-placeholder-val="{{ false }}"><button onClick="{{ obPrev }}" style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px 24px;font-size:14.5px;font-weight:600;cursor:pointer;color:var(--text);white-space:nowrap">이전</button></sc-if>
+          <button onClick="{{ obNext }}" style="background:var(--ink);color:var(--onInk);border:none;border-radius:14px;padding:13px 32px;font-size:14.5px;font-weight:600;cursor:pointer">{{ obNextLabel }}</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ===== APP ===== -->
+  <sc-if value="{{ isApp }}" hint-placeholder-val="{{ false }}">
+    <div style="position:relative;z-index:1;min-height:100vh">
+      <!-- fixed sidebar (desktop) -->
+      <sc-if value="{{ showSidebar }}" hint-placeholder-val="{{ true }}">
+        <aside style="position:fixed;left:14px;top:14px;bottom:14px;width:224px;z-index:20;display:flex;flex-direction:column;padding:20px 16px;background:var(--card2);backdrop-filter:blur(30px) saturate(1.3);-webkit-backdrop-filter:blur(30px) saturate(1.3);border:1px solid var(--cardbrd);border-radius:28px;box-shadow:var(--shadow)">
+          <div style="display:flex;align-items:center;gap:10px;padding:2px 6px 4px"><div style="width:40px;height:40px"><x-import component="EmotionBlob" from="./EmotionBlob.jsx" emotion="설렘" size="{{ 40 }}" variant="css" interactive="{{ false }}" hint-size="40px,40px"></x-import></div><div><div style="font-size:20px;font-weight:600;letter-spacing:-.02em">feelio</div><div style="font-size:10.5px;color:var(--sub);margin-top:-2px">Feel + I/O</div></div></div>
+          <nav style="display:flex;flex-direction:column;gap:5px;margin-top:20px">
+            <div onClick="{{ goHome }}" style="{{ navHome }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M4 11 12 4l8 7"></path><path d="M6 10v9h12v-9"></path></svg>홈</div>
+            <div onClick="{{ goAdd }}" style="{{ navAdd }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 8v8M8 12h8"></path></svg>지출·수입</div>
+            <div onClick="{{ goTxns }}" style="{{ navTxns }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 6h14M5 12h14M5 18h9"></path></svg>거래내역</div>
+            <div onClick="{{ goAnal }}" style="{{ navAnal }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 19V9M12 19V5M19 19v-6"></path></svg>AI 분석</div>
+            <div onClick="{{ goUniv }}" style="{{ navUniv }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="12" r="4"></circle><ellipse cx="11" cy="12" rx="10" ry="4.3" transform="rotate(28 11 12)"></ellipse><path d="M18.5 5.2l.5 1.4 1.4.5-1.4.5-.5 1.4-.5-1.4L16.6 7l1.4-.5z" fill="currentColor" stroke="none"></path></svg>평행우주</div>
+          </nav>
+          <div onClick="{{ openProfile }}" style="margin-top:auto;display:flex;align-items:center;gap:11px;padding:11px;border-radius:18px;cursor:pointer;background:var(--card);border:1px solid var(--line)" style-hover="background:var(--card2)"><span style="width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#FF8A62,#F2C766);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600;font-size:15px;flex-shrink:0">서</span><span style="flex:1;min-width:0"><span style="display:block;font-size:14px;font-weight:600">서연</span><span style="display:block;font-size:11.5px;color:var(--sub)">Google 계정</span></span></div>
+        </aside>
+      </sc-if>
+
+      <main style="{{ mainStyle }}">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px">
+          <div><div style="font-size:13px;color:var(--sub);font-weight:500">{{ todayLabel }}</div><div style="font-size:24px;font-weight:600;letter-spacing:-.02em;margin-top:2px">{{ pageTitle }}</div></div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <sc-if value="{{ showRecordBtn }}" hint-placeholder-val="{{ false }}"></sc-if>
+            <button onClick="{{ toggleMode }}" title="다크모드 전환" style="width:44px;height:44px;border-radius:50%;background:var(--card);border:1px solid var(--cardbrd);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text)">{{ modeIcon }}</button>
+            <sc-if value="{{ showTopProfile }}" hint-placeholder-val="{{ false }}"><div onClick="{{ openProfile }}" style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#FF8A62,#F2C766);cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600">서</div></sc-if>
+          </div>
+        </div>
+
+        <!-- HOME -->
+        <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+          <div style="opacity:1">
+            <div style="{{ homeGrid }}">
+              <!-- left: big free blob + ridge -->
+              <div style="display:flex;flex-direction:column;gap:14px">
+                <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2px 0 0;flex:1;min-height:0">
+                  <div style="position:relative;display:grid;place-items:center;width:min(300px,60vw);height:min(300px,60vw)"><div style="position:absolute;inset:5%;border-radius:50%;filter:blur(36px);opacity:.5;background:radial-gradient(circle,{{ topEmotionColor }},transparent 62%)"></div><div style="position:relative;width:min(208px,44vw);height:min(208px,44vw)"><x-import component="EmotionBlob" from="./EmotionBlob.jsx" emotion="{{ topEmotion }}" size="{{ blobSize }}" hint-size="320px,320px"></x-import></div></div>
+                  <div style="font-size:12px;color:var(--sub);font-weight:600;margin-top:2px">이번 달, 내 곁에 가장 오래 머문 마음</div>
+                  <div style="font-size:24px;font-weight:600;letter-spacing:-.02em;margin-top:2px;color:{{ topEmotionColor }}">{{ topEmotionName }}</div>
+                  
+                </div>
+                <div style="background: var(--card); backdrop-filter: blur(24px) saturate(1.3); -webkit-backdrop-filter: blur(24px) saturate(1.3); border: 1px solid var(--cardbrd); border-radius: 26px; box-shadow: var(--shadow); flex:0 0 auto; display: flex; flex-direction: column; padding: 18px 22px 0; overflow: hidden; width: 100%">
+                  <div style="font-size:14.5px;font-weight:600">마음 능선</div><div style="font-size:12px;color:var(--sub);margin-top:2px">이번 달 감정이 흘러온 결</div>
+                  <div style="height:150px;position:relative;margin:6px -22px 0">
+                    <svg viewBox="0 0 600 170" width="100%" height="100%" preserveAspectRatio="none" style="display:block;position:absolute;inset:0"><defs><linearGradient id="ridgeFade" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity="0.35"></stop><stop offset="42%" stop-color="#fff" stop-opacity="1"></stop><stop offset="100%" stop-color="#fff" stop-opacity="0"></stop></linearGradient><mask id="ridgeMask"><rect x="0" y="0" width="600" height="170" fill="url(#ridgeFade)"></rect></mask></defs><g mask="url(#ridgeMask)" style="filter:blur(2.5px)"><sc-for list="{{ ridgePeaks }}" as="p" hint-placeholder-count="6"><path d="{{ p.d }}" fill="{{ p.color }}" opacity="0.5" style="{{ p.blend }}"></path></sc-for></g></svg>
+                  </div>
+                  <div style="font-size:12.5px;color:var(--sub);padding:8px 0 14px">이번 달은 <span style="color:{{ ridgeTopColor }};font-weight:600">{{ ridgeTop }}</span>이 가장 높이 솟았어요</div>
+                </div>
+              </div>
+              <!-- right: mood pebble calendar + AI signal -->
+              <div style="display:flex;flex-direction:column;gap:14px">
+                <div style="padding:2px 2px 4px;width:100%;max-width:336px">
+                  <div style="margin-bottom:8px"><span style="font-size:18px;font-weight:700;letter-spacing:-.01em">2026년 7월</span></div>
+                  <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;font-size:10px;color:var(--sub);text-align:center;margin-bottom:4px"><span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span></div>
+                  <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px"><sc-for list="{{ calDays }}" as="d" hint-placeholder-count="35"><div onClick="{{ d.onClick }}" style="{{ d.style }}">{{ d.day }}</div></sc-for></div>
+                  <div style="display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:7px"><sc-for list="{{ legend }}" as="l" hint-placeholder-count="4"><span style="display:flex;align-items:center;gap:5px;font-size:10.5px;color:var(--sub)"><span style="width:8px;height:8px;border-radius:50%;background:{{ l.c }}"></span>{{ l.k }}</span></sc-for></div>
+                </div>
+                <div style="background:var(--card);backdrop-filter:blur(24px) saturate(1.3);-webkit-backdrop-filter:blur(24px) saturate(1.3);border:1px solid var(--cardbrd);border-radius:24px;box-shadow:var(--shadow);padding:13px 18px;display:flex;flex-direction:column;width:100%">
+                  <div style="display:flex;align-items:center;gap:9px;margin-bottom:7px"><span style="width:25px;height:25px;border-radius:9px;background:var(--ink);color:var(--onInk);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600">AI</span><span style="font-size:11.5px;color:var(--sub);font-weight:600">이번 달 감정 신호</span></div>
+                  <div style="font-size:14.5px;font-weight:600;line-height:1.35">{{ aiSignal }}</div>
+                  <div style="display:flex;gap:6px;flex-wrap:wrap;padding:8px 0 7px;border-top:1px solid var(--line);margin-top:8px"><sc-for list="{{ aiTags }}" as="t" hint-placeholder-count="3"><span style="{{ t.style }}"><span style="width:7px;height:7px;border-radius:50%;background:{{ t.c }}"></span>{{ t.k }} {{ t.delta }}</span></sc-for></div>
+                  <div onClick="{{ goAnal }}" style="font-size:12.5px;color:var(--sub);font-weight:600;cursor:pointer">분석 자세히 보기 →</div>
+                </div>
+                <div onClick="{{ goUniv }}" style="background: var(--card); backdrop-filter: blur(24px) saturate(1.3); -webkit-backdrop-filter: blur(24px) saturate(1.3); border: 1px solid var(--cardbrd); border-radius: 24px; box-shadow: var(--shadow); padding: 16px 20px; width: 100%; cursor: pointer; flex:1; min-height:92px; display:flex; flex-direction:column; justify-content:center">
+                  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px"><div style="display:flex;align-items:center;gap:9px"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#83C9B0" stroke-width="1.9"><circle cx="12" cy="12" r="4.5"></circle><ellipse cx="12" cy="12" rx="10" ry="3.6" transform="rotate(-25 12 12)"></ellipse></svg><span style="font-size:14px;font-weight:600">{{ primaryGoalName }}</span></div><span style="font-size:12.5px;color:#3E9578;font-weight:600">{{ primaryGoalPct }}%</span></div>
+                  <div style="height:9px;background:var(--line);border-radius:99px;overflow:hidden"><div style="{{ goalBarHome }}"></div></div>
+                  <div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px"><span style="font-size:12px;color:var(--sub)">{{ goalCurStr }} / {{ goalTgtStr }}</span><span style="font-size:12px;color:var(--sub)">{{ goalRemainStr }} 남음 →</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- ADD -->
+        <sc-if value="{{ isAdd }}" hint-placeholder-val="{{ false }}">
+          <div style="opacity:1;max-width:1080px;margin:0 auto;width:100%;flex:1;min-height:0;display:flex;flex-direction:column">
+            <div style="{{ addGrid }}">
+              <!-- LEFT PANEL: 금액 + 감정 한 덩어리 -->
+              <div style="{{ addPanelL }}">
+                <div style="{{ addBleedFaint }}"></div>
+                <div style="position:relative;display:flex;background:var(--line);border-radius:14px;padding:4px;width:220px"><div onClick="{{ setTypeExpense }}" style="{{ tabExpense }}">지출</div><div onClick="{{ setTypeIncome }}" style="{{ tabIncome }}">수입</div></div>
+                <div style="position:relative;margin-top:clamp(16px,2vw,22px)">
+                  <div style="font-size:13px;letter-spacing:.01em;color:var(--text);font-weight:700;margin-bottom:11px">{{ amountLabel }}</div>
+                  <div style="{{ amountFieldStyle }}">
+                    <span style="font-size:26px;font-weight:700;color:var(--sub);flex-shrink:0">₩</span>
+                    <input value="{{ fmtAmount }}" onInput="{{ setAmount }}" inputmode="numeric" placeholder="0" style="{{ amountInputStyle }}">
+                    <span style="{{ caretStyle }}"></span>
+                    <span style="font-size:20px;font-weight:700;color:var(--sub);flex-shrink:0">원</span>
+                  </div>
+                  <div style="font-size:12px;color:var(--sub);opacity:.75;margin-top:9px">숫자만 입력하면 돼요</div>
+                </div>
+                <div style="position:relative;height:1px;background:var(--line);margin:clamp(18px,2vw,22px) 0 clamp(14px,1.6vw,18px)"></div>
+                <div style="position:relative">
+                  <div style="font-size:14.5px;font-weight:700;color:var(--text)">이 소비, 어떤 기분이었어요?<sc-if value="{{ hasEmoSel }}" hint-placeholder-val="{{ false }}"><span style="color:{{ selEmoColor }};font-weight:800"> · {{ selEmoName }}</span></sc-if></div>
+                  <div style="{{ addEmoGrid }}">
+                    <sc-for list="{{ addEmos }}" as="e" hint-placeholder-count="8">
+                      <div onClick="{{ e.onClick }}" style="{{ e.col }}"><div style="{{ e.box }}"><div style="pointer-events:none"><x-import component="EmotionBlob" from="./EmotionBlob.jsx" emotion="{{ e.k }}" size="{{ e.size }}" variant="css" interactive="{{ false }}" hint-size="70px,70px"></x-import></div></div><span style="{{ e.label }}">{{ e.k }}</span></div>
+                    </sc-for>
+                  </div>
+                </div>
+              </div>
+              <!-- RIGHT PANEL: 카테고리 + 상황 + 메모 + 날짜 + 저장 한 덩어리 -->
+              <div style="display:flex;flex-direction:column;gap:16px">
+                <!-- 카드 1: 카테고리 -->
+                <div style="{{ addCardR }}">
+                  <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:13px">어디에 썼어요 <span style="font-weight:500;color:var(--sub)">· 필수</span></div>
+                  <div style="display:flex;flex-wrap:wrap;gap:8px"><sc-for list="{{ addCats }}" as="c" hint-placeholder-count="8"><div onClick="{{ c.onClick }}" style="{{ c.style }}">{{ c.name }}</div></sc-for></div>
+                </div>
+                <!-- 카드 2: 상황 + 메모 + 날짜 -->
+                <div style="{{ addCardRGrow }}">
+                  <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:13px">어떤 상황이었어요 <span style="font-weight:500;color:var(--sub)">· 선택</span></div>
+                  <div style="display:flex;flex-wrap:wrap;gap:8px"><sc-for list="{{ addSits }}" as="s" hint-placeholder-count="9"><div onClick="{{ s.onClick }}" style="{{ s.style }}">{{ s.name }}</div></sc-for></div>
+                  <textarea value="{{ form.memo }}" onInput="{{ setMemo }}" placeholder="한 줄 메모 — 그 순간, 왜 그 마음이었을까요?" style="margin-top:14px;min-height:64px;height:64px;resize:none;width:100%;background:var(--card);border:1px solid var(--line);border-radius:13px;padding:12px 15px;font-size:14px;line-height:1.5;color:var(--text);outline:none;font-family:inherit"></textarea>
+                  <label style="display:flex;align-items:center;gap:8px;margin-top:14px;padding-top:14px;border-top:1px solid var(--line);font-size:12.5px;color:var(--sub);cursor:pointer"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="3" y="4" width="18" height="17" rx="3"></rect><path d="M3 9h18M8 2v4M16 2v4"></path></svg><input type="datetime-local" value="{{ form.date }}" onInput="{{ setDate }}" style="background:transparent;border:none;font-size:12.5px;color:var(--sub);outline:none;font-family:inherit"><span style="color:{{ selEmoColor }};font-weight:700;white-space:nowrap">· 지금</span></label>
+                </div>
+                <!-- 카드 3: 저장 (단독) -->
+                <button onClick="{{ saveNewTxn }}" style="{{ saveStyle }}">{{ saveLabel }}</button>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- TRANSACTIONS -->
+        <sc-if value="{{ isTxns }}" hint-placeholder-val="{{ false }}">
+          <div style="opacity:1;flex:1;min-height:0;display:flex;flex-direction:column">
+            <div style="{{ txnSummaryGrid }}"><sc-for list="{{ txnSummary }}" as="s" hint-placeholder-count="4"><div style="background:var(--card);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);border:1px solid var(--cardbrd);border-radius:20px;padding:16px 18px"><div style="font-size:12px;color:var(--sub);font-weight:600;margin-bottom:6px">{{ s.label }}</div><div style="font-size:20px;font-weight:600;color:{{ s.color }}">{{ s.value }}</div></div></sc-for></div>
+            <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:18px 0 16px"><div style="display:flex;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:3px"><sc-for list="{{ viewTabs }}" as="t" hint-placeholder-count="4"><div onClick="{{ t.onClick }}" style="{{ t.style }}">{{ t.name }}</div></sc-for></div><div style="flex:1;min-width:180px;position:relative"><input placeholder="메모·카테고리 검색" style="width:100%;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 14px 10px 34px;font-size:13.5px;color:var(--text);outline:none"><svg style="position:absolute;left:12px;top:11px" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--sub)" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg></div></div>
+            <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px"><sc-for list="{{ filters }}" as="f" hint-placeholder-count="6"><div onClick="{{ f.onClick }}" style="{{ f.style }}">{{ f.name }}</div></sc-for></div>
+            <div style="display:flex;flex-direction:column;gap:22px"><sc-for list="{{ txnGroups }}" as="g" hint-placeholder-count="3"><div><div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:10px;padding:0 4px"><span style="font-size:14px;font-weight:600">{{ g.label }}</span><span style="font-size:12.5px;color:var(--sub);font-weight:600">{{ g.total }}</span></div><div style="background:var(--card);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid var(--cardbrd);border-radius:22px;overflow:hidden"><sc-for list="{{ g.items }}" as="t" hint-placeholder-count="3"><div onClick="{{ t.onClick }}" style="display:flex;align-items:center;gap:14px;padding:15px 18px;border-bottom:1px solid var(--line);cursor:pointer" style-hover="background:rgba(255,255,255,.16)"><div style="width:40px;height:40px;border-radius:12px;background:{{ t.emoLight }};display:flex;align-items:center;justify-content:center;flex-shrink:0"><span style="width:15px;height:15px;border-radius:50%;background:{{ t.emoColor }}"></span></div><div style="flex:1;min-width:0"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span style="font-size:14.5px;font-weight:600">{{ t.cat }}</span><span style="font-size:11px;font-weight:600;color:{{ t.emoColor }};background:{{ t.emoLight }};padding:2px 8px;border-radius:99px">{{ t.emo }}</span><span style="font-size:11px;color:var(--sub);background:var(--line);padding:2px 8px;border-radius:99px">{{ t.sit }}</span></div><div style="font-size:12.5px;color:var(--sub);margin-top:3px">{{ t.memo }}</div></div><div style="font-size:16px;font-weight:600;color:{{ t.amtColor }};flex-shrink:0">{{ t.amtStr }}</div></div></sc-for></div></div></sc-for></div>
+          </div>
+        </sc-if>
+
+        <!-- ANALYSIS -->
+        <sc-if value="{{ isAnal }}" hint-placeholder-val="{{ false }}">
+          <div style="opacity:1;display:flex;flex-direction:column;gap:20px;flex:1;min-height:0">
+            <!-- header -->
+            <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:16px">
+              
+              <div style="display:flex;align-items:center;gap:10px;background:#9E96EE18;padding:9px 15px;border-radius:14px"><div style="text-align:right"><div style="font-size:11px;color:#6A61C4;font-weight:600">감정소비 누수율</div><div style="font-size:19px;font-weight:700;color:#4A4299;letter-spacing:-.01em">38%</div></div><span style="display:inline-flex;align-items:center;gap:4px;font-size:11.5px;font-weight:600;color:#2E9E7A;background:#82E2C226;padding:5px 9px;border-radius:99px;white-space:nowrap">▼ 8%</span></div>
+            </div>
+
+            <!-- KPI strip -->
+            <div style="{{ analKpiGrid }}">
+              <sc-for list="{{ kpis }}" as="k" hint-placeholder-count="4">
+                
+              </sc-for>
+            </div>
+
+            <!-- duo A: 카테고리 · 감정 -->
+            <div style="{{ analDuo }}">
+              <div style="{{ analCard }};display:flex;flex-direction:column">
+                <div style="font-size:15.5px;font-weight:700;margin-bottom:4px">카테고리별 지출</div>
+                <div style="font-size:12px;color:var(--sub);margin-bottom:22px">가장 큰 지출은 <b style="color:var(--text)">배달</b>이에요</div>
+                <div style="display:flex;flex-direction:column;gap:20px;flex:1">
+                  <sc-for list="{{ catBars }}" as="l" hint-placeholder-count="4"><div><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;gap:10px"><div style="display:flex;align-items:center;gap:9px;min-width:0"><span style="font-size:15px;font-weight:700;white-space:nowrap">{{ l.k }}</span><span style="{{ l.chipStyle }}">{{ l.chip }}</span></div><div style="display:flex;align-items:baseline;gap:10px;flex-shrink:0"><span style="font-size:15px;font-weight:700;white-space:nowrap">{{ l.amt }}</span><span style="font-size:13px;font-weight:700;color:var(--sub);width:38px;text-align:right">{{ l.pct }}</span></div></div><div style="height:12px;background:var(--line);border-radius:99px;overflow:hidden"><div style="{{ l.bar }}"></div></div></div></sc-for>
+                </div>
+              </div>
+              <div style="{{ analCard }};display:flex;flex-direction:column">
+                <div style="font-size:15.5px;font-weight:700;margin-bottom:4px">감정별 지출 지분</div>
+                <div style="font-size:12px;color:var(--sub);margin-bottom:20px">어떤 마음이 지갑을 열었나</div>
+                <div style="display:flex;height:32px;border-radius:99px;overflow:hidden;box-shadow:inset 0 0 0 1px var(--line);margin-bottom:22px"><sc-for list="{{ riverSegs }}" as="r" hint-placeholder-count="4"><div style="{{ r.seg }}"></div></sc-for></div>
+                <div style="display:flex;flex-direction:column;gap:14px;flex:1"><sc-for list="{{ emoDist }}" as="e" hint-placeholder-count="4"><div style="display:flex;align-items:center;gap:11px"><span style="{{ e.dot }}"></span><div style="min-width:0;flex:1;display:flex;flex-direction:column"><span style="font-size:14px;font-weight:700;white-space:nowrap">{{ e.k }}</span><span style="font-size:11.5px;color:var(--sub)">{{ e.desc }}</span></div><span style="font-size:12px;color:var(--sub);font-weight:600;white-space:nowrap">{{ e.amt }}</span><span style="font-size:17px;font-weight:700;color:{{ e.c }};width:44px;text-align:right">{{ e.pct }}</span></div></sc-for></div>
+              </div>
+            </div>
+
+            <!-- duo B: 월별 추이 · 시간대 -->
+            <div style="{{ analDuo }}">
+              <div style="{{ analCard }};display:flex;flex-direction:column">
+                <div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:4px"><span style="font-size:15.5px;font-weight:700">월별 지출 추이</span><span style="font-size:12px;color:var(--sub);font-weight:600">최근 6개월</span></div>
+                <div style="font-size:12px;color:var(--sub);margin-bottom:24px">지난달보다 <b style="color:#3E9578">2.6% 줄었어요</b></div>
+                <div style="display:flex;align-items:flex-end;gap:10px;height:150px;flex:1"><sc-for list="{{ monBars }}" as="m" hint-placeholder-count="6"><div style="{{ m.col }}"><span style="{{ m.val }}">{{ m.amt }}</span><div style="{{ m.bar }}"></div><span style="{{ m.lbl }}">{{ m.k }}</span></div></sc-for></div>
+              </div>
+              <div style="{{ analCard }};display:flex;flex-direction:column">
+                <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:4px"><span style="font-size:15.5px;font-weight:700">시간대별 소비</span><span style="font-size:11.5px;font-weight:600;color:#6A61C4;background:#9E96EE1f;padding:6px 12px;border-radius:99px;white-space:nowrap">밤에 소비가 몰려요</span></div>
+                <div style="font-size:12px;color:var(--sub);margin-bottom:18px">감정소비의 <b style="color:var(--text)">64%</b>가 저녁·밤에 일어나요</div>
+                <div style="position:relative;height:132px;margin-top:auto">
+                  <svg viewBox="0 0 100 100" preserveAspectRatio="none" width="100%" height="132" style="display:block;position:absolute;inset:0"><defs><linearGradient id="ridgeG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9E96EE" stop-opacity=".4"></stop><stop offset="1" stop-color="#9E96EE" stop-opacity="0"></stop></linearGradient></defs><path d="{{ ridgeArea }}" fill="url(#ridgeG)"></path><path d="{{ ridgeLine }}" fill="none" stroke="#9E96EE" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"></path></svg>
+                  <div style="position:absolute;inset:0"><sc-for list="{{ ridgeCols }}" as="c" hint-placeholder-count="4"><span style="{{ c.dot }}"></span></sc-for></div>
+                </div>
+                <div style="display:flex;margin-top:10px"><sc-for list="{{ ridgeCols }}" as="c" hint-placeholder-count="4"><div style="flex:1;text-align:center"><div style="{{ c.lbl }}">{{ c.k }}</div><div style="font-size:11px;color:var(--sub);margin-top:2px">{{ c.pct }}</div></div></sc-for></div>
+              </div>
+            </div>
+
+            <!-- 감정소비 패턴 (full) -->
+            <div style="{{ analCard }}">
+              <div style="display:flex;align-items:center;gap:9px;margin-bottom:6px"><span style="width:24px;height:24px;border-radius:8px;background:var(--ink);color:var(--onInk);display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:700;flex-shrink:0">AI</span><span style="font-size:15.5px;font-weight:700">반복되는 감정소비 패턴</span></div>
+              <div style="font-size:12.5px;color:var(--sub);margin-bottom:22px">AI가 이번 달에 찾은 반복 조합이에요</div>
+              <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:22px">
+                <span style="display:inline-flex;align-items:center;gap:7px;font-size:14px;font-weight:700;background:#9E96EE22;color:#4A4299;padding:11px 17px;border-radius:14px"><span style="width:9px;height:9px;border-radius:50%;background:#9E96EE"></span>스트레스</span>
+                <span style="font-size:15px;color:var(--sub)">→</span>
+                <span style="font-size:14px;font-weight:600;background:var(--card);border:1px solid var(--line);padding:11px 17px;border-radius:14px;white-space:nowrap">배달</span>
+                <span style="font-size:15px;color:var(--sub)">→</span>
+                <span style="font-size:14px;font-weight:600;background:var(--card);border:1px solid var(--line);padding:11px 17px;border-radius:14px;white-space:nowrap">밤 10시 이후</span>
+                <span style="margin-left:auto;display:inline-flex;align-items:baseline;gap:5px;white-space:nowrap"><span style="font-size:22px;font-weight:700;color:#6A61C4">7</span><span style="font-size:12.5px;color:var(--sub);font-weight:600">번 반복</span></span>
+              </div>
+              <div style="display:flex;gap:12px;align-items:center;background:#9E96EE14;border-radius:16px;padding:15px 18px;margin-bottom:22px"><span style="font-size:14.5px;font-weight:600;line-height:1.55">스트레스 받은 밤, 배달로 마음을 달래고 있었어요. 그 순간을 조금만 알아채도 충분해요.</span></div>
+              <div style="border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--card)">
+                <div style="display:grid;grid-template-columns:84px 1fr auto;gap:14px;padding:11px 18px;font-size:10.5px;letter-spacing:.05em;color:var(--sub);font-weight:700;border-bottom:1px solid var(--line)"><span>날짜</span><span>내역</span><span style="text-align:right">금액</span></div>
+                <sc-for list="{{ evRows }}" as="r" hint-placeholder-count="3"><div style="display:grid;grid-template-columns:84px 1fr auto;gap:14px;align-items:center;padding:14px 18px;border-bottom:1px solid var(--line)"><span style="font-size:12.5px;color:var(--sub);font-weight:600;white-space:nowrap">{{ r.d }}</span><div style="display:flex;align-items:center;gap:9px;min-width:0"><span style="{{ r.dot }}"></span><span style="font-size:13.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.cat }} <span style="color:var(--sub);font-weight:500">· {{ r.sit }}</span></span><span style="{{ r.emoChip }}">{{ r.emo }}</span></div><span style="font-size:14px;font-weight:700;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums">{{ r.amt }}</span></div></sc-for>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- UNIVERSE -->
+        <sc-if value="{{ isUniv }}" hint-placeholder-val="{{ false }}">
+          <div style="opacity:1;display:flex;flex-direction:column;gap:20px;flex:1;min-height:0">
+            <!-- cosmic hero: diverging paths -->
+            <div style="position:relative;overflow:hidden;border-radius:28px;padding:30px 32px;background:linear-gradient(150deg,#2A2740,#151327 62%);box-shadow:var(--shadow);isolation:isolate">
+              <div style="position:absolute;inset:0;z-index:-1;background:radial-gradient(circle at 82% 22%,rgba(131,201,176,.28),transparent 44%),radial-gradient(circle at 20% 82%,rgba(158,150,238,.24),transparent 46%)"></div>
+              <div style="position:relative;max-width:440px">
+                <div style="font-size:12px;font-weight:700;letter-spacing:.14em;color:rgba(255,255,255,.55);margin-bottom:10px">PARALLEL UNIVERSE</div>
+                <div style="font-size:clamp(21px,2.6vw,27px);font-weight:700;line-height:1.4;color:#fff;letter-spacing:-.01em">지금의 소비가 이어질 미래와,<br>감정소비를 조금 줄인 미래.</div>
+                <div style="font-size:14px;color:rgba(255,255,255,.62);line-height:1.65;margin-top:12px">두 우주가 이렇게 갈라지고 있어요.</div>
+              </div>
+              <svg viewBox="0 0 520 190" width="100%" height="150" preserveAspectRatio="none" style="display:block;margin-top:16px;overflow:visible">
+                <circle cx="70" cy="140" r="120" fill="none"></circle>
+                <path d="M40,150 C200,150 300,150 490,150" fill="none" stroke="rgba(200,195,220,.42)" stroke-width="2.5" stroke-dasharray="2 7" stroke-linecap="round"></path>
+                <path d="M40,150 C210,150 300,90 490,34" fill="none" stroke="#8FDAC0" stroke-width="3" stroke-linecap="round"></path>
+                <circle cx="40" cy="150" r="6" fill="#fff"></circle>
+                <circle cx="490" cy="150" r="5.5" fill="rgba(200,195,220,.6)"></circle>
+                <path d="M490 20l3.4 9.6 9.6 3.4-9.6 3.4L490 46l-3.4-9.6-9.6-3.4 9.6-3.4z" fill="#8FDAC0"></path>
+                <circle cx="150" cy="150" r="2" fill="rgba(255,255,255,.4)"></circle><circle cx="430" cy="52" r="2" fill="rgba(255,255,255,.5)"></circle><circle cx="330" cy="150" r="1.6" fill="rgba(255,255,255,.3)"></circle>
+              </svg>
+              <div style="position:relative;display:flex;justify-content:space-between;font-size:11.5px;font-weight:600;margin-top:4px"><span style="color:rgba(255,255,255,.55)">지금</span><span style="color:#8FDAC0">목표 도착 ★</span></div>
+            </div>
+
+            <!-- comparison duo -->
+            <div style="{{ dash2Grid }}">
+              <div style="background:var(--card);backdrop-filter:blur(30px) saturate(1.2);-webkit-backdrop-filter:blur(30px) saturate(1.2);border:1px solid var(--cardbrd);border-radius:28px;box-shadow:var(--shadow);padding:28px;position:relative;overflow:hidden"><div style="position:absolute;top:-50px;right:-40px;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#cfcadb,#a49fb6);filter:blur(10px);opacity:.4"></div><div style="font-size:12.5px;color:var(--sub);font-weight:600;letter-spacing:.04em;position:relative">현재 우주</div><div style="font-size:20px;font-weight:600;margin:6px 0 18px;position:relative">지금처럼 소비한 나</div><div style="position:relative"><div style="font-size:13px;color:var(--sub)">이번 달 감정소비</div><div style="font-size:34px;font-weight:600;letter-spacing:-.02em">-182,000원</div></div><div style="margin-top:18px;font-size:14px;color:var(--sub);line-height:1.7;position:relative">외로운 밤의 배달이 지금 속도로 이어지면, 목표까지 <b style="color:var(--text)">4개월</b>이 더 걸려요.</div></div>
+              <div style="background:linear-gradient(160deg,#83C9B033,var(--card));backdrop-filter:blur(30px) saturate(1.2);-webkit-backdrop-filter:blur(30px) saturate(1.2);border:1px solid var(--cardbrd);border-radius:28px;box-shadow:var(--shadow);padding:28px;position:relative;overflow:hidden"><div style="position:absolute;top:-50px;right:-40px;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#C6F0E0,#72CFAD);filter:blur(10px);opacity:.55"></div><div style="font-size:12.5px;color:#3E9578;font-weight:600;letter-spacing:.04em;position:relative">다른 우주</div><div style="font-size:20px;font-weight:600;margin:6px 0 18px;position:relative">감정소비를 줄인 나</div><div style="position:relative"><div style="font-size:13px;color:var(--sub)">아낄 수 있는 금액</div><div style="font-size:34px;font-weight:600;color:#3E9578;letter-spacing:-.02em">+62,000원</div></div><div style="margin-top:18px;font-size:14px;color:var(--sub);line-height:1.7;position:relative">외로운 밤의 배달을 <b style="color:var(--text)">절반만</b> 줄이면, 목표에 이만큼 더 가까워져요.</div></div>
+            </div>
+
+            <!-- 6개월 격차 projection -->
+            <div style="background:var(--card);backdrop-filter:blur(30px) saturate(1.3);-webkit-backdrop-filter:blur(30px) saturate(1.3);border:1px solid var(--cardbrd);border-radius:28px;box-shadow:var(--shadow);padding:26px 30px">
+              <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:6px"><div><div style="font-size:15.5px;font-weight:700">6개월 후, 두 우주의 격차</div><div style="font-size:12.5px;color:var(--sub);margin-top:3px">감정소비 누적을 나란히 두면 이렇게 벌어져요</div></div><div style="display:flex;align-items:center;gap:16px"><span style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--sub);font-weight:600"><span style="width:10px;height:10px;border-radius:3px;background:#A49FB6"></span>현재 우주</span><span style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--sub);font-weight:600"><span style="width:10px;height:10px;border-radius:3px;background:#3E9578"></span>다른 우주</span></div></div>
+              <div style="display:flex;align-items:flex-end;gap:14px;height:150px;margin-top:20px"><sc-for list="{{ projBars }}" as="p" hint-placeholder-count="6"><div style="flex:1;display:flex;flex-direction:column;align-items:center;height:100%;justify-content:flex-end"><div style="display:flex;align-items:flex-end;justify-content:center;gap:5px;width:100%;height:100%"><div style="{{ p.nowBar }}"></div><div style="{{ p.altBar }}"></div></div><span style="font-size:11px;color:var(--sub);font-weight:600;margin-top:9px">{{ p.k }}</span></div></sc-for></div>
+              <div style="display:flex;align-items:center;gap:10px;background:linear-gradient(105deg,#83C9B01f,transparent);border-radius:16px;padding:14px 18px;margin-top:20px;font-size:14px;font-weight:600;line-height:1.5"><span style="font-size:20px;font-weight:700;color:#3E9578;white-space:nowrap">+600,000원</span><span style="color:var(--sub)">6개월이면 다른 우주가 이만큼 앞서요.</span></div>
+            </div>
+
+            <!-- 만약에 scenarios -->
+            <div>
+              <div style="font-size:15.5px;font-weight:700;margin-bottom:4px">만약에, 이렇게 바꾼다면</div>
+              <div style="font-size:12.5px;color:var(--sub);margin-bottom:16px">작은 레버 하나가 다른 우주를 열어요</div>
+              <div style="{{ univScenGrid }}">
+                <sc-for list="{{ scenarios }}" as="x" hint-placeholder-count="3">
+                  <div style="{{ x.card }}">
+                    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px"><span style="{{ x.chip }}">{{ x.emo }}</span><span style="font-size:19px;font-weight:700;color:#3E9578;letter-spacing:-.01em">{{ x.save }}</span></div>
+                    <div style="font-size:14.5px;font-weight:600;line-height:1.4">{{ x.lever }}</div>
+                    <div style="font-size:12px;color:var(--sub)">{{ x.note }} · 매달</div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+
+            <!-- goal arrival -->
+            <div style="background:var(--card2);backdrop-filter:blur(30px) saturate(1.3);-webkit-backdrop-filter:blur(30px) saturate(1.3);border:1px solid var(--cardbrd);border-radius:28px;box-shadow:var(--shadow);padding:26px 30px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px"><span style="font-size:15px;font-weight:600">목표 · {{ primaryGoalName }}</span><span style="font-size:13px;color:var(--sub);font-weight:600">{{ primaryGoalPct }}% 달성</span></div><div style="position:relative;height:16px;background:var(--line);border-radius:99px;overflow:hidden;margin:12px 0 8px"><div style="position:absolute;inset:0 auto 0 0;width:62%;background:linear-gradient(90deg,#76A7E8,#83C9B0);border-radius:99px"></div><div style="position:absolute;inset:0 auto 0 62%;width:6%;background:repeating-linear-gradient(45deg,#83C9B0,#83C9B0 4px,transparent 4px,transparent 8px);opacity:.7"></div></div><div style="display:flex;justify-content:space-between;font-size:12.5px;color:var(--sub)"><span>현재 1,240,000원</span><span style="color:#3E9578;font-weight:600">다른 우주 +62,000원</span><span>목표 2,000,000원</span></div><div style="background:linear-gradient(105deg,#83C9B01f,transparent);border-radius:16px;padding:16px 18px;margin-top:18px;font-size:15px;font-weight:600;line-height:1.55">"이번 달의 다른 우주에서는 내 목표에 62,000원 더 가까워졌어요. 감정소비를 줄이면 목표가 조금 더 가까워져요."</div></div>
+          </div>
+        </sc-if>
+      </main>
+
+      <!-- mobile bottom tab -->
+      <sc-if value="{{ isMobile }}" hint-placeholder-val="{{ false }}">
+        <nav style="position:fixed;left:12px;right:12px;bottom:12px;z-index:30;display:flex;justify-content:space-around;align-items:center;padding:8px 6px;background:var(--card2);backdrop-filter:blur(30px) saturate(1.3);-webkit-backdrop-filter:blur(30px) saturate(1.3);border:1px solid var(--cardbrd);border-radius:24px;box-shadow:var(--shadow)">
+          <div onClick="{{ goHome }}" style="{{ tabHome }}"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M4 11 12 4l8 7"></path><path d="M6 10v9h12v-9"></path></svg><span style="font-size:10px;font-weight:600">홈</span></div>
+          <div onClick="{{ goAdd }}" style="{{ tabAdd }}"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 8v8M8 12h8"></path></svg><span style="font-size:10px;font-weight:600">지출·수입</span></div>
+          <div onClick="{{ goTxns }}" style="{{ tabTxns }}"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 6h14M5 12h14M5 18h9"></path></svg><span style="font-size:10px;font-weight:600">거래내역</span></div>
+          <div onClick="{{ goAnal }}" style="{{ tabAnal }}"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 19V9M12 19V5M19 19v-6"></path></svg><span style="font-size:10px;font-weight:600">분석</span></div>
+          <div onClick="{{ goUniv }}" style="{{ tabUniv }}"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="4"></circle><ellipse cx="12" cy="12" rx="10" ry="4.5" transform="rotate(28 12 12)"></ellipse></svg><span style="font-size:10px;font-weight:600">우주</span></div>
+        </nav>
+      </sc-if>
+    </div>
+  </sc-if>
+
+  <!-- ===== MODALS ===== -->
+  <sc-if value="{{ hasModal }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeModal }}" style="position:fixed;inset:0;z-index:150;background:var(--scrim);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);display:flex;align-items:center;justify-content:center;padding:20px;animation:ovIn .2s ease">
+      <div onClick="{{ stop }}" style="width:100%;max-width:{{ modalWidth }};max-height:90vh;overflow-y:auto;background:var(--modalbg);backdrop-filter:blur(26px) saturate(1.3);-webkit-backdrop-filter:blur(26px) saturate(1.3);border:1px solid var(--cardbrd);border-radius:30px;box-shadow:0 40px 90px rgba(31,25,18,.4);animation:modalIn .32s cubic-bezier(.2,.8,.2,1)">
+
+        <sc-if value="{{ m.profile }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:28px 28px 24px"><div style="display:flex;align-items:center;gap:16px;margin-bottom:22px"><span style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#FF8A62,#F2C766);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600;font-size:24px;flex-shrink:0">서</span><div style="flex:1"><div style="font-size:19px;font-weight:600">서연</div><div style="font-size:13px;color:var(--sub)"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="374452584e525859775152525b5e5819564747">[email&#160;protected]</a> · Google 계정</div></div><button onClick="{{ closeModal }}" style="width:34px;height:34px;border-radius:50%;border:none;background:var(--line);cursor:pointer;font-size:16px;color:var(--sub)">✕</button></div>
+            <div style="background:linear-gradient(105deg,#83C9B026,#76A7E81a);border-radius:18px;padding:16px 18px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center"><div><div style="font-size:12px;color:var(--sub);font-weight:600">대표 목표</div><div style="font-size:15px;font-weight:600;margin-top:2px">{{ primaryGoalName }} · {{ primaryGoalPct }}%</div></div><div style="width:44px;height:44px"><x-import component="EmotionBlob" from="./EmotionBlob.jsx" emotion="뿌듯함" size="{{ 44 }}" variant="css" interactive="{{ false }}" hint-size="44px,44px"></x-import></div></div>
+            <div style="display:flex;flex-direction:column;gap:2px"><sc-for list="{{ settingsList }}" as="s" hint-placeholder-count="7"><div onClick="{{ s.onClick }}" style="display:flex;align-items:center;gap:12px;padding:14px 12px;border-radius:14px;cursor:pointer" style-hover="background:rgba(255,255,255,.14)"><span style="font-size:14.5px;font-weight:600;flex:1">{{ s.name }}</span><span style="color:var(--sub);font-size:13px">{{ s.hint }}</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--sub)" stroke-width="2"><path d="m9 6 6 6-6 6"></path></svg></div></sc-for></div>
+            <button onClick="{{ doLogout }}" style="width:100%;margin-top:16px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px;font-size:14px;font-weight:600;cursor:pointer;color:var(--sub)">로그아웃</button>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ m.profileEdit }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:24px 28px 26px"><div style="display:flex;align-items:center;gap:12px;margin-bottom:22px"><button onClick="{{ backToProfile }}" style="background:none;border:none;cursor:pointer;font-size:20px;color:var(--sub)">‹</button><span style="font-size:18px;font-weight:600">프로필 수정</span></div>
+            <div style="text-align:center;margin-bottom:20px"><div style="width:96px;height:96px;margin:0 auto"><x-import component="EmotionBlob" from="./EmotionBlob.jsx" emotion="설렘" size="{{ 96 }}" hint-size="96px,96px"></x-import></div><div style="font-size:12.5px;color:var(--sub);margin-top:6px">말랑이를 눌러 대표 감정을 바꿔보세요</div></div>
+            <label style="font-size:12.5px;font-weight:600;color:var(--sub)">닉네임</label><input value="서연" style="width:100%;margin:6px 0 14px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px 15px;font-size:15px;color:var(--text);outline:none">
+            <label style="font-size:12.5px;font-weight:600;color:var(--sub)">이메일</label><input value="seoyeon@feelio.app" disabled="" style="width:100%;margin:6px 0 22px;background:var(--line);border:1px solid var(--line);border-radius:14px;padding:13px 15px;font-size:15px;color:var(--sub);outline:none">
+            <button onClick="{{ saveGeneric }}" style="width:100%;background:var(--ink);color:var(--onInk);border:none;border-radius:14px;padding:15px;font-size:15px;font-weight:600;cursor:pointer">저장</button>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ m.goals }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:24px 28px 26px"><div style="display:flex;align-items:center;gap:12px;margin-bottom:20px"><button onClick="{{ backToProfile }}" style="background:none;border:none;cursor:pointer;font-size:20px;color:var(--sub)">‹</button><span style="font-size:18px;font-weight:600;flex:1">목표 관리</span><button onClick="{{ openGoalAdd }}" style="background:var(--ink);color:var(--onInk);border:none;border-radius:999px;padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer">+ 추가</button></div>
+            <div style="display:flex;flex-direction:column;gap:12px"><sc-for list="{{ goalCards }}" as="g" hint-placeholder-count="2"><div style="background:var(--card2);border:1px solid var(--line);border-radius:18px;padding:18px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><span style="font-size:15px;font-weight:600">{{ g.name }}</span><sc-if value="{{ g.primary }}" hint-placeholder-val="{{ false }}"><span style="font-size:10.5px;font-weight:600;color:#3E9578;background:#83C9B033;padding:2px 8px;border-radius:99px">대표</span></sc-if></div><div style="height:8px;background:var(--line);border-radius:99px;overflow:hidden"><div style="{{ g.bar }}"></div></div><div style="display:flex;justify-content:space-between;font-size:12.5px;color:var(--sub);margin-top:7px"><span>{{ g.cur }} / {{ g.tgt }}</span><span>{{ g.range }}</span></div><div style="display:flex;gap:8px;margin-top:12px"><button onClick="{{ g.onEdit }}" style="flex:1;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:9px;font-size:13px;font-weight:600;cursor:pointer;color:var(--text)">수정</button><button onClick="{{ g.onDelete }}" style="flex:1;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:9px;font-size:13px;font-weight:600;cursor:pointer;color:#E87573">삭제</button></div></div></sc-for></div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ m.goalForm }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:24px 28px 26px"><div style="display:flex;align-items:center;gap:12px;margin-bottom:20px"><button onClick="{{ openGoals }}" style="background:none;border:none;cursor:pointer;font-size:20px;color:var(--sub)">‹</button><span style="font-size:18px;font-weight:600">{{ goalFormTitle }}</span></div>
+            <label style="font-size:12.5px;font-weight:600;color:var(--sub)">목표명</label><input value="{{ goalFormName }}" placeholder="예: 제주도 여행" style="width:100%;margin:6px 0 12px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px 15px;font-size:15px;color:var(--text);outline:none">
+            <div style="display:flex;gap:10px;margin-bottom:12px"><div style="flex:1"><label style="font-size:12.5px;font-weight:600;color:var(--sub)">목표 금액</label><input value="{{ goalFormTgt }}" placeholder="2,000,000" style="width:100%;margin-top:6px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px 15px;font-size:15px;color:var(--text);outline:none"></div><div style="flex:1"><label style="font-size:12.5px;font-weight:600;color:var(--sub)">현재 금액</label><input value="{{ goalFormCur }}" placeholder="0" style="width:100%;margin-top:6px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px 15px;font-size:15px;color:var(--text);outline:none"></div></div>
+            <div style="display:flex;gap:10px;margin-bottom:14px"><div style="flex:1"><label style="font-size:12.5px;font-weight:600;color:var(--sub)">시작일</label><input type="date" style="width:100%;margin-top:6px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;font-size:14px;color:var(--text);outline:none"></div><div style="flex:1"><label style="font-size:12.5px;font-weight:600;color:var(--sub)">종료일</label><input type="date" style="width:100%;margin-top:6px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;font-size:14px;color:var(--text);outline:none"></div></div>
+            <label style="display:flex;align-items:center;gap:10px;font-size:13.5px;margin-bottom:20px;cursor:pointer"><span style="width:20px;height:20px;border-radius:6px;background:var(--ink);display:inline-flex;align-items:center;justify-content:center;color:var(--onInk);font-size:12px">✓</span> 대표 목표로 설정</label>
+            <button onClick="{{ saveGoal }}" style="width:100%;background:var(--ink);color:var(--onInk);border:none;border-radius:14px;padding:15px;font-size:15px;font-weight:600;cursor:pointer">저장</button>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ m.tags }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:24px 28px 26px"><div style="display:flex;align-items:center;gap:12px;margin-bottom:18px"><button onClick="{{ backToProfile }}" style="background:none;border:none;cursor:pointer;font-size:20px;color:var(--sub)">‹</button><span style="font-size:18px;font-weight:600;flex:1">태그 관리</span><button onClick="{{ openTagAdd }}" style="background:var(--ink);color:var(--onInk);border:none;border-radius:999px;padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer">+ 추가</button></div>
+            <div style="font-size:12.5px;font-weight:600;color:var(--sub);margin-bottom:10px">감정 태그 · 기본</div>
+            <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px"><sc-for list="{{ emoTags }}" as="e" hint-placeholder-count="8"><span style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;background:{{ e.light }};color:{{ e.c }};padding:7px 12px;border-radius:99px"><span style="width:9px;height:9px;border-radius:50%;background:{{ e.c }}"></span>{{ e.k }}<span style="font-size:10px;opacity:.55">🔒</span></span></sc-for></div>
+            <div style="font-size:12.5px;font-weight:600;color:var(--sub);margin-bottom:10px">상황 태그 · 내가 만든</div>
+            <div style="display:flex;flex-direction:column;gap:8px"><sc-for list="{{ userTags }}" as="t" hint-placeholder-count="4"><div style="display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 14px"><span style="width:12px;height:12px;border-radius:50%;background:{{ t.color }}"></span><span style="flex:1;font-size:14px;font-weight:600">{{ t.name }}</span><span onClick="{{ t.onEdit }}" style="font-size:13px;color:var(--sub);cursor:pointer;font-weight:600">수정</span><span onClick="{{ t.onDelete }}" style="font-size:13px;color:#E87573;cursor:pointer;font-weight:600">삭제</span></div></sc-for></div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ m.tagForm }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:24px 28px 26px"><div style="display:flex;align-items:center;gap:12px;margin-bottom:20px"><button onClick="{{ openTags }}" style="background:none;border:none;cursor:pointer;font-size:20px;color:var(--sub)">‹</button><span style="font-size:18px;font-weight:600">{{ tagFormTitle }}</span></div>
+            <label style="font-size:12.5px;font-weight:600;color:var(--sub)">태그 이름</label><input value="{{ tagFormName }}" placeholder="예: 야근" style="width:100%;margin:6px 0 16px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px 15px;font-size:15px;color:var(--text);outline:none">
+            <div style="font-size:12.5px;font-weight:600;color:var(--sub);margin-bottom:10px">태그 색상을 골라주세요</div>
+            <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:24px"><sc-for list="{{ tagColors }}" as="c" hint-placeholder-count="8"><div onClick="{{ c.onClick }}" style="{{ c.style }}"></div></sc-for></div>
+            <button onClick="{{ saveTag }}" style="width:100%;background:var(--ink);color:var(--onInk);border:none;border-radius:14px;padding:15px;font-size:15px;font-weight:600;cursor:pointer">저장</button>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ m.noti }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:24px 28px 26px"><div style="display:flex;align-items:center;gap:12px;margin-bottom:20px"><button onClick="{{ backToProfile }}" style="background:none;border:none;cursor:pointer;font-size:20px;color:var(--sub)">‹</button><span style="font-size:18px;font-weight:600">알림 설정</span></div>
+            <sc-for list="{{ notiRows }}" as="n" hint-placeholder-count="3"><div style="display:flex;align-items:center;justify-content:space-between;padding:15px 0;border-bottom:1px solid var(--line)"><div><div style="font-size:14.5px;font-weight:600">{{ n.name }}</div><div style="font-size:12px;color:var(--sub);margin-top:2px">{{ n.desc }}</div></div><div onClick="{{ n.onToggle }}" style="{{ n.track }}"><div style="{{ n.knob }}"></div></div></div></sc-for>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:15px 0"><div style="font-size:14.5px;font-weight:600">알림 시간</div><input type="time" value="21:00" style="background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px 12px;font-size:14px;color:var(--text);outline:none"></div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ m.aurora }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:24px 28px 26px"><div style="display:flex;align-items:center;gap:12px;margin-bottom:8px"><button onClick="{{ backToProfile }}" style="background:none;border:none;cursor:pointer;font-size:20px;color:var(--sub)">‹</button><span style="font-size:18px;font-weight:600;flex:1">화면 설정</span></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0 18px;border-bottom:1px solid var(--line);margin-bottom:16px"><div><div style="font-size:14.5px;font-weight:600">다크 모드</div><div style="font-size:12px;color:var(--sub);margin-top:2px">어두운 무광 글래스로 전환해요</div></div><div onClick="{{ toggleMode }}" style="{{ darkTrack }}"><div style="{{ darkKnob }}"></div></div></div>
+            <div style="font-size:12.5px;color:var(--sub);margin-bottom:14px">오로라 색상 · 배경에 크게 흐르는 세 개의 오로라 색</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><sc-for list="{{ auroraCards }}" as="a" hint-placeholder-count="8"><div onClick="{{ a.onClick }}" style="{{ a.wrap }}"><div style="display:flex;align-items:center"><span style="width:20px;height:20px;border-radius:50%;background:{{ a.c0 }}"></span><span style="width:20px;height:20px;border-radius:50%;background:{{ a.c1 }};margin-left:-7px"></span><span style="width:20px;height:20px;border-radius:50%;background:{{ a.c2 }};margin-left:-7px"></span></div><span style="flex:1;text-align:right;font-size:14px;font-weight:600">{{ a.name }}</span></div></sc-for></div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ m.data }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:24px 28px 26px"><div style="display:flex;align-items:center;gap:12px;margin-bottom:20px"><button onClick="{{ backToProfile }}" style="background:none;border:none;cursor:pointer;font-size:20px;color:var(--sub)">‹</button><span style="font-size:18px;font-weight:600">데이터 관리</span></div>
+            <div onClick="{{ saveGeneric }}" style="display:flex;align-items:center;justify-content:space-between;padding:16px 18px;background:var(--card);border:1px solid var(--line);border-radius:14px;margin-bottom:10px;cursor:pointer"><span style="font-size:14.5px;font-weight:600">데이터 백업</span><span style="font-size:12.5px;color:var(--sub)">클라우드에 저장</span></div>
+            <div onClick="{{ saveGeneric }}" style="display:flex;align-items:center;justify-content:space-between;padding:16px 18px;background:var(--card);border:1px solid var(--line);border-radius:14px;margin-bottom:22px;cursor:pointer"><span style="font-size:14.5px;font-weight:600">데이터 내보내기</span><span style="font-size:12.5px;color:var(--sub)">CSV · Excel</span></div>
+            <div style="background:#E8757314;border:1px solid #E8757333;border-radius:14px;padding:16px 18px"><div style="font-size:14px;font-weight:600;color:#E87573;margin-bottom:4px">전체 기록 초기화</div><div style="font-size:12.5px;color:var(--sub);line-height:1.5;margin-bottom:12px">모든 거래와 감정 기록이 사라져요. 되돌릴 수 없어요.</div><button onClick="{{ askDataReset }}" style="background:#E87573;color:#fff;border:none;border-radius:10px;padding:10px 16px;font-size:13px;font-weight:600;cursor:pointer">초기화하기</button></div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ m.account }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:24px 28px 26px"><div style="display:flex;align-items:center;gap:12px;margin-bottom:20px"><button onClick="{{ backToProfile }}" style="background:none;border:none;cursor:pointer;font-size:20px;color:var(--sub)">‹</button><span style="font-size:18px;font-weight:600">계정 관리</span></div>
+            <div style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin-bottom:10px"><div style="font-size:12px;color:var(--sub);font-weight:600">이메일</div><div style="font-size:14.5px;font-weight:600;margin-top:3px"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="077462687e626869476162626b6e6829667777">[email&#160;protected]</a></div></div>
+            <div style="background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin-bottom:22px"><div style="font-size:12px;color:var(--sub);font-weight:600">가입 방식</div><div style="font-size:14.5px;font-weight:600;margin-top:3px">Google OAuth2</div></div>
+            <button onClick="{{ doLogout }}" style="width:100%;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;font-size:14.5px;font-weight:600;cursor:pointer;color:var(--text);margin-bottom:10px">로그아웃</button>
+            <button onClick="{{ startWithdraw }}" style="width:100%;background:none;border:none;padding:12px;font-size:13.5px;font-weight:600;cursor:pointer;color:#E87573;text-decoration:underline;text-underline-offset:3px">회원탈퇴</button>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ m.withdraw }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:26px 28px">
+            <sc-if value="{{ wd0 }}" hint-placeholder-val="{{ false }}"><div style="text-align:center"><div style="width:90px;height:90px;margin:0 auto 8px"><x-import component="EmotionBlob" from="./EmotionBlob.jsx" emotion="외로움" size="{{ 90 }}" hint-size="90px,90px"></x-import></div><div style="font-size:20px;font-weight:600;margin-bottom:10px">정말 떠나시나요?</div><div style="font-size:14px;color:var(--sub);line-height:1.7;margin-bottom:22px">탈퇴하면 지금까지 기록한 <b style="color:var(--text)">모든 감정과 거래, 목표</b>가<br>사라지고 되돌릴 수 없어요.</div><div style="display:flex;gap:10px"><button onClick="{{ backToProfile }}" style="flex:1;background:var(--ink);color:var(--onInk);border:none;border-radius:14px;padding:14px;font-size:14.5px;font-weight:600;cursor:pointer">계속 함께하기</button><button onClick="{{ wdNext }}" style="flex:1;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;font-size:14.5px;font-weight:600;cursor:pointer;color:#E87573">탈퇴 진행</button></div></div></sc-if>
+            <sc-if value="{{ wd1 }}" hint-placeholder-val="{{ false }}"><div><div style="font-size:18px;font-weight:600;margin-bottom:6px">떠나는 이유를 알려주세요</div><div style="font-size:13px;color:var(--sub);margin-bottom:18px">더 나은 Feelio를 만드는 데 쓸게요.</div><div style="display:flex;flex-direction:column;gap:8px;margin-bottom:22px"><sc-for list="{{ wdReasons }}" as="r" hint-placeholder-count="4"><div onClick="{{ r.onClick }}" style="{{ r.style }}"><span style="{{ r.dot }}"></span>{{ r.name }}</div></sc-for></div><div style="display:flex;gap:10px"><button onClick="{{ wdPrev }}" style="flex:0 0 auto;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 22px;font-size:14.5px;font-weight:600;cursor:pointer;color:var(--text)">이전</button><button onClick="{{ wdNext }}" style="flex:1;background:var(--ink);color:var(--onInk);border:none;border-radius:14px;padding:14px;font-size:14.5px;font-weight:600;cursor:pointer">다음</button></div></div></sc-if>
+            <sc-if value="{{ wd2 }}" hint-placeholder-val="{{ false }}"><div><div style="font-size:18px;font-weight:600;margin-bottom:6px">마지막 확인이에요</div><div style="font-size:13px;color:var(--sub);line-height:1.6;margin-bottom:18px">아래 칸에 <b style="color:#E87573">탈퇴합니다</b> 를 그대로 입력하면 탈퇴가 진행돼요.</div><input value="{{ wdText }}" onInput="{{ setWdText }}" placeholder="탈퇴합니다" style="width:100%;margin-bottom:20px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;font-size:15px;color:var(--text);outline:none;text-align:center"><div style="display:flex;gap:10px"><button onClick="{{ wdPrev }}" style="flex:0 0 auto;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 22px;font-size:14.5px;font-weight:600;cursor:pointer;color:var(--text)">이전</button><button onClick="{{ confirmWithdraw }}" style="{{ wdFinalStyle }}">탈퇴합니다</button></div></div></sc-if>
+            <sc-if value="{{ wd3 }}" hint-placeholder-val="{{ false }}"><div style="text-align:center"><div style="width:80px;height:80px;margin:0 auto 12px"><x-import component="EmotionBlob" from="./EmotionBlob.jsx" emotion="무덤덤" size="{{ 80 }}" interactive="{{ false }}" hint-size="80px,80px"></x-import></div><div style="font-size:19px;font-weight:600;margin-bottom:10px">탈퇴가 완료됐어요</div><div style="font-size:14px;color:var(--sub);line-height:1.7;margin-bottom:22px">그동안 함께해줘서 고마웠어요.<br>언제든 다시 돌아오면 반갑게 맞이할게요.</div><button onClick="{{ doLogout }}" style="width:100%;background:var(--ink);color:var(--onInk);border:none;border-radius:14px;padding:14px;font-size:14.5px;font-weight:600;cursor:pointer">처음으로</button></div></sc-if>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ m.txnDetail }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:26px 28px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px"><span style="font-size:18px;font-weight:600">거래 상세</span><button onClick="{{ closeModal }}" style="width:32px;height:32px;border-radius:50%;border:none;background:var(--line);cursor:pointer;font-size:15px;color:var(--sub)">✕</button></div>
+            <div style="text-align:center;padding:8px 0 20px"><div style="width:76px;height:76px;margin:0 auto 8px"><x-import component="EmotionBlob" from="./EmotionBlob.jsx" emotion="{{ selEmo }}" size="{{ 76 }}" interactive="{{ false }}" hint-size="76px,76px"></x-import></div><div style="font-size:32px;font-weight:600;color:{{ selAmtColor }}">{{ selAmtStr }}</div></div>
+            <div style="background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;margin-bottom:20px"><sc-for list="{{ selRows }}" as="r" hint-placeholder-count="6"><div style="display:flex;justify-content:space-between;padding:13px 16px;border-bottom:1px solid var(--line)"><span style="font-size:13.5px;color:var(--sub)">{{ r.label }}</span><span style="font-size:13.5px;font-weight:600">{{ r.value }}</span></div></sc-for></div>
+            <div style="display:flex;gap:10px"><button onClick="{{ openTxnEdit }}" style="flex:1;background:var(--ink);color:var(--onInk);border:none;border-radius:14px;padding:14px;font-size:14.5px;font-weight:600;cursor:pointer">수정</button><button onClick="{{ askTxnDelete }}" style="flex:1;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;font-size:14.5px;font-weight:600;cursor:pointer;color:#E87573">삭제</button></div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ m.txnEdit }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:24px 28px 26px"><div style="display:flex;align-items:center;gap:12px;margin-bottom:20px"><button onClick="{{ openTxnDetailBack }}" style="background:none;border:none;cursor:pointer;font-size:20px;color:var(--sub)">‹</button><span style="font-size:18px;font-weight:600">거래 수정</span></div>
+            <div style="display:flex;gap:10px;margin-bottom:16px"><div style="flex:1"><label style="font-size:12px;font-weight:600;color:var(--sub)">금액</label><input value="{{ selAmtRaw }}" style="width:100%;margin-top:5px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:15px;color:var(--text);outline:none"></div><div style="flex:1"><label style="font-size:12px;font-weight:600;color:var(--sub)">카테고리</label><input value="{{ selCat }}" style="width:100%;margin-top:5px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:15px;color:var(--text);outline:none"></div></div>
+            <div style="margin-bottom:16px"><label style="font-size:12px;font-weight:600;color:var(--sub)">감정</label><div style="display:grid;grid-template-columns:repeat(8,1fr);gap:4px;margin-top:6px"><sc-for list="{{ editEmos }}" as="e" hint-placeholder-count="8"><div onClick="{{ e.onClick }}" style="{{ e.wrap }}"><div style="width:34px;height:34px;pointer-events:none"><x-import component="EmotionBlob" from="./EmotionBlob.jsx" emotion="{{ e.k }}" size="{{ 34 }}" variant="css" interactive="{{ false }}" hint-size="34px,34px"></x-import></div></div></sc-for></div></div>
+            <div style="margin-bottom:16px"><label style="font-size:12px;font-weight:600;color:var(--sub)">상황</label><input value="{{ selSit }}" style="width:100%;margin-top:5px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:15px;color:var(--text);outline:none"></div>
+            <div style="margin-bottom:16px"><label style="font-size:12px;font-weight:600;color:var(--sub)">메모</label><input value="{{ selMemo }}" style="width:100%;margin-top:5px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:15px;color:var(--text);outline:none"></div>
+            <div style="margin-bottom:22px"><label style="font-size:12px;font-weight:600;color:var(--sub)">날짜</label><input type="datetime-local" value="2026-07-01T21:30" style="width:100%;margin-top:5px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:11px 14px;font-size:14px;color:var(--text);outline:none"></div>
+            <button onClick="{{ saveTxnEdit }}" style="width:100%;background:var(--ink);color:var(--onInk);border:none;border-radius:14px;padding:15px;font-size:15px;font-weight:600;cursor:pointer">저장</button>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ m.confirm }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:28px 28px 26px;text-align:center"><div style="width:52px;height:52px;border-radius:50%;background:#E8757322;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-size:22px;color:#E87573">!</div><div style="font-size:18px;font-weight:600;margin-bottom:8px">{{ confirmTitle }}</div><div style="font-size:14px;color:var(--sub);line-height:1.6;margin-bottom:24px">{{ confirmBody }}</div><div style="display:flex;gap:10px"><button onClick="{{ confirmCancel }}" style="flex:1;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;font-size:14.5px;font-weight:600;cursor:pointer;color:var(--text)">취소</button><button onClick="{{ confirmProceed }}" style="flex:1;background:#E87573;color:#fff;border:none;border-radius:14px;padding:14px;font-size:14.5px;font-weight:600;cursor:pointer">{{ confirmCta }}</button></div></div>
+        </sc-if>
+
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:&quot;100%&quot;,&quot;height&quot;:&quot;100%&quot;}}">
+class Component extends DCLogic {
+  state = {
+    view: 'login', route: 'home', mode: 'light', w: 1280, cyc: 0,
+    ob: 0, obGoal: '내 집 마련', obAmount: 10000000, obPeriod: '1년', obCurrent: 4200000,
+    modal: null, confirmKind: null, aurora: '블루',
+    goalMode: 'add', tagMode: 'add', tagColor: '#F28AB7',
+    wd: 0, wdText: '', wdReason: null, txView: '일별', txFilter: '전체',
+    noti: { remind: true, warn: true, report: false },
+    form: { type: 'expense', amount: '', category: null, emotion: null, sits: [], memo: '', date: '2026-07-01T21:30' },
+    sel: null, toast: null,
+  };
+
+  EMO = [
+    { k: '신남', c: '#FF8A62' }, { k: '설렘', c: '#F28AB7' }, { k: '뿌듯함', c: '#F2C766' }, { k: '스트레스', c: '#A68BEA' },
+    { k: '외로움', c: '#76A7E8' }, { k: '화남', c: '#E87573' }, { k: '평온', c: '#83C9B0' }, { k: '무덤덤', c: '#AEB4C1' },
+  ];
+  CATS = ['배달', '카페', '쇼핑', '택시', '편의점', '구독', '마트', '급여'];
+  SITS = ['야근', '혼자', '늦은 밤', '주말', '기념일', '퇴근 후', '기분전환', '보상', '충동구매'];
+  AURORAS = {
+    블루: ['#37B9A0', '#4E7EF0', '#F0A63E'], 민트: ['#37C98C', '#37C6C9', '#F0C63E'],
+    핑크: ['#F06AA8', '#7A6AE0', '#4E8EF0'], 골드: ['#F0A03E', '#F0603A', '#6EC080'],
+    라벤더: ['#B9A0F0', '#9A9AF0', '#F0A6C8'], 스카이: ['#7EC8F0', '#4E9EF0', '#3A66E0'],
+    피치: ['#F7C08A', '#F49CB0', '#F7D0A0'], 라임: ['#8ED868', '#6FD0A0', '#E4E05E'],
+  };
+
+  componentDidMount() {
+    this._onResize = () => this.setState({ w: window.innerWidth });
+    window.addEventListener('resize', this._onResize);
+    this.setState({ w: window.innerWidth });
+    this._cyc = setInterval(() => { if (this.state.view === 'login') this.setState(st => ({ cyc: (st.cyc + 1) % 5 })); }, 2400);
+  }
+  componentWillUnmount() { window.removeEventListener('resize', this._onResize); clearInterval(this._cyc); }
+
+  css(str) { const o = {}; String(str).split(';').forEach(p => { const i = p.indexOf(':'); if (i < 0) return; const k = p.slice(0, i).trim(); if (!k) return; o[k.replace(/-([a-z])/g, (_, c) => c.toUpperCase())] = p.slice(i + 1).trim(); }); return o; }
+  emo(k) { return this.EMO.find(e => e.k === k) || this.EMO[7]; }
+  fmt(n) { return Math.abs(n).toLocaleString('ko-KR'); }
+  dateLabel(iso) { const [y, m, d] = iso.split('-').map(Number); const wd = ['일', '월', '화', '수', '목', '금', '토'][new Date(y, m - 1, d).getDay()]; return `${m}월 ${d}일 (${wd})`; }
+
+  txns = [
+    { id: 1, date: '2026-07-01', time: '21:30', cat: '배달', emo: '스트레스', sit: '야근', memo: '야근하고 시킨 치킨', amt: -24000 },
+    { id: 2, date: '2026-07-01', time: '12:40', cat: '카페', emo: '평온', sit: '점심', memo: '아메리카노', amt: -4800 },
+    { id: 3, date: '2026-06-30', time: '10:00', cat: '급여', emo: '뿌듯함', sit: '월급날', memo: '6월 월급', amt: 2600000 },
+    { id: 4, date: '2026-06-30', time: '17:20', cat: '쇼핑', emo: '설렘', sit: '주말', memo: '여름 원피스', amt: -58000 },
+    { id: 5, date: '2026-06-29', time: '23:50', cat: '택시', emo: '외로움', sit: '늦은 밤', memo: '집 가는 길', amt: -12800 },
+    { id: 6, date: '2026-06-29', time: '08:10', cat: '편의점', emo: '무덤덤', sit: '출근길', memo: '삼각김밥', amt: -3200 },
+    { id: 7, date: '2026-06-28', time: '22:40', cat: '배달', emo: '외로움', sit: '혼자', memo: '혼자 먹은 야식 피자', amt: -31000 },
+    { id: 8, date: '2026-06-28', time: '15:00', cat: '구독', emo: '신남', sit: '주말', memo: '음악 스트리밍', amt: -10900 },
+  ];
+  goals = [
+    { id: 1, name: '제주도 여행', tgt: 2000000, cur: 1240000, start: '2026.03', end: '2026.12', primary: true },
+    { id: 2, name: '비상금 모으기', tgt: 3000000, cur: 900000, start: '2026.01', end: '2027.06', primary: false },
+  ];
+  userTags = [{ id: 1, name: '야근', color: '#A68BEA' }, { id: 2, name: '혼자 밤', color: '#76A7E8' }, { id: 3, name: '기념일', color: '#F28AB7' }];
+
+  t(msg) { this.setState({ toast: msg }); clearTimeout(this._tt); this._tt = setTimeout(() => this.setState({ toast: null }), 2200); }
+
+  renderVals() {
+    const s = this.state;
+    const set = (patch) => this.setState(patch);
+    const setForm = (k, v) => this.setState(st => ({ form: { ...st.form, [k]: v } }));
+    const openM = (m) => set({ modal: m });
+    const css = (x) => this.css(x);
+    const isMobile = s.w <= 860;
+    // ONE unified glass recipe — matches the home 마음 능선 card (the reference the team pointed to).
+    // Every frosted surface across every screen + the modal shell uses this, so all glass looks identical.
+    const glass = `background:var(--card);backdrop-filter:blur(26px) saturate(1.3);-webkit-backdrop-filter:blur(26px) saturate(1.3);border:1px solid var(--cardbrd);box-shadow:var(--shadow)`;
+    // A quieter INSET surface for anything nested INSIDE a glass card — hairline only, no second pane of glass (avoids card-on-card).
+    const inset = `background:${s.mode === 'dark' ? 'rgba(255,255,255,.035)' : 'rgba(255,255,255,.28)'};border:1px solid var(--line)`;
+    const addCardBase = glass + ';border-radius:24px';
+    const panelBase = glass + ';border-radius:26px';
+
+    const R = {
+      isAuth: s.view === 'login', isOnboard: s.view === 'onboard', isApp: s.view === 'app',
+      darkScene: s.view === 'login' || s.view === 'onboard', hasModal: !!s.modal, mode: s.mode,
+      isHome: s.route === 'home', isAdd: s.route === 'add', isTxns: s.route === 'txns', isAnal: s.route === 'anal', isUniv: s.route === 'univ',
+      showToast: !!s.toast, toast: s.toast,
+      saved: !!s.saved, savedInfo: s.savedInfo || '', savedEmo: s.savedEmo || '평온',
+      isMobile, showSidebar: !isMobile, showTopProfile: isMobile, showRecordBtn: s.route !== 'home' && !isMobile,
+      rootStyle: css('min-height:100vh;position:relative;overflow-x:hidden;background:#0c1017'),
+      loginGrid: css(isMobile ? 'width:100%;max-width:440px;margin:0 auto;display:flex;flex-direction:column;gap:32px' : 'width:100%;max-width:1240px;margin:0 auto;display:grid;grid-template-columns:1.3fr .85fr;gap:56px;align-items:center'),
+      mainStyle: css(isMobile ? 'margin-left:0;padding:18px 16px 100px;min-height:100vh;box-sizing:border-box;display:flex;flex-direction:column' : 'margin-left:252px;padding:18px 40px 24px;max-width:1320px;min-height:100vh;box-sizing:border-box;display:flex;flex-direction:column'),
+      homeGrid: css(isMobile ? 'display:flex;flex-direction:column;gap:18px' : 'display:grid;grid-template-columns:1.12fr .88fr;gap:26px;align-items:stretch'),
+      dash2Grid: css(isMobile ? 'display:flex;flex-direction:column;gap:22px;' : 'display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start;'),
+      dashFeedbackGrid: css(isMobile ? 'display:flex;flex-direction:column;gap:22px;' : 'display:grid;grid-template-columns:1.3fr 1fr;gap:24px;align-items:stretch;'),
+      analRow: css(isMobile ? 'display:flex;flex-direction:column;gap:26px;padding-bottom:30px;border-bottom:1px solid var(--line);margin-bottom:30px' : 'display:grid;grid-template-columns:1fr 1fr;gap:0;padding-bottom:36px;border-bottom:1px solid var(--line);margin-bottom:36px'),
+      analRowLast: css(isMobile ? 'padding-bottom:30px;border-bottom:1px solid var(--line);margin-bottom:30px' : 'padding-bottom:36px;border-bottom:1px solid var(--line);margin-bottom:36px'),
+      analLeft: css(isMobile ? '' : 'padding-right:44px'),
+      analRight: css(isMobile ? 'padding-top:26px;border-top:1px solid var(--line)' : 'padding-left:44px;border-left:1px solid var(--line)'),
+      analFeedbackGrid: css(isMobile ? 'display:flex;flex-direction:column;gap:26px' : 'display:grid;grid-template-columns:1.3fr 1fr;gap:0;align-items:center'),
+      txnSummaryGrid: css(isMobile ? 'display:grid;grid-template-columns:1fr 1fr;gap:12px' : 'display:grid;grid-template-columns:repeat(4,1fr);gap:14px'),
+      emoRowStyle: css(isMobile ? 'display:grid;grid-template-columns:repeat(4,1fr);gap:8px' : 'display:grid;grid-template-columns:repeat(8,1fr);gap:5px'),
+      addGrid: css((isMobile || s.w <= 1100) ? 'display:flex;flex-direction:column;gap:16px;max-width:540px;margin:0 auto;width:100%' : 'display:grid;grid-template-columns:minmax(0,1fr) 384px;gap:18px;align-items:stretch;flex:1;min-height:0'),
+      addEmoGrid: css('display:grid;grid-template-columns:repeat(4,1fr);gap:2px 0;margin-top:12px;justify-items:center'),
+      addPanelL: css(panelBase + ';padding:clamp(26px,3vw,38px);position:relative;overflow:hidden;isolation:isolate;display:flex;flex-direction:column'),
+      addPanelR: css(panelBase + ';padding:clamp(24px,2.6vw,30px);display:flex;flex-direction:column;gap:16px'),
+      addCardR: css(panelBase + ';border-radius:22px;padding:24px 26px'),
+      addCardRGrow: css(panelBase + ';border-radius:22px;padding:24px 26px;display:flex;flex-direction:column'),
+      addCard: css(addCardBase),
+      addCardAmt: css(addCardBase + ';padding:clamp(22px,2.6vw,30px);position:relative;overflow:hidden;isolation:isolate'),
+      addCardEmo: css(addCardBase + ';padding:clamp(22px,2.6vw,30px)'),
+      addCardSide: css(addCardBase + ';padding:22px;flex:1;display:flex;flex-direction:column'),
+      analCard: css(addCardBase + ';padding:26px 28px'),
+      analKpiGrid: css((isMobile || s.w <= 1080) ? 'display:grid;grid-template-columns:1fr 1fr;gap:14px' : 'display:grid;grid-template-columns:repeat(4,1fr);gap:16px'),
+      analDuo: css(isMobile ? 'display:flex;flex-direction:column;gap:20px' : 'display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:stretch'),
+      univScenGrid: css(isMobile ? 'display:grid;grid-template-columns:1fr;gap:14px' : 'display:grid;grid-template-columns:repeat(3,1fr);gap:16px'),
+      analCardCta: css(addCardBase + ';padding:26px 28px;background:linear-gradient(120deg,rgba(134,201,255,.16),rgba(130,226,194,.14))'),
+      blobSize: isMobile ? 150 : 208,
+      modeIcon: s.mode === 'dark' ? '☀' : '☾',
+      toggleMode: () => set({ mode: s.mode === 'dark' ? 'light' : 'dark' }),
+    };
+
+    const a = this.AURORAS[s.aurora] || this.AURORAS['블루'];
+    const op = s.mode === 'dark' ? '.5' : '.42';
+    const aurora = {
+      auroraOrb1: css(`position:absolute;top:-180px;left:-100px;width:640px;height:640px;border-radius:50%;background:${a[0]};filter:blur(110px);opacity:${op};animation:drift1 28s ease-in-out infinite`),
+      auroraOrb2: css(`position:absolute;top:16%;right:-140px;width:560px;height:560px;border-radius:50%;background:${a[1]};filter:blur(115px);opacity:${op};animation:drift2 32s ease-in-out infinite`),
+      auroraOrb3: css(`position:absolute;bottom:-200px;left:32%;width:640px;height:640px;border-radius:50%;background:${a[2]};filter:blur(120px);opacity:${op};animation:drift3 36s ease-in-out infinite`),
+      auroraVeil: css(`position:absolute;inset:0;background:${s.mode === 'dark' ? 'rgba(12,14,22,.3)' : 'rgba(247,244,238,.08)'}`),
+    };
+
+    const nav = {
+      oauth: () => set({ view: 'onboard', ob: 0 }),
+      cycBlob: ['설렘', '스트레스', '외로움', '뿌듯함', '평온'][s.cyc] || '설렘',
+      cycWord: ['설렜던 날', '스트레스였던 밤', '외로웠던 새벽', '뿌듯했던 하루', '평온했던 오후'][s.cyc] || '설렜던 날',
+      cycWordStyle: css(`color:${this.emo((['설렘','스트레스','외로움','뿌듯함','평온'][s.cyc] || '설렘')).c}`),
+      loginSplit: css(isMobile ? 'flex:1;display:flex;flex-direction:column' : 'flex:1;display:flex'),
+      loginAuthPanel: css(isMobile ? 'display:flex;align-items:center;justify-content:center;padding:20px 24px 56px' : 'flex:1 1 400px;display:flex;align-items:center;justify-content:center;padding:44px;background:var(--card2);backdrop-filter:blur(30px) saturate(1.35);-webkit-backdrop-filter:blur(30px) saturate(1.35);border-left:1px solid var(--cardbrd);min-height:100vh'),
+      loginPills: [{ k: '감정 태그 기록', c: '#F28AB7' }, { k: 'AI 패턴 분석', c: '#A68BEA' }, { k: '평행우주 목표', c: '#83C9B0' }],
+      loginHalo: css(`position:absolute;left:50%;top:50%;width:140px;height:140px;border-radius:50%;background:radial-gradient(circle,${this.emo((['설렘','스트레스','외로움','뿌듯함','평온'][s.cyc] || '설렘')).c}66,transparent 66%);filter:blur(20px);animation:haloPulse 4s ease-in-out infinite`),
+      cycWords: [['설렜던 날', '설렘'], ['스트레스였던 밤', '스트레스'], ['외로웠던 새벽', '외로움'], ['뿌듯했던 하루', '뿌듯함'], ['무심코 지나친 순간', '무덤덤']].map(([w, ek], i) => ({ w, style: css(`position:absolute;left:0;right:0;top:0;color:${this.emo(ek).c};animation:cycle5 12s ${(-i * 2.4).toFixed(1)}s infinite`) })),
+      oauthBtns: [
+        { label: 'Google', icon: 'G', circle: css('width:58px;height:58px;border-radius:50%;background:#fff;border:1px solid rgba(0,0,0,.08);display:flex;align-items:center;justify-content:center;font-weight:700;color:#4285F4;font-size:22px;box-shadow:0 8px 22px -12px rgba(66,133,244,.6);transition:transform .15s'), },
+        { label: 'Kakao', icon: '💬', circle: css('width:58px;height:58px;border-radius:50%;background:#FEE500;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 8px 22px -12px rgba(254,229,0,.8);transition:transform .15s'), },
+        { label: 'Naver', icon: 'N', circle: css('width:58px;height:58px;border-radius:50%;background:#03C75A;display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:22px;box-shadow:0 8px 22px -12px rgba(3,199,90,.7);transition:transform .15s'), },
+      ],
+      goHome: () => set({ route: 'home' }), goAdd: () => set({ route: 'add' }), goTxns: () => set({ route: 'txns' }), goAnal: () => set({ route: 'anal' }), goUniv: () => set({ route: 'univ' }),
+      openProfile: () => openM('profile'), closeModal: () => set({ modal: null, wd: 0, wdText: '', wdReason: null }),
+      stop: (e) => e && e.stopPropagation(),
+      doLogout: () => set({ view: 'login', modal: null, wd: 0, wdText: '', wdReason: null }),
+    };
+
+    const titles = { home: '홈', add: '지출·수입 기록', txns: '거래내역', anal: 'AI 분석', univ: '평행우주' };
+    const navStyle = (on) => css(`display:flex;align-items:center;gap:11px;padding:12px 14px;border-radius:15px;font-size:15.5px;font-weight:600;cursor:pointer;transition:all .15s;color:${on ? 'var(--text)' : 'var(--sub)'};background:${on ? 'var(--card)' : 'transparent'};border:1px solid ${on ? 'var(--cardbrd)' : 'transparent'}`);
+    const tabStyleNav = (on) => css(`display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 8px;border-radius:14px;cursor:pointer;flex:1;transition:color .15s;color:${on ? 'var(--text)' : 'var(--sub)'}`);
+
+    // ---- onboarding ----
+    const obLabels = ['1 / 5', '2 / 5', '3 / 5', '4 / 5', '5 / 5'];
+    const obSteps = [0, 1, 2, 3, 4].map(i => ({ style: css(`flex:1;height:6px;border-radius:99px;background:${i <= s.ob ? 'var(--ink)' : 'var(--line)'}`) }));
+    const goalOpts = [
+      { k: '내 집 마련', d: '가장 가까운 큰 목표를 기준으로 볼게요.', icon: '🏠', tint: '#F2C76633' },
+      { k: '비상금 만들기', d: '흔들리지 않을 안전망을 준비해요.', icon: '🧧', tint: '#E8757333' },
+      { k: '여행비 모으기', d: '기대되는 여행을 현실적인 숫자로 바꿔요.', icon: '✈️', tint: '#76A7E833' },
+      { k: '소비 줄이기', d: '무리하지 않고 줄일 수 있는 흐름을 찾아요.', icon: '🌱', tint: '#83C9B033' },
+      { k: '직접 입력하기', d: '나만의 목표 이름으로 시작해요.', icon: '✍️', tint: '#A68BEA33' },
+    ];
+    const amountChips = [['500만', 5000000], ['1,000만', 10000000], ['3,000만', 30000000], ['직접 입력', -1]];
+    const periods = ['3개월', '6개월', '1년', '2년', '직접 설정'];
+    const goalIcon = (goalOpts.find(g => g.k === s.obGoal) || goalOpts[0]).icon;
+    const goalTint = (goalOpts.find(g => g.k === s.obGoal) || goalOpts[0]).tint;
+    const chips = [];
+    if (s.ob >= 1) chips.push({ label: '목표', value: s.obGoal, icon: goalIcon, tint: goalTint });
+    if (s.ob >= 2) chips.push({ label: '목표 금액', value: '₩' + this.fmt(s.obAmount), icon: '🪙', tint: '#F2C76633' });
+    if (s.ob >= 3) chips.push({ label: '기간', value: s.obPeriod, icon: '📅', tint: '#76A7E833' });
+    if (s.ob >= 4) chips.push({ label: '현재', value: '₩' + this.fmt(s.obCurrent), icon: '💙', tint: '#4E7EF033' });
+    const obNextLabels = ['다음', '다음', '다음', '다음', '시작하기'];
+    const obSummaryParts = [];
+    if (s.ob >= 1) obSummaryParts.push(s.obGoal);
+    if (s.ob >= 2) obSummaryParts.push('₩' + this.fmt(s.obAmount));
+    if (s.ob >= 3) obSummaryParts.push(s.obPeriod);
+    if (s.ob >= 4) obSummaryParts.push('현재 ₩' + this.fmt(s.obCurrent));
+    const ob = {
+      obStepLabel: obLabels[s.ob], obSteps,
+      obProgress: Math.round((s.ob + 1) / 5 * 100) + '%',
+      obSummaryLine: obSummaryParts.length ? obSummaryParts.join('  ·  ') : '목표를 함께 그려볼게요',
+      ob0: s.ob === 0, ob1: s.ob === 1, ob2: s.ob === 2, ob3: s.ob === 3, ob4: s.ob === 4,
+      obCanPrev: s.ob > 0, obNextLabel: obNextLabels[s.ob],
+      obNext: () => { if (s.ob >= 4) set({ view: 'app', route: 'home' }); else set({ ob: s.ob + 1 }); },
+      obPrev: () => set({ ob: Math.max(0, s.ob - 1) }),
+      obGoalOpts: goalOpts.map(g => ({ ...g, onClick: () => set({ obGoal: g.k }), wrap: css(`display:flex;align-items:center;gap:12px;padding:10px 8px;cursor:pointer;border-bottom:1px solid var(--line);border-radius:${s.obGoal === g.k ? '12px' : '0'};background:${s.obGoal === g.k ? this.emo('설렘').c + '14' : 'transparent'};transition:background .15s`), radio: css(`width:22px;height:22px;border-radius:50%;flex-shrink:0;border:2px solid ${s.obGoal === g.k ? 'var(--ink)' : 'var(--sub)'};background:${s.obGoal === g.k ? 'var(--ink)' : 'transparent'};display:flex;align-items:center;justify-content:center;color:var(--onInk);font-size:12px`) })),
+      obAmount: s.obAmount, obAmountStr: this.fmt(s.obAmount),
+      setObAmount: (e) => { const v = parseInt(e.target.value.replace(/[^0-9]/g, '')) || 0; set({ obAmount: v, obCurrent: Math.min(s.obCurrent, v) }); },
+      obAmountChips: amountChips.map(([n, v]) => ({ name: n, onClick: () => { if (v > 0) set({ obAmount: v, obCurrent: Math.min(s.obCurrent, v) }); }, style: css(`flex:1;text-align:center;padding:13px;border-radius:14px;font-size:13.5px;font-weight:600;cursor:pointer;color:${s.obAmount === v ? 'var(--onInk)' : 'var(--text)'};background:${s.obAmount === v ? 'var(--ink)' : 'var(--card)'};border:1px solid ${s.obAmount === v ? 'var(--ink)' : 'var(--line)'}`) })),
+      obPeriodOpts: periods.map(p => ({ name: p, onClick: () => set({ obPeriod: p }), style: css(`padding:14px 26px;border-radius:14px;font-size:14px;font-weight:600;cursor:pointer;color:${s.obPeriod === p ? 'var(--onInk)' : 'var(--text)'};background:${s.obPeriod === p ? 'var(--ink)' : 'var(--card)'};border:1px solid ${s.obPeriod === p ? 'var(--ink)' : 'var(--line)'}`) })),
+      obCurrentStr: '₩' + this.fmt(s.obCurrent), setObCurrent: (e) => set({ obCurrent: parseInt(e.target.value) || 0 }),
+      obSummary: [
+        { label: '목표', value: s.obGoal }, { label: '목표 금액', value: '₩' + this.fmt(s.obAmount) },
+        { label: '기간', value: s.obPeriod }, { label: '현재', value: '₩' + this.fmt(s.obCurrent) + ' (' + Math.round(s.obCurrent / s.obAmount * 100) + '%)' },
+      ],
+    };
+
+    const pg = this.goals.find(g => g.primary) || this.goals[0];
+    const pgPct = Math.round(pg.cur / pg.tgt * 100);
+    const goalMeta = { primaryGoalName: pg.name, primaryGoalPct: pgPct, goalCurStr: this.fmt(pg.cur) + '원', goalTgtStr: this.fmt(pg.tgt) + '원', goalRemainStr: this.fmt(pg.tgt - pg.cur) + '원', goalBarHome: this.css(`height:100%;width:${pgPct}%;background:linear-gradient(90deg,#F2A65E,#F28AB7);border-radius:99px`) };
+
+    // ---- home ----
+    const calEmoMap = { 1: '스트레스', 30: '뿌듯함', 29: '외로움', 28: '외로움', 26: '평온', 24: '신남', 20: '스트레스', 18: '설렘', 15: '무덤덤', 12: '평온', 8: '화남', 6: '평온', 5: '설렘', 3: '뿌듯함' };
+    const heavy = { 1: 1, 29: 1, 28: 1, 20: 1, 8: 1 };
+    const lead = new Date(2026, 6, 1).getDay();
+    const calDays = [];
+    const isDark = s.mode === 'dark';
+    const pebbleBase = 'aspect-ratio:1;border-radius:19px;display:flex;align-items:center;justify-content:center;font-size:12px;position:relative;backdrop-filter:blur(16px) saturate(1.35);-webkit-backdrop-filter:blur(16px) saturate(1.35)';
+    for (let i = 0; i < lead; i++) calDays.push({ day: '', style: css('aspect-ratio:1'), onClick: () => {} });
+    for (let d = 1; d <= 31; d++) {
+      const c = calEmoMap[d] ? this.emo(calEmoMap[d]) : null;
+      const today = d === 1;
+      let bg;
+      if (c) { const a1 = heavy[d] ? (isDark ? '9C' : 'B4') : (isDark ? '60' : '7C'); const a2 = isDark ? '12' : '26'; const hl = isDark ? '.12' : '.34'; bg = `radial-gradient(circle at 40% 24%,rgba(255,255,255,${hl}),transparent 44%),linear-gradient(150deg,${c.c}${a1},${c.c}${a2})`; }
+      else bg = 'linear-gradient(150deg,var(--pebbleEmpty),transparent)';
+      const fg = c ? (isDark ? '#F3F1F8' : '#fff') : 'var(--sub)';
+      const brd = today ? `1.5px solid rgba(255,255,255,${isDark ? '.6' : '.92'})` : `1px solid var(--pebbleBrd)`;
+      const glow = today ? `,0 0 0 3px rgba(255,255,255,${isDark ? '.16' : '.28'})` : '';
+      const shadow = isDark
+        ? `inset 0 1px 1px rgba(255,255,255,.16),inset 0 0 14px rgba(255,255,255,.03),0 8px 20px -16px rgba(0,0,0,.55)${glow}`
+        : `inset 0 1px 1.5px rgba(255,255,255,.5),inset 0 -8px 20px rgba(70,55,44,.045),0 12px 26px -22px rgba(70,55,44,.36)${glow}`;
+      calDays.push({ day: d, onClick: () => set({ route: 'txns' }), style: css(`${pebbleBase};font-weight:${today ? 700 : 600};cursor:pointer;background:${bg};color:${fg};border:${brd};box-shadow:${shadow}`) });
+    }
+    const legend = ['스트레스', '외로움', '평온', '뿌듯함'].map(k => ({ k, c: this.emo(k).c }));
+    const rd = [['화남', 8], ['평온', 15], ['외로움', 38], ['스트레스', 22], ['신남', 12], ['무덤덤', 5]];
+    const rtot = rd.reduce((t, d) => t + d[1], 0);
+    const W = 600, H = 170, base = 172;
+    const peakPath = (cx, w, h, by) => `M ${(cx - w).toFixed(1)} ${by} C ${(cx - w * 0.42).toFixed(1)} ${by} ${(cx - w * 0.32).toFixed(1)} ${(by - h).toFixed(1)} ${cx.toFixed(1)} ${(by - h).toFixed(1)} C ${(cx + w * 0.32).toFixed(1)} ${(by - h).toFixed(1)} ${(cx + w * 0.42).toFixed(1)} ${by} ${(cx + w).toFixed(1)} ${by} Z`;
+    const rSlot = (W - 40) / rd.length;
+    const ridgePeaks = rd.map((d, i) => ({ color: this.emo(d[0]).c, d: peakPath(20 + rSlot * (i + 0.5), rSlot * 1.15, 34 + (d[1] / 38) * 120, base), blend: css('mix-blend-mode:' + (s.mode === 'dark' ? 'screen' : 'multiply')) }));
+    const aiTagStyle = css('display:flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;white-space:nowrap;color:var(--sub);background:var(--card);border:1px solid var(--line);border-radius:99px;padding:5px 10px');
+    const aiTags = [{ k: '스트레스', c: this.emo('스트레스').c, delta: '▲ 8%' }, { k: '외로움', c: this.emo('외로움').c, delta: '▲ 5%' }, { k: '평온', c: this.emo('평온').c, delta: '▼ 3%' }].map(t => ({ ...t, style: aiTagStyle }));
+    const home = { todayLabel: '2026년 7월 1일 수요일', pageTitle: titles[s.route], topEmotion: '스트레스', topEmotionName: '스트레스 말랑이', topEmotionColor: this.emo('스트레스').c, homeBlobLine: '바쁜 하루 끝의 소비가 유독 잦았어요. 오늘은 말랑이를 한 번 눌러 마음을 말랑하게 해줄까요?', aiSignal: '이번 달은 스트레스 소비가 조금 늘고 있어요.', aiTags, calDays, legend, ridgePeaks, ridgeTop: '외로움', ridgeTopColor: this.emo('외로움').c };
+
+    // ---- add ----
+    const isExp = s.form.type === 'expense';
+    const tabBase = 'flex:1;text-align:center;padding:11px;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;transition:all .15s;';
+    const selEmo = s.form.emotion;
+    const accentHex = selEmo ? this.emo(selEmo).c : (s.mode === 'dark' ? '#8b8b98' : '#bcbcc6');
+    const fmtAmount = s.form.amount ? Number(s.form.amount).toLocaleString() : '';
+    const canSave = s.form.amount !== '' && !!selEmo;
+    const chip = (on) => css(`padding:10px 16px;border-radius:999px;font-size:13.5px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .2s;border:1.5px solid ${on ? accentHex : 'var(--line)'};background:${on ? accentHex + '26' : 'transparent'};color:${on ? 'var(--text)' : 'var(--sub)'}`);
+    const add = {
+      form: s.form, fmtAmount, selEmoColor: accentHex, selEmoName: selEmo || '',
+      previewLine: (!s.form.amount && !selEmo) ? '금액과 기분을 고르면 여기에 미리보기가 떠요.' : `${s.form.amount ? Number(s.form.amount).toLocaleString() + '원' : '금액 미입력'} · ${selEmo ? selEmo + '한 마음' : '기분 미선택'}${s.form.category ? ' · ' + s.form.category : ''}`,
+      hasEmoSel: !!selEmo,
+      addBleedFaint: css(`position:absolute;inset:0;z-index:-1;border-radius:26px;pointer-events:none;transition:background .55s ease;background:${selEmo ? `radial-gradient(130% 78% at 50% -12%,${accentHex}1a,transparent 62%)` : 'transparent'}`),
+      amountLabel: isExp ? '얼마를 썼어요?' : '얼마가 들어왔어요?',
+      addBleed: css(`position:absolute;inset:0;z-index:-1;border-radius:24px;pointer-events:none;transition:background .55s ease;background:${selEmo ? `radial-gradient(120% 88% at 60% -8%,${accentHex}42,transparent 60%),radial-gradient(85% 70% at 100% 12%,${accentHex}24,transparent 60%)` : 'transparent'}`),
+      saveLabel: canSave ? '기록하기' : (s.form.amount === '' && !selEmo) ? '금액과 기분을 골라줘' : (s.form.amount === '') ? '금액을 입력해줘' : '기분을 골라줘',
+      saveStyle: css(`width:100%;border:none;border-radius:16px;padding:17px;font-size:16px;font-weight:700;transition:all .35s ease;cursor:${canSave ? 'pointer' : 'not-allowed'};background:${canSave ? accentHex : 'var(--line)'};color:${canSave ? '#fff' : 'var(--sub)'};box-shadow:${canSave ? '0 10px 28px ' + accentHex + '55' : 'none'}`),
+      amountFieldStyle: css(`display:flex;align-items:center;gap:10px;width:100%;background:var(--field, var(--card));border:1.5px solid ${s.form.amount ? accentHex : 'var(--line)'};border-radius:16px;padding:0 22px;height:84px;transition:border-color .3s ease`),
+      amountInputStyle: css(`flex:1;min-width:0;text-align:right;font-size:clamp(30px,4.4vw,48px);font-weight:800;border:none;background:transparent;outline:none;letter-spacing:-.02em;font-variant-numeric:tabular-nums;caret-color:transparent;color:${s.form.amount ? (isExp ? 'var(--text)' : '#3E9578') : 'var(--sub)'}`),
+      caretStyle: css(`width:2px;height:34px;flex-shrink:0;border-radius:2px;background:${accentHex};animation:caretBlink 1.1s steps(1) infinite`),
+      amountUnderline: css(`height:3px;width:150px;margin:16px auto 0;border-radius:3px;background:${accentHex};opacity:${s.form.amount ? '1' : '.3'};transition:all .35s ease`),
+      tabExpense: css(tabBase + `background:${isExp ? 'var(--card2)' : 'transparent'};color:${isExp ? 'var(--text)' : 'var(--sub)'};box-shadow:${isExp ? '0 2px 10px rgba(0,0,0,.07)' : 'none'}`),
+      tabIncome: css(tabBase + `background:${!isExp ? 'var(--card2)' : 'transparent'};color:${!isExp ? '#3E9578' : 'var(--sub)'};box-shadow:${!isExp ? '0 2px 10px rgba(0,0,0,.07)' : 'none'}`),
+      setTypeExpense: () => setForm('type', 'expense'), setTypeIncome: () => setForm('type', 'income'),
+      setAmount: (e) => setForm('amount', e.target.value.replace(/[^0-9]/g, '').slice(0, 10)), setMemo: (e) => setForm('memo', e.target.value), setDate: (e) => setForm('date', e.target.value),
+      addCats: this.CATS.map(c => ({ name: c, onClick: () => setForm('category', s.form.category === c ? null : c), style: chip(s.form.category === c) })),
+      addEmos: this.EMO.map(e => { const on = selEmo === e.k; return { k: e.k, onClick: () => setForm('emotion', on ? null : e.k), size: on ? 122 : 92, col: css('display:flex;flex-direction:column;align-items:center;gap:1px;cursor:pointer;width:clamp(78px,8.4vw,112px)'), box: css(`height:104px;display:grid;place-items:end center;filter:${selEmo && !on ? 'saturate(.55) opacity(.42)' : 'none'};transition:filter .28s ease`), label: css(`font-size:13px;font-weight:${on ? 800 : 600};color:${on ? 'var(--text)' : 'var(--sub)'};transition:all .2s`) }; }),
+      addSits: this.SITS.map(x => ({ name: x, onClick: () => setForm('sits', s.form.sits.includes(x) ? s.form.sits.filter(y => y !== x) : [...s.form.sits, x]), style: chip(s.form.sits.includes(x)) })),
+      saveNewTxn: () => { if (!canSave) { this.t(s.form.amount === '' ? '금액을 입력해줘' : '기분을 골라줘'); return; } const info = `${Number(s.form.amount).toLocaleString()}원 · ${selEmo}`; this.setState({ saved: true, savedInfo: info, savedEmo: selEmo }); clearTimeout(this._st); this._st = setTimeout(() => this.setState(st => ({ saved: false, form: { type: st.form.type, amount: '', category: null, emotion: null, sits: [], memo: '', date: st.form.date } })), 1600); },
+      resetForm: () => { this.setState({ form: { type: 'expense', amount: '', category: null, emotion: null, sits: [], memo: '', date: '2026-07-01T21:30' } }); this.t('새로 기록해요'); },
+    };
+
+    // ---- transactions ----
+    const filtered = this.txns.filter(x => { if (s.txFilter === '지출') return x.amt < 0; if (s.txFilter === '수입') return x.amt > 0; if (s.txFilter === '감정소비') return x.amt < 0 && ['스트레스', '외로움', '화남'].includes(x.emo); return true; });
+    const byDate = {}; filtered.forEach(x => { (byDate[x.date] = byDate[x.date] || []).push(x); });
+    const openDetail = (x) => set({ sel: x, modal: 'txnDetail' });
+    const txnGroups = Object.keys(byDate).sort().reverse().map(date => { const items = byDate[date]; const tot = items.reduce((aa, b) => aa + b.amt, 0); return { label: this.dateLabel(date), total: (tot >= 0 ? '+' : '-') + this.fmt(tot) + '원', items: items.map(x => { const em = this.emo(x.emo); return { ...x, emoColor: em.c, emoLight: em.c + '2B', amtStr: (x.amt >= 0 ? '+' : '-') + this.fmt(x.amt) + '원', amtColor: x.amt >= 0 ? '#3E9578' : 'var(--text)', onClick: () => openDetail(x) }; }) }; });
+    const tabStyle = (on) => css(`padding:7px 15px;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;background:${on ? 'var(--ink)' : 'transparent'};color:${on ? 'var(--onInk)' : 'var(--sub)'}`);
+    const filStyle = (on) => css(`padding:8px 15px;border-radius:99px;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;background:${on ? 'var(--ink)' : 'var(--card)'};color:${on ? 'var(--onInk)' : 'var(--sub)'};border:1px solid ${on ? 'var(--ink)' : 'var(--line)'}`);
+    const txn = {
+      txnSummary: [ { label: '이번 달 지출', value: '-486,700원', color: 'var(--text)' }, { label: '이번 달 수입', value: '+2,600,000원', color: '#3E9578' }, { label: '순지출', value: '+2,113,300원', color: 'var(--text)' }, { label: '감정소비', value: '-186,000원', color: '#7960b8' } ],
+      viewTabs: ['일별', '월별', '연간', '감정별'].map(n => ({ name: n, onClick: () => set({ txView: n }), style: tabStyle(s.txView === n) })),
+      filters: ['전체', '지출', '수입', '감정소비', '카테고리', '감정'].map(n => ({ name: n, onClick: () => set({ txFilter: n }), style: filStyle(s.txFilter === n) })),
+      txnGroups,
+    };
+
+    // ---- analysis (감정 리포트) — editorial redesign ----
+    const leak = { pct: 38, comment: '이번 달은 스트레스 소비가 줄었지만, 밤 시간대 배달 소비는 아직 반복되고 있어요.' };
+    // 01 · 마음의 지분 — emotion river + ranked list
+    const EMODESC = { 스트레스: '바쁜 하루 끝의 충동', 외로움: '혼자인 밤의 위로', 설렘: '기대가 이끈 지출', 평온: '기분 좋은 여유' };
+    const EMOAMT = { 스트레스: 80000, 외로움: 52000, 설렘: 39000, 평온: 15000 };
+    const distDefs = [['스트레스', 43], ['외로움', 28], ['설렘', 21], ['평온', 8]];
+    const riverSegs = distDefs.map(([k, p]) => ({ k, seg: css(`height:100%;width:${p}%;background:${this.emo(k).c};transition:width .5s ease`) }));
+    const emoDist = distDefs.map(([k, p]) => ({ k, pct: p + '%', c: this.emo(k).c, dot: css(`width:11px;height:11px;border-radius:50%;background:${this.emo(k).c};flex-shrink:0`), desc: EMODESC[k], amt: this.fmt(EMOAMT[k]) + '원' }));
+    // 02 · 어디에 마음이 샜나 — category bars tinted by dominant emotion
+    const catRank = [['배달', 82000, 43, '스트레스'], ['카페', 54000, 28, '설렘'], ['쇼핑', 39000, 21, '설렘'], ['편의점', 15000, 8, '평온']];
+    const crMax = 82000;
+    const catBars = catRank.map(([k, v, p, emo]) => { const c = this.emo(emo).c; return { k, amt: this.fmt(v) + '원', pct: p + '%', chip: emo, chipStyle: css(`font-size:10.5px;font-weight:600;padding:2px 9px;border-radius:99px;white-space:nowrap;color:${this.emo(emo).t};background:${c}26`), bar: css(`height:100%;width:${(v / crMax * 100).toFixed(0)}%;background:linear-gradient(90deg,${c}9e,${c});border-radius:99px`) }; });
+    // 03 · 언제 흔들렸나 — smooth day ridge
+    const timeDefs = [['아침', 12], ['점심', 24], ['저녁', 31], ['밤', 33]];
+    const tn = timeDefs.length, tmaxV = 40, baseY = 90, topY = 16;
+    const tpts = timeDefs.map(([k, v], i) => { const x = ((i + 0.5) / tn) * 100; const y = baseY - (v / tmaxV) * (baseY - topY); return { x, y, v, k, peak: i === tn - 1 }; });
+    const curves = tpts.slice(1).map((p, idx) => { const pp = tpts[idx]; const mx = ((pp.x + p.x) / 2).toFixed(1); return `C${mx},${pp.y.toFixed(1)} ${mx},${p.y.toFixed(1)} ${p.x.toFixed(1)},${p.y.toFixed(1)}`; }).join(' ');
+    const head = `M0,${tpts[0].y.toFixed(1)} L${tpts[0].x.toFixed(1)},${tpts[0].y.toFixed(1)} ${curves} L100,${tpts[tn - 1].y.toFixed(1)}`;
+    const ridgeLine = head;
+    const ridgeArea = head + ` L100,${baseY} L0,${baseY} Z`;
+    const ridgeCols = tpts.map(p => ({ k: p.k, pct: p.v + '%', peak: p.peak,
+      dot: css(`position:absolute;left:${p.x.toFixed(1)}%;bottom:${(100 - p.y).toFixed(1)}%;transform:translate(-50%,50%);width:${p.peak ? 13 : 8}px;height:${p.peak ? 13 : 8}px;border-radius:50%;background:${p.peak ? '#9E96EE' : 'var(--card2)'};border:2px solid ${p.peak ? '#fff' : '#9E96EE'};box-shadow:${p.peak ? '0 3px 10px rgba(158,150,238,.5)' : 'none'};z-index:2`),
+      lbl: css(`font-size:12px;font-weight:${p.peak ? 700 : 600};color:${p.peak ? '#6A61C4' : 'var(--sub)'}`) }));
+    // 04 · 반복되는 마음의 습관 — loop + receipts
+    const evidence = [['6월 12일', '배달', '스트레스', '퇴근 후', 23000], ['6월 18일', '편의점', '스트레스', '밤', 8400], ['6월 22일', '배달', '스트레스', '혼자 있음', 18000]];
+    const evRows = evidence.map(([d, cat, emo, sit, amt]) => ({ d, cat, emo, sit, amt: '₩' + this.fmt(amt), dot: css(`width:8px;height:8px;border-radius:50%;flex-shrink:0;background:${this.emo(emo).c}`), emoChip: css(`font-size:10.5px;font-weight:600;padding:2px 8px;border-radius:99px;white-space:nowrap;color:${this.emo(emo).t};background:${this.emo(emo).c}26`) }));
+    const nextAct = { save: '41,000원', bar: css('height:100%;width:62%;background:linear-gradient(90deg,#86C9FF,#82E2C2);border-radius:99px') };
+    // KPI strip — standard ledger stats
+    const kpiDefs = [
+      { label: '총 지출', value: '486,700', unit: '원', tone: 'var(--text)', sub: '지난달 대비 -2.6%', subC: '#3E9578' },
+      { label: '총 수입', value: '2,600,000', unit: '원', tone: 'var(--text)', sub: '고정 급여', subC: 'var(--sub)' },
+      { label: '이번 달 순액', value: '+2,113,300', unit: '원', tone: '#3E9578', sub: '흑자 유지 중', subC: 'var(--sub)' },
+      { label: '감정소비', value: '186,000', unit: '원', tone: '#7960b8', sub: '전체 지출의 38%', subC: '#7960b8' },
+    ];
+    const kpis = kpiDefs.map(k => ({ ...k, box: css(addCardBase + ';padding:20px 22px;display:flex;flex-direction:column;gap:6px') }));
+    // 월별 지출 추이 — standard trend chart
+    const monDefs = [['2월', 392], ['3월', 445], ['4월', 418], ['5월', 502], ['6월', 473], ['7월', 487]];
+    const monMax = 520;
+    const monBars = monDefs.map(([k, v], i) => { const cur = i === monDefs.length - 1; return { k, cur, amt: (v / 100).toFixed(1) + '만',
+      col: css('display:flex;flex-direction:column;align-items:center;flex:1;justify-content:flex-end;height:100%;gap:0'),
+      bar: css(`width:72%;max-width:34px;border-radius:7px 7px 3px 3px;height:${(v / monMax * 100).toFixed(0)}%;min-height:6px;background:${cur ? 'linear-gradient(180deg,#9E96EE,#B7B0F2)' : 'var(--line)'};transition:height .5s`),
+      lbl: css(`font-size:11px;font-weight:${cur ? 700 : 600};color:${cur ? 'var(--text)' : 'var(--sub)'};margin-top:9px`),
+      val: css(`font-size:10px;font-weight:600;color:${cur ? '#6A61C4' : 'var(--sub)'};margin-bottom:7px;opacity:${cur ? 1 : .6}`) }; });
+    const anal = { leak, riverSegs, emoDist, catBars, ridgeLine, ridgeArea, ridgeCols, evRows, nextAct, kpis, monBars,
+      // parallel universe
+      projBars: [['1월', 18, 11], ['2월', 36, 21], ['3월', 55, 30], ['4월', 74, 38], ['5월', 92, 46], ['6월', 112, 52]].map(([k, now, alt]) => ({ k,
+        nowBar: css(`width:42%;max-width:16px;border-radius:5px 5px 2px 2px;height:${(now / 120 * 100).toFixed(0)}%;background:linear-gradient(180deg,#C9C3DB,#A49FB6)`),
+        altBar: css(`width:42%;max-width:16px;border-radius:5px 5px 2px 2px;height:${(alt / 120 * 100).toFixed(0)}%;background:linear-gradient(180deg,#8FDAC0,#3E9578)`) })),
+      scenarios: [
+        { lever: '밤 배달 주 2회 → 1회', emo: '스트레스', save: '+38,000', note: '가장 큰 누수예요' },
+        { lever: '습관성 카페 절반으로', emo: '설렘', save: '+16,000', note: '작지만 매일 쌓여요' },
+        { lever: '충동 쇼핑 하루만 참기', emo: '설렘', save: '+24,000', note: '주말에 몰려요' },
+      ].map(x => ({ ...x, chip: css(`font-size:10.5px;font-weight:600;padding:2px 9px;border-radius:99px;white-space:nowrap;color:${this.emo(x.emo).t};background:${this.emo(x.emo).c}26`), card: css(addCardBase + ';padding:20px 22px;display:flex;flex-direction:column;gap:11px') })),
+      analMast: css(addCardBase + ';padding:clamp(26px,3vw,40px);position:relative;overflow:hidden;isolation:isolate'),
+      analBleed: css('position:absolute;top:-130px;right:-70px;width:360px;height:360px;border-radius:50%;background:radial-gradient(circle,rgba(158,150,238,.42),transparent 66%);filter:blur(26px);z-index:-1;pointer-events:none'),
+      analCardGrid: css(isMobile ? 'display:flex;flex-direction:column;gap:20px' : 'display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:stretch'),
+    };
+
+    // ---- settings ----
+    const settingsList = [
+      { name: '프로필 수정', hint: '서연', onClick: () => openM('profileEdit') },
+      { name: '목표 관리', hint: this.goals.length + '개', onClick: () => openM('goals') },
+      { name: '태그 관리', hint: '', onClick: () => openM('tags') },
+      { name: '알림 설정', hint: '', onClick: () => openM('noti') },
+      { name: '화면 · 오로라', hint: s.mode === 'dark' ? '다크 · ' + s.aurora : s.aurora, onClick: () => openM('aurora') },
+      { name: '데이터 관리', hint: '', onClick: () => openM('data') },
+      { name: '계정 관리', hint: '', onClick: () => openM('account') },
+    ];
+    const settings = { settingsList, backToProfile: () => openM('profile'), openGoals: () => openM('goals'), openTags: () => openM('tags'), saveGeneric: () => { this.t('변경 사항을 저장했어요'); openM('profile'); } };
+
+    const goalCards = this.goals.map(g => { const pct = Math.round(g.cur / g.tgt * 100); return { name: g.name, primary: g.primary, bar: css(`height:100%;width:${pct}%;background:linear-gradient(90deg,#76A7E8,#83C9B0);border-radius:99px`), cur: this.fmt(g.cur) + '원', tgt: this.fmt(g.tgt) + '원', range: `${g.start} – ${g.end}`, onEdit: () => set({ goalMode: 'edit', modal: 'goalForm' }), onDelete: () => set({ confirmKind: 'goal', modal: 'confirm' }) }; });
+    const goalM = { goalCards, openGoalAdd: () => set({ goalMode: 'add', modal: 'goalForm' }), goalFormTitle: s.goalMode === 'add' ? '목표 추가' : '목표 수정', goalFormName: s.goalMode === 'edit' ? '제주도 여행' : '', goalFormTgt: s.goalMode === 'edit' ? '2,000,000' : '', goalFormCur: s.goalMode === 'edit' ? '1,240,000' : '', saveGoal: () => { this.t(s.goalMode === 'add' ? '목표를 추가했어요' : '목표를 수정했어요'); openM('goals'); } };
+
+    const emoTags = this.EMO.map(e => ({ k: e.k, c: e.c, light: e.c + '2B' }));
+    const userTagRows = this.userTags.map(t => ({ name: t.name, color: t.color, onEdit: () => set({ tagMode: 'edit', tagColor: t.color, modal: 'tagForm' }), onDelete: () => set({ confirmKind: 'tag', modal: 'confirm' }) }));
+    const tagPalette = this.EMO.map(e => e.c);
+    const tagM = { emoTags, userTags: userTagRows, openTags: () => openM('tags'), openTagAdd: () => set({ tagMode: 'add', tagColor: this.EMO[1].c, modal: 'tagForm' }), tagFormTitle: s.tagMode === 'add' ? '태그 추가' : '태그 수정', tagFormName: s.tagMode === 'edit' ? '야근' : '', tagColors: tagPalette.map(c => ({ onClick: () => set({ tagColor: c }), style: css(`width:38px;height:38px;border-radius:50%;cursor:pointer;background:${c};border:3px solid ${s.tagColor === c ? 'var(--ink)' : 'transparent'};box-shadow:0 0 0 1px var(--line)`) })), saveTag: () => { this.t(s.tagMode === 'add' ? '태그를 추가했어요' : '태그를 수정했어요'); openM('tags'); } };
+
+    const track = (on) => css(`width:46px;height:27px;border-radius:99px;cursor:pointer;position:relative;transition:background .2s;background:${on ? 'var(--ink)' : 'var(--line)'}`);
+    const knob = (on) => css(`position:absolute;top:3px;left:${on ? 22 : 3}px;width:21px;height:21px;border-radius:50%;background:#fff;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)`);
+    const notiM = { notiRows: [ { name: '기록 리마인드', desc: '매일 지정 시간에 기록을 권해요', key: 'remind' }, { name: '감정소비 경고', desc: '패턴이 반복되면 알려줘요', key: 'warn' }, { name: '월간 리포트', desc: '한 달 감정소비를 정리해드려요', key: 'report' } ].map(r => ({ name: r.name, desc: r.desc, track: track(s.noti[r.key]), knob: knob(s.noti[r.key]), onToggle: () => this.setState(st => ({ noti: { ...st.noti, [r.key]: !st.noti[r.key] } })) })) };
+
+    const auroraCards = Object.keys(this.AURORAS).map(name => { const cs = this.AURORAS[name]; const on = s.aurora === name; return { name, c0: cs[0], c1: cs[1], c2: cs[2], onClick: () => set({ aurora: name }), wrap: css(`display:flex;align-items:center;gap:8px;padding:13px 15px;border-radius:16px;cursor:pointer;background:var(--card);border:2px solid ${on ? 'var(--ink)' : 'var(--line)'}`) }; });
+    const auroraM = { auroraCards, darkTrack: track(s.mode === 'dark'), darkKnob: knob(s.mode === 'dark') };
+
+    const confirmMeta = { txn: { title: '이 기록을 삭제할까요?', body: '삭제하면 이 거래와 감정 기록이 함께 사라져요.', cta: '삭제' }, goal: { title: '이 목표를 삭제할까요?', body: '목표와 진행 상황이 사라져요. 되돌릴 수 없어요.', cta: '삭제' }, tag: { title: '이 태그를 삭제할까요?', body: '이 태그가 붙은 기록에서는 태그만 제거돼요.', cta: '삭제' }, data: { title: '모든 기록을 초기화할까요?', body: '거래·감정·목표가 전부 사라져요. 되돌릴 수 없어요.', cta: '초기화' } };
+    const cm = confirmMeta[s.confirmKind] || confirmMeta.txn;
+    const dataM = {
+      askDataReset: () => set({ confirmKind: 'data', modal: 'confirm' }), confirmTitle: cm.title, confirmBody: cm.body, confirmCta: cm.cta,
+      confirmCancel: () => set({ modal: ({ txn: 'txnDetail', goal: 'goals', tag: 'tags', data: 'data' })[s.confirmKind] || null }),
+      confirmProceed: () => { this.t(({ txn: '기록을 삭제했어요', goal: '목표를 삭제했어요', tag: '태그를 삭제했어요', data: '모든 기록을 초기화했어요' })[s.confirmKind] || '삭제했어요'); if (s.confirmKind === 'txn') set({ modal: null, route: 'txns' }); else set({ modal: ({ goal: 'goals', tag: 'tags', data: 'data' })[s.confirmKind] }); },
+    };
+
+    const wdReasons = ['기대했던 기능이 없어요', '감정 기록이 부담돼요', '다른 앱을 쓰게 됐어요', '개인정보가 걱정돼요'];
+    const wdOk = s.wdText.trim() === '탈퇴합니다';
+    const wdM = {
+      startWithdraw: () => set({ modal: 'withdraw', wd: 0, wdText: '', wdReason: null }),
+      wd0: s.wd === 0, wd1: s.wd === 1, wd2: s.wd === 2, wd3: s.wd === 3,
+      wdNext: () => set({ wd: s.wd + 1 }), wdPrev: () => set({ wd: Math.max(0, s.wd - 1) }),
+      wdText: s.wdText, setWdText: (e) => set({ wdText: e.target.value }),
+      wdReasons: wdReasons.map(r => ({ name: r, onClick: () => set({ wdReason: r }), style: css(`display:flex;align-items:center;gap:11px;padding:14px 16px;border-radius:14px;cursor:pointer;font-size:14px;font-weight:600;background:var(--card);border:1px solid ${s.wdReason === r ? 'var(--ink)' : 'var(--line)'}`), dot: css(`width:18px;height:18px;border-radius:50%;border:2px solid ${s.wdReason === r ? 'var(--ink)' : 'var(--sub)'};background:${s.wdReason === r ? 'var(--ink)' : 'transparent'};flex-shrink:0`) })),
+      wdFinalStyle: css(`flex:1;border:none;border-radius:14px;padding:14px;font-size:14.5px;font-weight:600;cursor:${wdOk ? 'pointer' : 'not-allowed'};background:${wdOk ? '#E87573' : 'var(--line)'};color:${wdOk ? '#fff' : 'var(--sub)'}`),
+      confirmWithdraw: () => { if (wdOk) set({ wd: 3 }); },
+    };
+
+    const sel = s.sel || this.txns[0];
+    const txnDM = {
+      selEmo: sel.emo, selAmtStr: (sel.amt >= 0 ? '+' : '-') + this.fmt(sel.amt) + '원', selAmtColor: sel.amt >= 0 ? '#3E9578' : 'var(--text)', selAmtRaw: this.fmt(sel.amt), selCat: sel.cat, selSit: sel.sit, selMemo: sel.memo,
+      selRows: [ { label: '구분', value: sel.amt >= 0 ? '수입' : '지출' }, { label: '카테고리', value: sel.cat }, { label: '감정', value: sel.emo }, { label: '상황', value: sel.sit }, { label: '메모', value: sel.memo }, { label: '날짜', value: `${this.dateLabel(sel.date)} ${sel.time}` } ],
+      editEmos: this.EMO.map(e => ({ k: e.k, onClick: () => {}, wrap: css(`display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;padding:6px 0;border-radius:12px;transition:all .15s;background:${sel.emo === e.k ? e.c + '33' : 'transparent'};border:1px solid ${sel.emo === e.k ? e.c : 'transparent'}`) })),
+      openTxnEdit: () => openM('txnEdit'), openTxnDetailBack: () => openM('txnDetail'), askTxnDelete: () => set({ confirmKind: 'txn', modal: 'confirm' }), saveTxnEdit: () => { this.t('거래를 수정했어요'); openM('txnDetail'); },
+    };
+
+    const wideModals = { profile: '460px', txnDetail: '440px', txnEdit: '520px', confirm: '400px', aurora: '480px', withdraw: '440px' };
+    const modalWidth = wideModals[s.modal] || '460px';
+    const m = {}; ['profile', 'profileEdit', 'goals', 'goalForm', 'tags', 'tagForm', 'noti', 'aurora', 'data', 'account', 'withdraw', 'txnDetail', 'txnEdit', 'confirm'].forEach(k => { m[k] = s.modal === k; });
+
+    return {
+      ...R, ...aurora, ...nav, ...ob, ...goalMeta, ...home, ...add, ...txn, ...anal, ...settings, ...goalM, ...tagM, ...notiM, ...auroraM, ...dataM, ...wdM, ...txnDM,
+      navHome: navStyle(s.route === 'home'), navAdd: navStyle(s.route === 'add'), navTxns: navStyle(s.route === 'txns'), navAnal: navStyle(s.route === 'anal'), navUniv: navStyle(s.route === 'univ'),
+      tabHome: tabStyleNav(s.route === 'home'), tabAdd: tabStyleNav(s.route === 'add'), tabTxns: tabStyleNav(s.route === 'txns'), tabAnal: tabStyleNav(s.route === 'anal'), tabUniv: tabStyleNav(s.route === 'univ'),
+      m, modalWidth,
+    };
+  }
+}
+</script>
+</body>
+</html>

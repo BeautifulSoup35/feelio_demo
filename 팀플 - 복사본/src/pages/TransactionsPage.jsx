@@ -1,199 +1,109 @@
+/** @jsxImportSource @emotion/react */
 import { useMemo, useState } from 'react';
-import GlassCard from '../components/common/GlassCard.jsx';
-import EmotionExpenseCard from '../components/home/EmotionExpenseCard.jsx';
-import { allTags } from '../constants/tags.js';
-import { formatKoreanDateWithWeekday, toDateKey, todayKey } from '../utils/date.js';
-import { formatMoney } from '../utils/money.js';
+import styled from '@emotion/styled';
+import { GlassCard } from '../components/common/GlassCard.jsx';
+import { getEmotion } from '../data/emotions.js';
+import { dayKey, money, signedMoney } from '../utils/format.js';
 
-const tagMap = new Map(allTags.map(tag => [tag.tagId, tag]));
-const monthlyBudget = 760000;
-const filterLabels = ['전체', '월급', '용돈', '카페', '구독', '쇼핑', '식비', '교통', '편의점', '배달'];
-const categoryIcons = {
-  배달: '🍜',
-  카페: '☕',
-  쇼핑: '🛍',
-  택시: '🚕',
-  편의점: '🏪',
-  구독: '◼',
-  식비: '🍚',
-  교통: '🚕',
-  월급: '↥',
-  용돈: '＋',
-  기타: '•'
-};
+const Wrap = styled.div`
+  width: min(100%, 1120px);
+  margin: 0 auto;
+`;
 
-function tagNames(transaction, type) {
-  return transaction.tags
-    .map(tagId => tagMap.get(tagId))
-    .filter(tag => tag?.type === type)
-    .map(tag => tag.name);
-}
+const Summary = styled.div`
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 18px;
 
-function categoryName(transaction) {
-  return transaction.tags
-    .map(tagId => tagMap.get(tagId))
-    .find(tag => tag?.type === 'EXPENSE_CATEGORY' || tag?.type === 'INCOME_CATEGORY')?.name || transaction.title;
-}
+  @media (max-width: 760px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+`;
 
-function monthLabel(monthKey) {
-  const [year, month] = monthKey.split('-');
-  return `${year}년 ${Number(month)}월`;
-}
+const Tools = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 16px;
+`;
 
-function shiftMonth(monthKey, diff) {
-  const [year, month] = monthKey.split('-').map(Number);
-  const date = new Date(year, month - 1 + diff, 1);
-  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-}
+const Pill = styled.button`
+  border: 1px solid ${({ active }) => active ? 'var(--ink)' : 'var(--line)'};
+  border-radius: 999px;
+  padding: 9px 14px;
+  background: ${({ active }) => active ? 'var(--ink)' : 'var(--card)'};
+  color: ${({ active }) => active ? 'var(--on-ink)' : 'var(--text)'};
+  cursor: pointer;
+  font-weight: 800;
+`;
 
-function groupByDate(transactions) {
-  return transactions.reduce((groups, transaction) => {
-    const key = toDateKey(transaction.transactionAt);
-    if (!groups[key]) groups[key] = [];
-    groups[key].push(transaction);
-    return groups;
-  }, {});
-}
+const Group = styled.div`
+  margin-top: 22px;
+`;
 
-export default function TransactionsPage({ state, onAddTransaction, onRemoveTransaction }) {
-  const [selectedMonth, setSelectedMonth] = useState(todayKey().slice(0, 7));
-  const [activeFilter, setActiveFilter] = useState('전체');
-  const monthlyTransactions = useMemo(() => (
-    state.transactions
-      .filter(item => toDateKey(item.transactionAt).slice(0, 7) === selectedMonth)
-      .sort((a, b) => new Date(b.transactionAt) - new Date(a.transactionAt))
-  ), [state.transactions, selectedMonth]);
-  const filteredTransactions = useMemo(() => (
-    activeFilter === '전체'
-      ? monthlyTransactions
-      : monthlyTransactions.filter(item => categoryName(item) === activeFilter)
-  ), [activeFilter, monthlyTransactions]);
-  const groupedTransactions = groupByDate(filteredTransactions);
-  const expenseTotal = monthlyTransactions
-    .filter(item => item.transactionType === 'EXPENSE')
-    .reduce((sum, item) => sum + item.amount, 0);
-  const incomeTotal = monthlyTransactions
-    .filter(item => item.transactionType === 'INCOME')
-    .reduce((sum, item) => sum + item.amount, 0);
-  const netBalance = incomeTotal - expenseTotal;
-  const remainingBudget = Math.max(0, monthlyBudget - expenseTotal);
+const Row = styled.button`
+  width: 100%;
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) max-content;
+  align-items: center;
+  gap: 14px;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  background: transparent;
+  padding: 15px 18px;
+  text-align: left;
+  cursor: pointer;
+
+  &:last-child { border-bottom: 0; }
+`;
+
+export default function TransactionsPage({ state, onSelect }) {
+  const [filter, setFilter] = useState('전체');
+  const filtered = state.transactions.filter(item => {
+    if (filter === '지출') return item.type === 'expense';
+    if (filter === '수입') return item.type === 'income';
+    if (filter === '감정소비') return item.type === 'expense' && ['스트레스', '외로움', '화남'].includes(item.emotion);
+    return true;
+  });
+  const expense = state.transactions.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
+  const income = state.transactions.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
+  const emotional = state.transactions.filter(t => t.type === 'expense' && ['스트레스', '외로움', '화남'].includes(t.emotion)).reduce((s, t) => s + t.amount, 0);
+  const groups = useMemo(() => filtered.reduce((map, item) => {
+    const key = dayKey(item.date);
+    map[key] = [...(map[key] || []), item];
+    return map;
+  }, {}), [filtered]);
 
   return (
-    <div className="pageGrid transactionsDashboard">
-      <div className="pageLead transactionsLead">
-        <div>
-          <p><span className="leadDot">◎</span> 감정과 함께 남기는 가계부</p>
-          <h1>지출 · 수입</h1>
-        </div>
-        <div className="monthStepper" aria-label="월 선택">
-          <button type="button" onClick={() => setSelectedMonth(prev => shiftMonth(prev, -1))}>‹</button>
-          <strong>{monthLabel(selectedMonth)}</strong>
-          <button type="button" onClick={() => setSelectedMonth(prev => shiftMonth(prev, 1))}>›</button>
-        </div>
-      </div>
-
-      <section className="transactionOverviewStrip" aria-label="이번 달 입출금 요약">
-        <article className="overviewPill expense">
-          <span>↓</span>
-          <div>
-            <small>지출</small>
-            <strong>{formatMoney(expenseTotal)}</strong>
-            <em>{monthlyTransactions.filter(item => item.transactionType === 'EXPENSE').length}건의 지출</em>
-          </div>
-        </article>
-        <article className="overviewPill">
-          <span>↥</span>
-          <div>
-            <small>수입</small>
-            <strong>{formatMoney(incomeTotal)}</strong>
-          </div>
-        </article>
-        <article className="overviewPill">
-          <span>▰</span>
-          <div>
-            <small>순 잔액</small>
-            <strong>{netBalance >= 0 ? '+' : ''}{formatMoney(netBalance)}</strong>
-          </div>
-        </article>
-        <article className="overviewPill">
-          <span>◎</span>
-          <div>
-            <small>남은 예산</small>
-            <strong>{formatMoney(remainingBudget)}</strong>
-          </div>
-        </article>
-      </section>
-
-      <div className="transactionsMain">
-        <EmotionExpenseCard onSubmit={onAddTransaction} />
-      </div>
-
-      <div className="transactionsAside">
-        <GlassCard className="transactionHistoryCard">
-          <div className="transactionHistoryHeader">
-            <div className="sectionTitle compact">
-              <strong>거래 내역</strong>
-            </div>
-            <span>{filteredTransactions.length}건</span>
-          </div>
-          <div className="transactionFilterChips" aria-label="거래 분류 필터">
-            {filterLabels.map(label => (
-              <button
-                key={label}
-                type="button"
-                className={activeFilter === label ? 'active' : ''}
-                onClick={() => setActiveFilter(label)}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-          <div className="transactionHistoryList">
-            {filteredTransactions.length > 0 ? Object.entries(groupedTransactions).map(([dateKey, transactions]) => {
-              const dailyExpense = transactions
-                .filter(item => item.transactionType === 'EXPENSE')
-                .reduce((sum, item) => sum + item.amount, 0);
+    <Wrap>
+      <Summary>
+        {[
+          ['이번 달 지출', `-${money(expense)}`, 'var(--text)'],
+          ['이번 달 수입', `+${money(income)}`, '#3E9578'],
+          ['순지출', `+${money(income - expense)}`, 'var(--text)'],
+          ['감정소비', `-${money(emotional)}`, '#7960b8']
+        ].map(([label, value, color]) => <GlassCard key={label} padding={18}><small css={{ color: 'var(--sub)', fontWeight: 800 }}>{label}</small><strong css={{ display: 'block', marginTop: 6, fontSize: 20, color }}>{value}</strong></GlassCard>)}
+      </Summary>
+      <Tools>{['전체', '지출', '수입', '감정소비', '카테고리', '감정'].map(item => <Pill key={item} active={filter === item} onClick={() => setFilter(item)}>{item}</Pill>)}</Tools>
+      {Object.entries(groups).map(([date, items]) => (
+        <Group key={date}>
+          <div css={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10, padding: '0 4px' }}><strong>{date}</strong><span css={{ color: 'var(--sub)', fontWeight: 800 }}>{money(items.reduce((s, t) => s + (t.type === 'expense' ? t.amount : 0), 0))}</span></div>
+          <GlassCard padding={0}>
+            {items.map(item => {
+              const emo = getEmotion(item.emotion);
               return (
-                <section className="transactionDateGroup" key={dateKey}>
-                  <div className="transactionDateHeader">
-                    <strong>{formatKoreanDateWithWeekday(`${dateKey}T00:00:00`)}</strong>
-                    <span>-{formatMoney(dailyExpense)}</span>
-                  </div>
-                  {transactions.map(transaction => {
-                    const emotions = tagNames(transaction, 'EMOTION');
-                    const situations = tagNames(transaction, 'SITUATION');
-                    const category = categoryName(transaction);
-                    return (
-                      <article className="transactionHistoryItem" key={transaction.transactionId}>
-                        <span className="transactionCategoryIcon">{categoryIcons[category] || categoryIcons.기타}</span>
-                        <div>
-                          <strong>{transaction.memo || category}</strong>
-                          <small>{category} · {[...emotions, ...situations].map(name => `#${name}`).join(' ') || '태그 없음'}</small>
-                        </div>
-                        <b className={transaction.transactionType === 'INCOME' ? 'income' : ''}>
-                          {transaction.transactionType === 'INCOME' ? '+' : '-'}{formatMoney(transaction.amount)}
-                        </b>
-                        <button
-                          type="button"
-                          className="transactionDeleteButton"
-                          onClick={() => onRemoveTransaction?.(transaction.transactionId)}
-                          aria-label={`${category} 기록 삭제`}
-                        >
-                          삭제
-                        </button>
-                      </article>
-                    );
-                  })}
-                </section>
+                <Row key={item.id} onClick={() => onSelect(item)}>
+                  <span css={{ width: 40, height: 40, borderRadius: 12, display: 'grid', placeItems: 'center', background: emo.light }}><i css={{ width: 15, height: 15, borderRadius: '50%', background: emo.color }} /></span>
+                  <span css={{ minWidth: 0 }}><strong>{item.category}</strong><small css={{ display: 'block', color: 'var(--sub)', marginTop: 3 }}>{item.emotion} · {item.situation} · {item.memo}</small></span>
+                  <b css={{ color: item.type === 'income' ? '#3E9578' : 'var(--text)' }}>{signedMoney(item)}</b>
+                </Row>
               );
-            }) : (
-              <div className="transactionEmpty">
-                선택한 달 또는 필터에 해당하는 거래가 없어요.
-              </div>
-            )}
-          </div>
-        </GlassCard>
-      </div>
-    </div>
+            })}
+          </GlassCard>
+        </Group>
+      ))}
+    </Wrap>
   );
 }
+

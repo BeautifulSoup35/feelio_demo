@@ -60,7 +60,7 @@ const NavButton = styled.button`
   background: ${({ active }) => active ? 'var(--card-strong)' : 'transparent'};
   color: ${({ active }) => active ? 'var(--text)' : 'var(--sub)'};
   font-size: 14.5px;
-  font-weight: 800;
+  font-weight: 700;
   text-align: left;
   cursor: pointer;
   box-shadow: ${({ active }) => active ? '0 12px 28px rgba(0,0,0,.06)' : 'none'};
@@ -101,7 +101,7 @@ const Profile = styled.button`
   }
 `;
 
-export function Sidebar({ route, onRoute, user, onProfile }) {
+export function SidebarDc({ route, onRoute, user, onProfile }) {
   return (
     <Aside>
       <Brand>
