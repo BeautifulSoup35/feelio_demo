@@ -294,23 +294,33 @@ export default function AnalysisPageDc() {
       <Card>
         <div css={{ display: 'flex', alignItems: 'center', gap: 9, marginBottom: 6 }}><span css={{ width: 24, height: 24, borderRadius: 8, background: 'var(--ink)', color: 'var(--on-ink)', display: 'grid', placeItems: 'center', fontSize: 10, fontWeight: 900 }}>AI</span><b>반복되는 감정소비 패턴</b></div>
         <p css={{ color: 'var(--sub)', fontSize: 12.5, margin: '0 0 22px' }}>AI가 이번 달에 찾은 반복 조합이에요</p>
-        <div css={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', marginBottom: 22 }}>
-          <span css={{ display: 'inline-flex', alignItems: 'center', gap: 7, fontWeight: 900, background: '#9E96EE22', color: '#4A4299', padding: '11px 17px', borderRadius: 14 }}><i css={{ width: 9, height: 9, borderRadius: '50%', background: '#9E96EE' }} />스트레스</span>
-          <span css={{ color: 'var(--sub)' }}>→</span><span css={{ fontWeight: 800, background: 'var(--card)', border: '1px solid var(--line)', padding: '11px 17px', borderRadius: 14 }}>배달</span>
-          <span css={{ color: 'var(--sub)' }}>→</span><span css={{ fontWeight: 800, background: 'var(--card)', border: '1px solid var(--line)', padding: '11px 17px', borderRadius: 14 }}>밤 10시 이후</span>
-          <span css={{ marginLeft: 'auto' }}><b css={{ fontSize: 22, color: '#6A61C4' }}>7</b><span css={{ color: 'var(--sub)', fontSize: 12, fontWeight: 800 }}> 번 반복</span></span>
-        </div>
-        <div css={{ background: '#9E96EE14', borderRadius: 16, padding: '15px 18px', marginBottom: 22, fontWeight: 800 }}>스트레스 받은 밤, 배달로 마음을 달래고 있었어요. 그 순간을 조금만 알아채도 충분해요.</div>
-        <div css={{ border: '1px solid var(--line)', borderRadius: 16, overflow: 'hidden', background: 'var(--card)' }}>
-          <div css={{ display: 'grid', gridTemplateColumns: '84px 1fr auto', gap: 14, padding: '11px 18px', fontSize: 11, color: 'var(--sub)', fontWeight: 900, borderBottom: '1px solid var(--line)' }}><span>날짜</span><span>내역</span><span>금액</span></div>
-          {evidence.map(([date, category, emotion, situation, amount]) => {
-            const emo = getEmotion(emotion);
-            return <div key={date} css={{ display: 'grid', gridTemplateColumns: '84px 1fr auto', gap: 14, alignItems: 'center', padding: '14px 18px', borderBottom: '1px solid var(--line)' }}>
-              <span css={{ color: 'var(--sub)', fontSize: 12, fontWeight: 800 }}>{date}</span>
-              <div css={{ display: 'flex', alignItems: 'center', gap: 9, minWidth: 0 }}><span css={{ width: 8, height: 8, borderRadius: '50%', background: emo.color }} /><b>{category} <span css={{ color: 'var(--sub)', fontWeight: 600 }}>· {situation}</span></b><span css={{ color: emo.text || emo.color, background: `${emo.color}26`, borderRadius: 99, padding: '2px 8px', fontSize: 11, fontWeight: 800 }}>{emotion}</span></div>
-              <b>{amount}</b>
-            </div>;
-          })}
+        
+        <div css={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: 30, alignItems: 'start' }}>
+          {/* 왼쪽: 패턴 요약 */}
+          <div>
+            <div css={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', marginBottom: 22 }}>
+              <span css={{ display: 'inline-flex', alignItems: 'center', gap: 7, fontWeight: 900, background: '#9E96EE22', color: '#4A4299', padding: '11px 17px', borderRadius: 14 }}><i css={{ width: 9, height: 9, borderRadius: '50%', background: '#9E96EE' }} />스트레스</span>
+              <span css={{ color: 'var(--sub)' }}>→</span><span css={{ fontWeight: 800, background: 'var(--card)', border: '1px solid var(--line)', padding: '11px 17px', borderRadius: 14 }}>배달</span>
+              <span css={{ color: 'var(--sub)' }}>→</span><span css={{ fontWeight: 800, background: 'var(--card)', border: '1px solid var(--line)', padding: '11px 17px', borderRadius: 14 }}>밤 10시 이후</span>
+            </div>
+            <div css={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 22 }}>
+              <span css={{ color: '#6A61C4', fontSize: 24, fontWeight: 900 }}>7</span><span css={{ color: 'var(--sub)', fontSize: 14, fontWeight: 800 }}>번 반복</span>
+            </div>
+            <div css={{ background: '#9E96EE14', borderRadius: 16, padding: '15px 18px', fontWeight: 800, lineHeight: 1.6 }}>스트레스 받은 밤, 배달로 마음을 달래고 있었어요. 그 순간을 조금만 알아채도 충분해요.</div>
+          </div>
+
+          {/* 오른쪽: 내역 리스트 */}
+          <div css={{ border: '1px solid var(--line)', borderRadius: 16, overflow: 'hidden', background: 'var(--card)' }}>
+            <div css={{ display: 'grid', gridTemplateColumns: '84px 1fr auto', gap: 14, padding: '11px 18px', fontSize: 11, color: 'var(--sub)', fontWeight: 900, borderBottom: '1px solid var(--line)' }}><span>날짜</span><span>내역</span><span>금액</span></div>
+            {evidence.map(([date, category, emotion, situation, amount]) => {
+              const emo = getEmotion(emotion);
+              return <div key={date} css={{ display: 'grid', gridTemplateColumns: '84px 1fr auto', gap: 14, alignItems: 'center', padding: '14px 18px', borderBottom: '1px solid var(--line)' }}>
+                <span css={{ color: 'var(--sub)', fontSize: 12, fontWeight: 800 }}>{date}</span>
+                <div css={{ display: 'flex', alignItems: 'center', gap: 9, minWidth: 0 }}><span css={{ width: 8, height: 8, borderRadius: '50%', background: emo.color }} /><b>{category} <span css={{ color: 'var(--sub)', fontWeight: 600 }}>· {situation}</span></b><span css={{ color: emo.text || emo.color, background: `${emo.color}26`, borderRadius: 99, padding: '2px 8px', fontSize: 11, fontWeight: 800 }}>{emotion}</span></div>
+                <b>{amount}</b>
+              </div>;
+            })}
+          </div>
         </div>
       </Card>
     </Page>

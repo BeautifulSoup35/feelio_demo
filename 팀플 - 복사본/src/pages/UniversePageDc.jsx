@@ -12,6 +12,36 @@ const Page = styled.div`
   gap: 20px;
 `;
 
+const ContentLayout = styled.div`
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, .42fr);
+  gap: 20px;
+  align-items: stretch;
+
+  @media (max-width: 980px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+const LeftColumn = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+`;
+
+const RightColumn = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
+const SchedulePanel = styled(GlassCard)`
+  padding: 32px 28px;
+  height: 100%;
+  border-radius: 28px;
+  display: flex;
+  flex-direction: column;
+`;
+
 const Cosmic = styled.div`
   position: relative;
   overflow: hidden;
@@ -78,20 +108,54 @@ const CardBack = styled(CardFace)`
   transform: rotateX(180deg);
 `;
 
-const ScheduleList = styled.div`
+const TimelineContainer = styled.div`
+  position: relative;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin-top: 10px;
-  font-size: 13px;
-  line-height: 1.5;
+  gap: 20px;
+  margin-top: 18px;
+  padding-left: 6px;
+  &::before {
+    content: '';
+    position: absolute;
+    top: 10px;
+    bottom: 10px;
+    left: 28px;
+    width: 2px;
+    background: rgba(255,255,255,0.15);
+  }
 `;
 
-const TimeRow = styled.div`
+const TimelineItem = styled.div`
   display: flex;
-  gap: 12px;
-  align-items: flex-start;
-  b { color: ${props => props.color}; min-width: 44px; }
+  align-items: center;
+  gap: 16px;
+  position: relative;
+`;
+
+const TimeCircle = styled.div`
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: 3px solid ${props => props.color};
+  background: ${props => props.bg || '#252336'};
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 900;
+  z-index: 1;
+  flex-shrink: 0;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+`;
+
+const TimelineContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
 `;
 
 const ScenarioGrid = styled.div`
@@ -178,74 +242,178 @@ export default function UniversePageDc() {
         <div css={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, fontWeight: 900, marginTop: 4 }}><span css={{ color: 'rgba(255,255,255,.55)' }}>지금</span><span css={{ color: '#8FDAC0' }}>목표 도착 ★</span></div>
       </Cosmic>
 
-      <Duo>
-        <FlipContainer onClick={() => setSelectedUniverse(selectedUniverse === 'current' ? null : 'current')}>
-          <CardInner isFlipped={selectedUniverse === 'current'}>
-            <CardFace>
-              <div css={{ position: 'absolute', top: -50, right: -40, width: 180, height: 180, borderRadius: '50%', background: 'radial-gradient(circle at 40% 35%,#cfcadb,#a49fb6)', filter: 'blur(10px)', opacity: .4 }} />
-              <div css={{ color: 'var(--sub)', fontSize: 12, fontWeight: 900, letterSpacing: '.04em' }}>현재 우주</div>
-              <h3 css={{ margin: '6px 0 18px', fontSize: 20 }}>지금처럼 소비한 나</h3>
-              <div css={{ color: 'var(--sub)', fontSize: 13 }}>이번 달 감정소비</div>
-              <div css={{ fontSize: 34, fontWeight: 900 }}>-182,000원</div>
-              <p css={{ color: 'var(--sub)', lineHeight: 1.7, marginTop: 'auto' }}>외로운 밤의 배달이 지금 속도로 이어지면, 목표까지 <b css={{ color: 'var(--text)' }}>4개월</b>이 더 걸려요.</p>
-              <div css={{ fontSize: 11, color: 'var(--sub)', marginTop: 14, textAlign: 'right' }}>클릭해서 스케줄 보기 ↺</div>
-            </CardFace>
-            <CardBack css={{ background: '#252336' }}>
-              <div css={{ color: 'var(--sub)', fontSize: 12, fontWeight: 900, letterSpacing: '.04em' }}>현재 우주의 하루</div>
-              <h3 css={{ margin: '6px 0 14px', fontSize: 18 }}>돈이 모이지 않는 스케줄</h3>
-              <ScheduleList>
-                <TimeRow color="#cfcadb"><b>22:00</b><span>스트레스 폭발, 누워서 배달 앱 탐색</span></TimeRow>
-                <TimeRow color="#cfcadb"><b>23:30</b><span>매운 야식 결제 (-23,000원) 완료</span></TimeRow>
-                <TimeRow color="#cfcadb"><b>08:30</b><span>더부룩한 속, 늦잠으로 택시 탑승 (-9,800원)</span></TimeRow>
-                <TimeRow color="#cfcadb"><b>12:00</b><span>피곤함을 달래려 비싼 커피 수혈 (-6,000원)</span></TimeRow>
-              </ScheduleList>
-              <div css={{ fontSize: 11, color: 'var(--sub)', marginTop: 'auto', textAlign: 'right' }}>돌아가기 ↺</div>
-            </CardBack>
-          </CardInner>
-        </FlipContainer>
+      <ContentLayout>
+        <LeftColumn>
+          <Duo>
+            <FlipContainer onClick={() => setSelectedUniverse(selectedUniverse === 'current' ? null : 'current')}>
+              <CardInner isFlipped={selectedUniverse === 'current'}>
+                <CardFace>
+                  <div css={{ position: 'absolute', top: -50, right: -40, width: 180, height: 180, borderRadius: '50%', background: 'radial-gradient(circle at 40% 35%,#cfcadb,#a49fb6)', filter: 'blur(10px)', opacity: .4 }} />
+                  <div css={{ color: 'var(--sub)', fontSize: 12, fontWeight: 900, letterSpacing: '.04em' }}>현재 우주</div>
+                  <h3 css={{ margin: '6px 0 18px', fontSize: 20 }}>지금처럼 소비한 나</h3>
+                  <div css={{ color: 'var(--sub)', fontSize: 13 }}>이번 달 감정소비</div>
+                  <div css={{ fontSize: 34, fontWeight: 900 }}>-182,000원</div>
+                  <p css={{ color: 'var(--sub)', lineHeight: 1.7, marginTop: 'auto' }}>외로운 밤의 배달이 지금 속도로 이어지면, 목표까지 <b css={{ color: 'var(--text)' }}>4개월</b>이 더 걸려요.</p>
+                  <div css={{ fontSize: 11, color: 'var(--sub)', marginTop: 14, textAlign: 'right' }}>클릭해서 스케줄 보기 ↺</div>
+                </CardFace>
+                <CardBack css={{ background: '#252336' }}>
+                  <div css={{ color: 'var(--sub)', fontSize: 12, fontWeight: 900, letterSpacing: '.04em' }}>현재 우주의 하루</div>
+                  <h3 css={{ margin: '6px 0 14px', fontSize: 18 }}>이대로 가면... 텅장 예약입니다 💸</h3>
+                  <p css={{ color: 'var(--sub)', lineHeight: 1.6, fontSize: 14 }}>스트레스 풀려다 지갑이 풀려버리는 루트.<br/>배달 앱 VIP 달성은 축하드리지만, 통장 잔고는 매일 눈물을 흘리고 있어요. 이대로면 6개월 뒤 60만원 증발 확정!</p>
+                  <div css={{ fontSize: 11, color: 'var(--sub)', marginTop: 'auto', textAlign: 'right' }}>돌아가기 ↺</div>
+                </CardBack>
+              </CardInner>
+            </FlipContainer>
 
-        <FlipContainer onClick={() => setSelectedUniverse(selectedUniverse === 'alt' ? null : 'alt')}>
-          <CardInner isFlipped={selectedUniverse === 'alt'}>
-            <CardFace css={{ background: 'linear-gradient(160deg,#83C9B033,var(--card))' }}>
-              <div css={{ position: 'absolute', top: -50, right: -40, width: 180, height: 180, borderRadius: '50%', background: 'radial-gradient(circle at 40% 35%,#C6F0E0,#72CFAD)', filter: 'blur(10px)', opacity: .55 }} />
-              <div css={{ color: '#3E9578', fontSize: 12, fontWeight: 900, letterSpacing: '.04em' }}>다른 우주</div>
-              <h3 css={{ margin: '6px 0 18px', fontSize: 20 }}>감정소비를 줄인 나</h3>
-              <div css={{ color: 'var(--sub)', fontSize: 13 }}>아낄 수 있는 금액</div>
-              <div css={{ fontSize: 34, fontWeight: 900, color: '#3E9578' }}>+62,000원</div>
-              <p css={{ color: 'var(--sub)', lineHeight: 1.7, marginTop: 'auto' }}>외로운 밤의 배달을 <b css={{ color: 'var(--text)' }}>절반만</b> 줄이면, 목표에 이만큼 더 가까워져요.</p>
-              <div css={{ fontSize: 11, color: '#3E957880', marginTop: 14, textAlign: 'right' }}>클릭해서 스케줄 보기 ↺</div>
-            </CardFace>
-            <CardBack css={{ background: 'linear-gradient(160deg,#3E957833,#252336)' }}>
-              <div css={{ color: '#3E9578', fontSize: 12, fontWeight: 900, letterSpacing: '.04em' }}>다른 우주의 하루</div>
-              <h3 css={{ margin: '6px 0 14px', fontSize: 18 }}>가벼워지는 스케줄</h3>
-              <ScheduleList>
-                <TimeRow color="#8FDAC0"><b>22:00</b><span>야식 대신 따뜻한 차 한 잔으로 릴렉스</span></TimeRow>
-                <TimeRow color="#8FDAC0"><b>23:00</b><span>배달비 방어 성공! 가벼운 속으로 취침</span></TimeRow>
-                <TimeRow color="#8FDAC0"><b>07:30</b><span>개운하게 기상, 여유롭게 대중교통 탑승</span></TimeRow>
-                <TimeRow color="#8FDAC0"><b>10:00</b><span>아낀 돈으로 늘어난 적금 이자 확인 (+62,000원)</span></TimeRow>
-              </ScheduleList>
-              <div css={{ fontSize: 11, color: '#3E957880', marginTop: 'auto', textAlign: 'right' }}>돌아가기 ↺</div>
-            </CardBack>
-          </CardInner>
-        </FlipContainer>
-      </Duo>
+            <FlipContainer onClick={() => setSelectedUniverse(selectedUniverse === 'alt' ? null : 'alt')}>
+              <CardInner isFlipped={selectedUniverse === 'alt'}>
+                <CardFace css={{ background: 'linear-gradient(160deg,#83C9B033,var(--card))' }}>
+                  <div css={{ position: 'absolute', top: -50, right: -40, width: 180, height: 180, borderRadius: '50%', background: 'radial-gradient(circle at 40% 35%,#C6F0E0,#72CFAD)', filter: 'blur(10px)', opacity: .55 }} />
+                  <div css={{ color: '#3E9578', fontSize: 12, fontWeight: 900, letterSpacing: '.04em' }}>다른 우주</div>
+                  <h3 css={{ margin: '6px 0 18px', fontSize: 20 }}>감정소비를 줄인 나</h3>
+                  <div css={{ color: 'var(--sub)', fontSize: 13 }}>아낄 수 있는 금액</div>
+                  <div css={{ fontSize: 34, fontWeight: 900, color: '#3E9578' }}>+62,000원</div>
+                  <p css={{ color: 'var(--sub)', lineHeight: 1.7, marginTop: 'auto' }}>외로운 밤의 배달을 <b css={{ color: 'var(--text)' }}>절반만</b> 줄이면, 목표에 이만큼 더 가까워져요.</p>
+                  <div css={{ fontSize: 11, color: '#3E957880', marginTop: 14, textAlign: 'right' }}>클릭해서 스케줄 보기 ↺</div>
+                </CardFace>
+                <CardBack css={{ background: 'linear-gradient(160deg,#3E957833,#252336)' }}>
+                  <div css={{ color: '#3E9578', fontSize: 12, fontWeight: 900, letterSpacing: '.04em' }}>다른 우주의 하루</div>
+                  <h3 css={{ margin: '6px 0 14px', fontSize: 18 }}>참으면 복이 와요! 📈</h3>
+                  <p css={{ color: 'var(--sub)', lineHeight: 1.6, fontSize: 14 }}>작은 인내가 모여 통장이 두둑해지는 지름길.<br/>조금만 참으면 6개월 뒤 60만원 이상의 이득! 여유롭게 제주도 왕복 항공권 겟!</p>
+                  <div css={{ fontSize: 11, color: '#3E957880', marginTop: 'auto', textAlign: 'right' }}>돌아가기 ↺</div>
+                </CardBack>
+              </CardInner>
+            </FlipContainer>
+          </Duo>
 
-      <GlassCard css={{ padding: '26px 30px', borderRadius: 28 }}>
-        <div css={{ display: 'flex', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
-          <div><h3 css={{ margin: '0 0 3px', fontSize: 16 }}>6개월 후, 두 우주의 격차</h3><div css={{ color: 'var(--sub)', fontSize: 12 }}>감정소비 누적을 나란히 두면 이렇게 벌어져요</div></div>
-          <div css={{ display: 'flex', gap: 16, alignItems: 'center' }}><span css={{ color: 'var(--sub)', fontSize: 12, fontWeight: 800 }}>■ 현재 우주</span><span css={{ color: '#3E9578', fontSize: 12, fontWeight: 900 }}>■ 다른 우주</span></div>
-        </div>
-        <Bars>{projection.map(([label, now, alt]) => (
-          <div key={label} css={{ flex: 1, height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end' }}>
-            <div css={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'center', gap: 5, width: '100%', height: '100%' }}>
-              <div css={{ width: '42%', maxWidth: 16, height: `${now / 120 * 100}%`, borderRadius: '5px 5px 2px 2px', background: 'linear-gradient(180deg,#C9C3DB,#A49FB6)' }} />
-              <div css={{ width: '42%', maxWidth: 16, height: `${alt / 120 * 100}%`, borderRadius: '5px 5px 2px 2px', background: 'linear-gradient(180deg,#8FDAC0,#3E9578)' }} />
+          <GlassCard css={{ padding: '26px 30px', borderRadius: 28, marginTop: 'auto' }}>
+            <div css={{ display: 'flex', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
+              <div><h3 css={{ margin: '0 0 3px', fontSize: 16 }}>6개월 후, 두 우주의 격차</h3><div css={{ color: 'var(--sub)', fontSize: 12 }}>감정소비 누적을 나란히 두면 이렇게 벌어져요</div></div>
+              <div css={{ display: 'flex', gap: 16, alignItems: 'center' }}><span css={{ color: 'var(--sub)', fontSize: 12, fontWeight: 800 }}>■ 현재 우주</span><span css={{ color: '#3E9578', fontSize: 12, fontWeight: 900 }}>■ 다른 우주</span></div>
             </div>
-            <span css={{ color: 'var(--sub)', fontSize: 11, fontWeight: 800, marginTop: 9 }}>{label}</span>
-          </div>
-        ))}</Bars>
-        <div css={{ display: 'flex', alignItems: 'center', gap: 10, background: 'linear-gradient(105deg,#83C9B01f,transparent)', borderRadius: 16, padding: '14px 18px', marginTop: 20, fontWeight: 800 }}><span css={{ fontSize: 20, color: '#3E9578' }}>+600,000원</span><span css={{ color: 'var(--sub)' }}>6개월이면 다른 우주가 이만큼 앞서요.</span></div>
-      </GlassCard>
+            <Bars>{projection.map(([label, now, alt]) => (
+              <div key={label} css={{ flex: 1, height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end' }}>
+                <div css={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'center', gap: 5, width: '100%', height: '100%' }}>
+                  <div css={{ width: '42%', maxWidth: 16, height: `${now / 120 * 100}%`, borderRadius: '5px 5px 2px 2px', background: 'linear-gradient(180deg,#C9C3DB,#A49FB6)' }} />
+                  <div css={{ width: '42%', maxWidth: 16, height: `${alt / 120 * 100}%`, borderRadius: '5px 5px 2px 2px', background: 'linear-gradient(180deg,#8FDAC0,#3E9578)' }} />
+                </div>
+                <span css={{ color: 'var(--sub)', fontSize: 11, fontWeight: 800, marginTop: 9 }}>{label}</span>
+              </div>
+            ))}</Bars>
+            <div css={{ display: 'flex', alignItems: 'center', gap: 10, background: 'linear-gradient(105deg,#83C9B01f,transparent)', borderRadius: 16, padding: '14px 18px', marginTop: 20, fontWeight: 800 }}><span css={{ fontSize: 20, color: '#3E9578' }}>+600,000원</span><span css={{ color: 'var(--sub)' }}>6개월이면 다른 우주가 이만큼 앞서요.</span></div>
+          </GlassCard>
+        </LeftColumn>
+
+        <RightColumn>
+          <SchedulePanel>
+            {selectedUniverse === 'current' ? (
+              <>
+                <div css={{ color: 'var(--sub)', fontSize: 12, fontWeight: 900, letterSpacing: '.04em' }}>현재 우주 타임라인</div>
+                <h3 css={{ margin: '6px 0 24px', fontSize: 20 }}>돈이 모이지 않는 스케줄</h3>
+                <TimelineContainer>
+                  <TimelineItem>
+                    <TimeCircle color="#cfcadb" bg="#252336">18:30</TimeCircle>
+                    <TimelineContent>
+                      <div css={{ fontSize: 13, color: '#cfcadb', fontWeight: 500 }}>퇴근길 스트레스, 편의점 캔맥주 충동구매</div>
+                      <div css={{ fontSize: 13, color: '#ff7a6b', fontWeight: 800 }}>-12,000원</div>
+                    </TimelineContent>
+                  </TimelineItem>
+                  <TimelineItem>
+                    <TimeCircle color="#cfcadb" bg="#252336">20:00</TimeCircle>
+                    <TimelineContent>
+                      <div css={{ fontSize: 13, color: '#cfcadb', fontWeight: 500 }}>유튜브 보다가 쇼핑몰 할인 광고 클릭</div>
+                    </TimelineContent>
+                  </TimelineItem>
+                  <TimelineItem>
+                    <TimeCircle color="#cfcadb" bg="#252336">22:00</TimeCircle>
+                    <TimelineContent>
+                      <div css={{ fontSize: 13, color: '#cfcadb', fontWeight: 500 }}>스트레스 폭발, 누워서 배달 앱 탐색</div>
+                    </TimelineContent>
+                  </TimelineItem>
+                  <TimelineItem>
+                    <TimeCircle color="#cfcadb" bg="#252336">23:30</TimeCircle>
+                    <TimelineContent>
+                      <div css={{ fontSize: 13, color: '#cfcadb', fontWeight: 500 }}>매운 야식 결제 완료</div>
+                      <div css={{ fontSize: 13, color: '#ff7a6b', fontWeight: 800 }}>-23,000원</div>
+                    </TimelineContent>
+                  </TimelineItem>
+                  <TimelineItem>
+                    <TimeCircle color="#cfcadb" bg="#252336">02:00</TimeCircle>
+                    <TimelineContent>
+                      <div css={{ fontSize: 13, color: '#cfcadb', fontWeight: 500 }}>소화불량으로 뒤척이다 새벽 감성 쇼핑</div>
+                      <div css={{ fontSize: 13, color: '#ff7a6b', fontWeight: 800 }}>-45,000원</div>
+                    </TimelineContent>
+                  </TimelineItem>
+                  <TimelineItem>
+                    <TimeCircle color="#cfcadb" bg="#252336">08:30</TimeCircle>
+                    <TimelineContent>
+                      <div css={{ fontSize: 13, color: '#cfcadb', fontWeight: 500 }}>더부룩한 속, 늦잠으로 인한 택시 탑승</div>
+                      <div css={{ fontSize: 13, color: '#ff7a6b', fontWeight: 800 }}>-9,800원</div>
+                    </TimelineContent>
+                  </TimelineItem>
+                  <TimelineItem>
+                    <TimeCircle color="#cfcadb" bg="#252336">12:00</TimeCircle>
+                    <TimelineContent>
+                      <div css={{ fontSize: 13, color: '#cfcadb', fontWeight: 500 }}>피곤함을 달래려 비싼 커피 수혈</div>
+                      <div css={{ fontSize: 13, color: '#ff7a6b', fontWeight: 800 }}>-6,000원</div>
+                    </TimelineContent>
+                  </TimelineItem>
+                </TimelineContainer>
+              </>
+            ) : selectedUniverse === 'alt' ? (
+              <>
+                <div css={{ color: '#3E9578', fontSize: 12, fontWeight: 900, letterSpacing: '.04em' }}>다른 우주 타임라인</div>
+                <h3 css={{ margin: '6px 0 24px', fontSize: 20 }}>가벼워지는 스케줄</h3>
+                <TimelineContainer>
+                  <TimelineItem>
+                    <TimeCircle color="#8FDAC0" bg="#1a2522">18:30</TimeCircle>
+                    <TimelineContent>
+                      <div css={{ fontSize: 13, color: '#8FDAC0', fontWeight: 500 }}>퇴근길 산책하며 스트레스 날리기</div>
+                      <div css={{ fontSize: 13, color: '#3E9578', fontWeight: 800 }}>0원</div>
+                    </TimelineContent>
+                  </TimelineItem>
+                  <TimelineItem>
+                    <TimeCircle color="#8FDAC0" bg="#1a2522">20:00</TimeCircle>
+                    <TimelineContent>
+                      <div css={{ fontSize: 13, color: '#8FDAC0', fontWeight: 500 }}>건강한 집밥으로 가벼운 저녁 식사</div>
+                    </TimelineContent>
+                  </TimelineItem>
+                  <TimelineItem>
+                    <TimeCircle color="#8FDAC0" bg="#1a2522">22:00</TimeCircle>
+                    <TimelineContent>
+                      <div css={{ fontSize: 13, color: '#8FDAC0', fontWeight: 500 }}>야식 대신 따뜻한 차 한 잔으로 릴렉스</div>
+                    </TimelineContent>
+                  </TimelineItem>
+                  <TimelineItem>
+                    <TimeCircle color="#8FDAC0" bg="#1a2522">23:00</TimeCircle>
+                    <TimelineContent>
+                      <div css={{ fontSize: 13, color: '#8FDAC0', fontWeight: 500 }}>배달비 방어 성공! 가벼운 속으로 취침</div>
+                    </TimelineContent>
+                  </TimelineItem>
+                  <TimelineItem>
+                    <TimeCircle color="#8FDAC0" bg="#1a2522">07:30</TimeCircle>
+                    <TimelineContent>
+                      <div css={{ fontSize: 13, color: '#8FDAC0', fontWeight: 500 }}>개운하게 기상, 여유롭게 대중교통 탑승</div>
+                    </TimelineContent>
+                  </TimelineItem>
+                  <TimelineItem>
+                    <TimeCircle color="#8FDAC0" bg="#1a2522">10:00</TimeCircle>
+                    <TimelineContent>
+                      <div css={{ fontSize: 13, color: '#8FDAC0', fontWeight: 500 }}>늘어난 적금 이자 확인</div>
+                      <div css={{ fontSize: 13, color: '#3E9578', fontWeight: 800 }}>+62,000원</div>
+                    </TimelineContent>
+                  </TimelineItem>
+                </TimelineContainer>
+              </>
+            ) : (
+              <div css={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--sub)', textAlign: 'center', gap: 16 }}>
+                <div css={{ fontSize: 40, opacity: 0.5 }}>👀</div>
+                <div css={{ fontSize: 15, lineHeight: 1.6, fontWeight: 600 }}>왼쪽 카드를 클릭하여<br/>각 우주의 하루 일과를 확인해보세요</div>
+              </div>
+            )}
+          </SchedulePanel>
+        </RightColumn>
+      </ContentLayout>
 
     </Page>
   );
