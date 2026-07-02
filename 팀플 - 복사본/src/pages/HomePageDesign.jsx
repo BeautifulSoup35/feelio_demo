@@ -1,5 +1,5 @@
 /** @jsxImportSource @emotion/react */
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import styled from '@emotion/styled';
 import { EmotionBlob } from '../components/common/EmotionBlob.jsx';
 import { GlassCard } from '../components/common/GlassCard.jsx';
@@ -147,9 +147,9 @@ const Pebble = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
-  border: ${({ empty, today, dark }) => {
+  border: ${({ empty, selected, today, dark }) => {
     if (empty) return '1px solid transparent';
-    return today ? `1.5px solid rgba(255,255,255,${dark ? '.6' : '.92'})` : '1px solid var(--line)';
+    return (selected || today) ? `1.5px solid rgba(255,255,255,${dark ? '.68' : '.96'})` : '1px solid var(--line)';
   }};
   background: ${({ empty, color, strong, dark }) => {
     if (empty) return 'transparent';
@@ -164,14 +164,14 @@ const Pebble = styled.button`
     return color ? (dark ? '#F3F1F8' : '#fff') : 'var(--sub)';
   }};
   font-size: clamp(11px, .9vw, 13px);
-  font-weight: ${({ today }) => today ? 800 : 700};
+  font-weight: ${({ selected, today }) => (selected || today) ? 800 : 700};
   cursor: ${({ empty }) => empty ? 'default' : 'pointer'};
   pointer-events: ${({ empty }) => empty ? 'none' : 'auto'};
   backdrop-filter: ${({ empty }) => empty ? 'none' : 'blur(16px) saturate(1.35)'};
   -webkit-backdrop-filter: ${({ empty }) => empty ? 'none' : 'blur(16px) saturate(1.35)'};
-  box-shadow: ${({ empty, today, dark }) => {
+  box-shadow: ${({ empty, selected, today, dark }) => {
     if (empty) return 'none';
-    const glow = today ? `, 0 0 0 3px rgba(255,255,255,${dark ? '.16' : '.28'})` : '';
+    const glow = (selected || today) ? `, 0 0 0 3px rgba(255,255,255,${dark ? '.16' : '.28'})` : '';
     return dark
       ? `inset 0 1px 1px rgba(255,255,255,.16), inset 0 0 14px rgba(255,255,255,.03), 0 8px 20px -16px rgba(0,0,0,.55)${glow}`
       : `inset 0 1px 1.5px rgba(255,255,255,.5), inset 0 -8px 20px rgba(70,55,44,.045), 0 12px 26px -22px rgba(70,55,44,.36)${glow}`;
@@ -361,9 +361,14 @@ function visibleMonthTransactions(transactions, visibleMonth) {
   });
 }
 
+function visibleDayTransactions(transactions, visibleDate) {
+  const key = dayKey(visibleDate);
+  return transactions.filter(item => dayKey(item.date) === key);
+}
+
 function dominantEmotion(transactions, fallback = defaultHomeEmotion) {
   const counts = transactions.reduce((map, item) => {
-    if (item.type === 'expense') map[item.emotion] = (map[item.emotion] || 0) + 1;
+    if (item.emotion) map[item.emotion] = (map[item.emotion] || 0) + 1;
     return map;
   }, {});
   return Object.entries(counts).sort((a, b) => b[1] - a[1])[0]?.[0] || fallback;
@@ -420,22 +425,46 @@ function ridgePath(cx, width, height, base = 172) {
   return `M ${(cx - width).toFixed(1)} ${base} C ${(cx - width * .42).toFixed(1)} ${base} ${(cx - width * .32).toFixed(1)} ${(base - height).toFixed(1)} ${cx.toFixed(1)} ${(base - height).toFixed(1)} C ${(cx + width * .32).toFixed(1)} ${(base - height).toFixed(1)} ${(cx + width * .42).toFixed(1)} ${base} ${(cx + width).toFixed(1)} ${base} Z`;
 }
 
-export default function HomePageDesign({ state, onRoute }) {
-  const [visibleMonth, setVisibleMonth] = useState(() => new Date(2026, 6, 1));
+export default function HomePageDesign({ state, onRoute, selectedDate, onSelectDate }) {
+  const selected = selectedDate || new Date(2026, 6, 1);
+  const [visibleMonth, setVisibleMonth] = useState(() => new Date(selected.getFullYear(), selected.getMonth(), 1));
+
+  useEffect(() => {
+    setVisibleMonth(prev => {
+      if (prev.getFullYear() === selected.getFullYear() && prev.getMonth() === selected.getMonth()) return prev;
+      return new Date(selected.getFullYear(), selected.getMonth(), 1);
+    });
+  }, [selected]);
+
   const monthlyTransactions = visibleMonthTransactions(state.transactions, visibleMonth);
+  const monthlyEmotionTransactions = monthlyTransactions.filter(item => item.type === 'expense' && item.emotion);
+  const hasAnyTransactions = state.transactions.length > 0;
   const hasMonthlyTransactions = monthlyTransactions.length > 0;
-  const hasEnoughRidgeData = monthlyTransactions.length >= 5;
-  const displayEmotion = hasMonthlyTransactions ? dominantEmotion(monthlyTransactions) : defaultHomeEmotion;
+  const dailyTransactions = visibleDayTransactions(state.transactions, selected);
+  const dailyEmotionTransactions = dailyTransactions.filter(item => item.emotion);
+  const hasDailyEmotion = dailyEmotionTransactions.length > 0;
+  const hasEnoughRidgeData = monthlyEmotionTransactions.length >= 5;
+  const displayEmotion = hasDailyEmotion
+    ? dominantEmotion(dailyEmotionTransactions)
+    : dominantEmotion(state.transactions, defaultHomeEmotion);
   const topMeta = getEmotion(displayEmotion);
   const goal = state.goals[0];
   const goalPct = percent(goal.current, goal.target);
   const dark = state.mode === 'dark';
   const days = calendarDays(state.transactions, visibleMonth);
-  const ridgeData = hasEnoughRidgeData ? emotionRidge(monthlyTransactions) : defaultRidgeData;
+  const selectedDayKey = dayKey(selected);
+  const ridgeData = hasEnoughRidgeData ? emotionRidge(monthlyEmotionTransactions) : defaultRidgeData;
   const ridgePeak = ridgeData.reduce((max, item) => item[1] > max[1] ? item : max, ridgeData[0]);
   const slot = 560 / ridgeData.length;
   const monthLabel = `${visibleMonth.getFullYear()}년 ${visibleMonth.getMonth() + 1}월`;
-  const moveMonth = (step) => setVisibleMonth(prev => new Date(prev.getFullYear(), prev.getMonth() + step, 1));
+  const moveMonth = (step) => setVisibleMonth(prev => {
+    const next = new Date(prev.getFullYear(), prev.getMonth() + step, 1);
+    onSelectDate?.(next);
+    return next;
+  });
+  const selectDay = (day) => {
+    onSelectDate?.(new Date(visibleMonth.getFullYear(), visibleMonth.getMonth(), day));
+  };
 
   return (
     <Grid>
@@ -443,14 +472,18 @@ export default function HomePageDesign({ state, onRoute }) {
         <Stage>
           <div>
             <BlobHalo color={topMeta.color}>
-              <div css={{ position: 'relative', display: 'grid', placeItems: 'center', width: 'clamp(260px, 22vw, 320px)', height: hasMonthlyTransactions ? 'clamp(230px, 20vw, 290px)' : 'clamp(310px, 26vw, 360px)' }}>
-                {hasMonthlyTransactions
+              <div css={{ position: 'relative', display: 'grid', placeItems: 'center', width: 'clamp(260px, 22vw, 320px)', height: hasAnyTransactions ? 'clamp(230px, 20vw, 290px)' : 'clamp(310px, 26vw, 360px)' }}>
+                {hasAnyTransactions
                   ? <EmotionBlob emotion={displayEmotion} size={300} />
                   : <EmptyEmotionBlob size={280} dark={dark} />}
               </div>
             </BlobHalo>
-            <div css={{ fontSize: 12, color: 'var(--sub)', fontWeight: 800, marginTop: 2 }}>{hasMonthlyTransactions ? '이번 달, 내 곁에 가장 오래 머문 마음' : '아직 감정을 기다리는 중'}</div>
-            <div css={{ fontSize: 24, color: hasMonthlyTransactions ? topMeta.color : (dark ? '#9B8CFF' : '#7C6BE0'), fontWeight: 900, letterSpacing: '-.02em', marginTop: 2 }}>{hasMonthlyTransactions ? `${displayEmotion} 말랑이` : '감정 말랑이'}</div>
+            <div css={{ fontSize: 12, color: 'var(--sub)', fontWeight: 800, marginTop: 2 }}>
+              {!hasAnyTransactions ? '아직 감정을 기다리는 중' : hasDailyEmotion ? '선택한 날에 가장 오래 머문 마음' : '선택한 날에는 감정 기록이 없어요'}
+            </div>
+            <div css={{ fontSize: 24, color: hasAnyTransactions ? topMeta.color : (dark ? '#9B8CFF' : '#7C6BE0'), fontWeight: 900, letterSpacing: '-.02em', marginTop: 2 }}>
+              {hasAnyTransactions ? `${displayEmotion} 말랑이` : '감정 말랑이'}
+            </div>
           </div>
         </Stage>
 
@@ -498,7 +531,8 @@ export default function HomePageDesign({ state, onRoute }) {
             {days.map(item => {
               if (item.empty) return <Pebble key={item.id} empty disabled aria-hidden="true" />;
               const color = item.emotion ? getEmotion(item.emotion).color : undefined;
-              return <Pebble key={item.id} color={color} strong={item.strong} today={item.today} dark={dark} onClick={() => onRoute('transactions')}>{item.day}</Pebble>;
+              const dateKey = `${visibleMonth.getFullYear()}-${String(visibleMonth.getMonth() + 1).padStart(2, '0')}-${String(item.day).padStart(2, '0')}`;
+              return <Pebble key={item.id} color={color} strong={item.strong} selected={dateKey === selectedDayKey} today={item.today} dark={dark} onClick={() => selectDay(item.day)}>{item.day}</Pebble>;
             })}
           </PebbleGrid>
           <Legend>{['스트레스', '외로움', '평온', '뿌듯함'].map(name => <span key={name}><i style={{ background: getEmotion(name).color }} />{name}</span>)}</Legend>
