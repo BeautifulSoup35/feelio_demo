@@ -13,7 +13,7 @@ import LoginPage from '../pages/LoginPage.jsx';
 import OnboardingPage from '../pages/OnboardingPage.jsx';
 import HomePageDesign from '../pages/HomePageDesign.jsx';
 import RecordPageDc from '../pages/RecordPageDc.jsx';
-import TransactionsPage from '../pages/TransactionsPage.jsx';
+import TransactionsPageDesign from '../pages/TransactionsPageDesign.jsx';
 import AnalysisPageDc from '../pages/AnalysisPageDc.jsx';
 import UniversePageDc from '../pages/UniversePageDc.jsx';
 import { getAurora } from '../data/aurorasDc.js';
@@ -67,7 +67,7 @@ export default function App() {
   const content = {
     home: <HomePageDesign state={state} onRoute={setRoute} />,
     record: <RecordPageDc state={state} actions={actions} />,
-    transactions: <TransactionsPage state={state} onSelect={setSelectedTxn} />,
+    transactions: <TransactionsPageDesign state={state} onSelect={setSelectedTxn} />,
     analysis: <AnalysisPageDc state={state} />,
     universe: <UniversePageDc state={state} />
   }[route];

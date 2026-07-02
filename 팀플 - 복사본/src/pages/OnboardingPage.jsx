@@ -77,7 +77,7 @@ export default function OnboardingPage({ onComplete }) {
   const [step, setStep] = useState(0);
   const [goal, setGoal] = useState('제주도 여행');
   const [amount, setAmount] = useState(2000000);
-  const [current, setCurrent] = useState(1240000);
+  const [current, setCurrent] = useState(0);
   const goals = ['제주도 여행', '비상금 마련', '이사 준비', '콘서트 비용', '나만의 목표'];
 
   function next() {

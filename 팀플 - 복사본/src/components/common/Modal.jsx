@@ -13,9 +13,10 @@ const Scrim = styled.div`
 `;
 
 const Panel = styled.div`
-  width: min(560px, 100%);
-  max-height: min(720px, 92vh);
-  overflow: auto;
+  width: ${({ width }) => width || 'min(560px, 100%)'};
+  height: ${({ height }) => height || 'auto'};
+  max-height: ${({ maxHeight }) => maxHeight || 'min(720px, 92vh)'};
+  overflow: ${({ overflow }) => overflow || 'auto'};
   border-radius: 28px;
   background: var(--modal-bg);
   border: 1px solid var(--card-border);
@@ -24,13 +25,18 @@ const Panel = styled.div`
   animation: ${modalIn} .24s ease;
 `;
 
-export function Modal({ children, onClose }) {
+export function Modal({ children, onClose, width, height, maxHeight, overflow }) {
   return (
     <Scrim onMouseDown={onClose}>
-      <Panel onMouseDown={event => event.stopPropagation()}>
+      <Panel
+        width={width}
+        height={height}
+        maxHeight={maxHeight}
+        overflow={overflow}
+        onMouseDown={event => event.stopPropagation()}
+      >
         {children}
       </Panel>
     </Scrim>
   );
 }
-
