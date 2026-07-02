@@ -4,18 +4,19 @@ import styled from '@emotion/styled';
 import { GlassCard } from '../components/common/GlassCard.jsx';
 import { getEmotion } from '../data/emotions.js';
 import PlanetTest from '../components/universe/PlanetTest.jsx';
+import TheFork from '../components/universe/TheFork.jsx';
 
 const Page = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 14px;
 `;
 
 const Cosmic = styled.div`
   position: relative;
   overflow: hidden;
   border-radius: 28px;
-  padding: 30px 32px;
+  padding: 22px 26px;
   background: linear-gradient(150deg, #2A2740, #151327 62%);
   box-shadow: var(--shadow);
   isolation: isolate;
@@ -24,7 +25,7 @@ const Cosmic = styled.div`
 const Duo = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 20px;
+  gap: 14px;
 
   @media (max-width: 860px) {
     grid-template-columns: 1fr;
@@ -34,15 +35,15 @@ const Duo = styled.div`
 const UniverseCard = styled(GlassCard)`
   position: relative;
   overflow: hidden;
-  padding: 28px;
+  padding: 22px;
 `;
 
 const Bars = styled.div`
   display: flex;
   align-items: flex-end;
-  gap: 14px;
-  height: 150px;
-  margin-top: 20px;
+  gap: 10px;
+  height: 112px;
+  margin-top: 14px;
 `;
 
 const FlipContainer = styled.div`
@@ -55,7 +56,7 @@ const CardInner = styled.div`
   position: relative;
   width: 100%;
   height: 100%;
-  min-height: 280px;
+  min-height: 230px;
   transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
   transform-style: preserve-3d;
   ${props => props.isFlipped && `transform: rotateX(180deg);`}
@@ -80,17 +81,17 @@ const CardBack = styled(CardFace)`
 const ScheduleList = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin-top: 10px;
-  font-size: 13px;
+  gap: 9px;
+  margin-top: 8px;
+  font-size: 12px;
   line-height: 1.5;
 `;
 
 const TimeRow = styled.div`
   display: flex;
-  gap: 12px;
+  gap: 10px;
   align-items: flex-start;
-  b { color: ${props => props.color}; min-width: 44px; }
+  b { color: ${props => props.color}; min-width: 40px; }
 `;
 
 const ScenarioGrid = styled.div`
@@ -145,12 +146,12 @@ export default function UniversePageDc() {
     <Page>
       <Cosmic>
         <div css={{ position: 'absolute', inset: 0, zIndex: -1, background: 'radial-gradient(circle at 82% 22%,rgba(131,201,176,.28),transparent 44%),radial-gradient(circle at 20% 82%,rgba(158,150,238,.24),transparent 46%)' }} />
-        <div css={{ position: 'relative', maxWidth: 440 }}>
-          <div css={{ fontSize: 12, fontWeight: 900, letterSpacing: '.14em', color: 'rgba(255,255,255,.55)', marginBottom: 10 }}>PARALLEL UNIVERSE</div>
-          <div css={{ fontSize: 'clamp(22px, 2.6vw, 28px)', fontWeight: 900, lineHeight: 1.4, color: '#fff' }}>지금의 소비가 이어질 미래와,<br />감정소비를 조금 줄인 미래.</div>
-          <div css={{ fontSize: 14, color: 'rgba(255,255,255,.62)', lineHeight: 1.65, marginTop: 12 }}>두 우주가 이렇게 갈라지고 있어요.</div>
+        <div css={{ position: 'relative', maxWidth: 400 }}>
+          <div css={{ fontSize: 11, fontWeight: 900, letterSpacing: '.14em', color: 'rgba(255,255,255,.55)', marginBottom: 8 }}>PARALLEL UNIVERSE</div>
+          <div css={{ fontSize: 'clamp(19px, 2.2vw, 24px)', fontWeight: 900, lineHeight: 1.35, color: '#fff' }}>지금의 소비가 이어질 미래와,<br />감정소비를 조금 줄인 미래.</div>
+          <div css={{ fontSize: 13, color: 'rgba(255,255,255,.62)', lineHeight: 1.55, marginTop: 9 }}>두 우주가 이렇게 갈라지고 있어요.</div>
         </div>
-        <svg viewBox="0 0 520 190" width="100%" height="150" preserveAspectRatio="none" css={{ display: 'block', marginTop: 16, overflow: 'visible' }}>
+        <svg viewBox="0 0 520 190" width="100%" height="112" preserveAspectRatio="none" css={{ display: 'block', marginTop: 10, overflow: 'visible' }}>
           <path d="M40,150 C200,150 300,150 490,150" fill="none" stroke="rgba(200,195,220,.42)" strokeWidth="2.5" strokeDasharray="2 7" strokeLinecap="round" />
           {/* Background Dashed Path (Unreached) */}
           <path d="M40,150 C210,150 300,90 490,34" fill="none" stroke="#8FDAC0" strokeWidth="3" strokeDasharray="2 7" strokeLinecap="round" opacity={0.4} />
@@ -177,23 +178,25 @@ export default function UniversePageDc() {
         <div css={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, fontWeight: 900, marginTop: 4 }}><span css={{ color: 'rgba(255,255,255,.55)' }}>지금</span><span css={{ color: '#8FDAC0' }}>목표 도착 ★</span></div>
       </Cosmic>
 
+      <TheFork />
+
       <PlanetTest />
 
       <Duo>
         <FlipContainer onClick={() => setSelectedUniverse(selectedUniverse === 'current' ? null : 'current')}>
           <CardInner isFlipped={selectedUniverse === 'current'}>
             <CardFace>
-              <div css={{ position: 'absolute', top: -50, right: -40, width: 180, height: 180, borderRadius: '50%', background: 'radial-gradient(circle at 40% 35%,#cfcadb,#a49fb6)', filter: 'blur(10px)', opacity: .4 }} />
+              <div css={{ position: 'absolute', top: -44, right: -34, width: 145, height: 145, borderRadius: '50%', background: 'radial-gradient(circle at 40% 35%,#cfcadb,#a49fb6)', filter: 'blur(10px)', opacity: .4 }} />
               <div css={{ color: 'var(--sub)', fontSize: 12, fontWeight: 900, letterSpacing: '.04em' }}>현재 우주</div>
-              <h3 css={{ margin: '6px 0 18px', fontSize: 20 }}>지금처럼 소비한 나</h3>
+              <h3 css={{ margin: '5px 0 12px', fontSize: 17 }}>지금처럼 소비한 나</h3>
               <div css={{ color: 'var(--sub)', fontSize: 13 }}>이번 달 감정소비</div>
-              <div css={{ fontSize: 34, fontWeight: 900 }}>-182,000원</div>
-              <p css={{ color: 'var(--sub)', lineHeight: 1.7, marginTop: 'auto' }}>외로운 밤의 배달이 지금 속도로 이어지면, 목표까지 <b css={{ color: 'var(--text)' }}>4개월</b>이 더 걸려요.</p>
-              <div css={{ fontSize: 11, color: 'var(--sub)', marginTop: 14, textAlign: 'right' }}>클릭해서 스케줄 보기 ↺</div>
+              <div css={{ fontSize: 27, fontWeight: 900 }}>-182,000원</div>
+              <p css={{ color: 'var(--sub)', lineHeight: 1.55, fontSize: 13, marginTop: 'auto' }}>외로운 밤의 배달이 지금 속도로 이어지면, 목표까지 <b css={{ color: 'var(--text)' }}>4개월</b>이 더 걸려요.</p>
+              <div css={{ fontSize: 10.5, color: 'var(--sub)', marginTop: 10, textAlign: 'right' }}>클릭해서 스케줄 보기 ↺</div>
             </CardFace>
             <CardBack css={{ background: '#252336' }}>
               <div css={{ color: 'var(--sub)', fontSize: 12, fontWeight: 900, letterSpacing: '.04em' }}>현재 우주의 하루</div>
-              <h3 css={{ margin: '6px 0 14px', fontSize: 18 }}>돈이 모이지 않는 스케줄</h3>
+              <h3 css={{ margin: '5px 0 10px', fontSize: 16 }}>돈이 모이지 않는 스케줄</h3>
               <ScheduleList>
                 <TimeRow color="#cfcadb"><b>22:00</b><span>스트레스 폭발, 누워서 배달 앱 탐색</span></TimeRow>
                 <TimeRow color="#cfcadb"><b>23:30</b><span>매운 야식 결제 (-23,000원) 완료</span></TimeRow>
@@ -208,17 +211,17 @@ export default function UniversePageDc() {
         <FlipContainer onClick={() => setSelectedUniverse(selectedUniverse === 'alt' ? null : 'alt')}>
           <CardInner isFlipped={selectedUniverse === 'alt'}>
             <CardFace css={{ background: 'linear-gradient(160deg,#83C9B033,var(--card))' }}>
-              <div css={{ position: 'absolute', top: -50, right: -40, width: 180, height: 180, borderRadius: '50%', background: 'radial-gradient(circle at 40% 35%,#C6F0E0,#72CFAD)', filter: 'blur(10px)', opacity: .55 }} />
+              <div css={{ position: 'absolute', top: -44, right: -34, width: 145, height: 145, borderRadius: '50%', background: 'radial-gradient(circle at 40% 35%,#C6F0E0,#72CFAD)', filter: 'blur(10px)', opacity: .55 }} />
               <div css={{ color: '#3E9578', fontSize: 12, fontWeight: 900, letterSpacing: '.04em' }}>다른 우주</div>
-              <h3 css={{ margin: '6px 0 18px', fontSize: 20 }}>감정소비를 줄인 나</h3>
+              <h3 css={{ margin: '5px 0 12px', fontSize: 17 }}>감정소비를 줄인 나</h3>
               <div css={{ color: 'var(--sub)', fontSize: 13 }}>아낄 수 있는 금액</div>
-              <div css={{ fontSize: 34, fontWeight: 900, color: '#3E9578' }}>+62,000원</div>
-              <p css={{ color: 'var(--sub)', lineHeight: 1.7, marginTop: 'auto' }}>외로운 밤의 배달을 <b css={{ color: 'var(--text)' }}>절반만</b> 줄이면, 목표에 이만큼 더 가까워져요.</p>
-              <div css={{ fontSize: 11, color: '#3E957880', marginTop: 14, textAlign: 'right' }}>클릭해서 스케줄 보기 ↺</div>
+              <div css={{ fontSize: 27, fontWeight: 900, color: '#3E9578' }}>+62,000원</div>
+              <p css={{ color: 'var(--sub)', lineHeight: 1.55, fontSize: 13, marginTop: 'auto' }}>외로운 밤의 배달을 <b css={{ color: 'var(--text)' }}>절반만</b> 줄이면, 목표에 이만큼 더 가까워져요.</p>
+              <div css={{ fontSize: 10.5, color: '#3E957880', marginTop: 10, textAlign: 'right' }}>클릭해서 스케줄 보기 ↺</div>
             </CardFace>
             <CardBack css={{ background: 'linear-gradient(160deg,#3E957833,#252336)' }}>
               <div css={{ color: '#3E9578', fontSize: 12, fontWeight: 900, letterSpacing: '.04em' }}>다른 우주의 하루</div>
-              <h3 css={{ margin: '6px 0 14px', fontSize: 18 }}>가벼워지는 스케줄</h3>
+              <h3 css={{ margin: '5px 0 10px', fontSize: 16 }}>가벼워지는 스케줄</h3>
               <ScheduleList>
                 <TimeRow color="#8FDAC0"><b>22:00</b><span>야식 대신 따뜻한 차 한 잔으로 릴렉스</span></TimeRow>
                 <TimeRow color="#8FDAC0"><b>23:00</b><span>배달비 방어 성공! 가벼운 속으로 취침</span></TimeRow>
@@ -231,7 +234,7 @@ export default function UniversePageDc() {
         </FlipContainer>
       </Duo>
 
-      <GlassCard css={{ padding: '26px 30px', borderRadius: 28 }}>
+      <GlassCard css={{ padding: '20px 24px', borderRadius: 24 }}>
         <div css={{ display: 'flex', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
           <div><h3 css={{ margin: '0 0 3px', fontSize: 16 }}>6개월 후, 두 우주의 격차</h3><div css={{ color: 'var(--sub)', fontSize: 12 }}>감정소비 누적을 나란히 두면 이렇게 벌어져요</div></div>
           <div css={{ display: 'flex', gap: 16, alignItems: 'center' }}><span css={{ color: 'var(--sub)', fontSize: 12, fontWeight: 800 }}>■ 현재 우주</span><span css={{ color: '#3E9578', fontSize: 12, fontWeight: 900 }}>■ 다른 우주</span></div>
@@ -245,7 +248,7 @@ export default function UniversePageDc() {
             <span css={{ color: 'var(--sub)', fontSize: 11, fontWeight: 800, marginTop: 9 }}>{label}</span>
           </div>
         ))}</Bars>
-        <div css={{ display: 'flex', alignItems: 'center', gap: 10, background: 'linear-gradient(105deg,#83C9B01f,transparent)', borderRadius: 16, padding: '14px 18px', marginTop: 20, fontWeight: 800 }}><span css={{ fontSize: 20, color: '#3E9578' }}>+600,000원</span><span css={{ color: 'var(--sub)' }}>6개월이면 다른 우주가 이만큼 앞서요.</span></div>
+        <div css={{ display: 'flex', alignItems: 'center', gap: 10, background: 'linear-gradient(105deg,#83C9B01f,transparent)', borderRadius: 14, padding: '11px 15px', marginTop: 14, fontWeight: 800 }}><span css={{ fontSize: 17, color: '#3E9578' }}>+600,000원</span><span css={{ color: 'var(--sub)', fontSize: 13 }}>6개월이면 다른 우주가 이만큼 앞서요.</span></div>
       </GlassCard>
 
     </Page>

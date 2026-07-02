@@ -51,8 +51,8 @@ const Observatory = styled.section`
   overflow: hidden;
   isolation: isolate;
   border-radius: 26px;
-  padding: clamp(22px, 4vw, 44px) clamp(16px, 4vw, 44px) clamp(28px, 4vw, 44px);
-  min-height: 540px;
+  padding: clamp(18px, 3vw, 30px) clamp(14px, 3vw, 30px) clamp(22px, 3vw, 30px);
+  min-height: 430px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -112,16 +112,16 @@ const MonoTag = styled.div`
 `;
 
 const Headline = styled.h2`
-  margin: 14px 0 6px;
-  font-size: clamp(20px, 3vw, 26px);
+  margin: 10px 0 5px;
+  font-size: clamp(18px, 2.5vw, 23px);
   font-weight: 900;
   line-height: 1.45;
 `;
 
 const SubCopy = styled.p`
   margin: 0;
-  font-size: 14px;
-  line-height: 1.7;
+  font-size: 13px;
+  line-height: 1.55;
   color: rgba(236, 235, 240, .62);
 `;
 
@@ -130,8 +130,8 @@ const PrimaryBtn = styled.button`
   border: 0;
   cursor: pointer;
   border-radius: 999px;
-  padding: 14px 26px;
-  font-size: 15px;
+  padding: 12px 22px;
+  font-size: 14px;
   font-weight: 900;
   color: #141220;
   background: linear-gradient(120deg, #ECEBF0, #cfc9e8);
@@ -152,13 +152,13 @@ const BtnRow = styled.div`
   flex-wrap: wrap;
   justify-content: center;
   gap: 10px;
-  margin-top: 26px;
+  margin-top: 18px;
 `;
 
 const Panel = styled.div`
   width: 100%;
   border-radius: 20px;
-  padding: 20px 22px;
+  padding: 16px 18px;
   background: rgba(255, 255, 255, .045);
   border: 1px solid rgba(255, 255, 255, .1);
   text-align: left;
@@ -416,8 +416,8 @@ export default function PlanetTest({ questions = QUESTIONS, types = TYPES, bridg
       {stage === 'intro' && (
         <Stage>
           <MonoTag>OBSERVATION 001</MonoTag>
-          <div css={{ margin: '30px 0 24px' }}>
-            <PlanetOrb pal={MYSTERY_PAL} size={180} blurred ariaLabel="정체불명의 흐릿한 행성" />
+          <div css={{ margin: '18px 0 14px' }}>
+            <PlanetOrb pal={MYSTERY_PAL} size={140} blurred ariaLabel="정체불명의 흐릿한 행성" />
           </div>
           <Headline>다중우주에서<br />정체불명의 소비 행성이 관측됐어요</Headline>
           <SubCopy>9번의 스캔으로 이 행성 — 당신의 소비 기질 좌표를 확인합니다.</SubCopy>
@@ -429,7 +429,7 @@ export default function PlanetTest({ questions = QUESTIONS, types = TYPES, bridg
 
       {stage === 'scan' && (
         <Stage key={qIndex}>
-          <div css={{ display: 'flex', gap: 22, marginBottom: 14 }}>
+          <div css={{ display: 'flex', gap: 16, marginBottom: 10 }}>
             {AXIS_ORDER.map(axis => (
               <AxisRing key={axis} axis={axis} answered={answeredIn(axis)} active={question.axis === axis} />
             ))}
@@ -438,7 +438,7 @@ export default function PlanetTest({ questions = QUESTIONS, types = TYPES, bridg
             SCAN {scanAxisNo}/3 · {AXES[question.axis].name} · {qIndex + 1}/9
           </MonoTag>
           <Headline css={{ minHeight: '2.9em', display: 'flex', alignItems: 'center' }}>{question.t}</Headline>
-          <div css={{ display: 'grid', gap: 12, width: '100%', maxWidth: 460, marginTop: 8 }}>
+          <div css={{ display: 'grid', gap: 10, width: '100%', maxWidth: 430, marginTop: 6 }}>
             <ChoiceBtn onClick={() => choose('A')}><ChoiceKey>A</ChoiceKey>{question.A}</ChoiceBtn>
             <ChoiceBtn onClick={() => choose('B')}><ChoiceKey>B</ChoiceKey>{question.B}</ChoiceBtn>
           </div>
@@ -448,8 +448,8 @@ export default function PlanetTest({ questions = QUESTIONS, types = TYPES, bridg
       {stage === 'reveal' && type && (
         <Stage>
           <MonoTag>COORDINATE CONDENSING</MonoTag>
-          <div css={{ margin: '34px 0 26px', animation: `${pulse} 1.1s ease-in-out infinite` }}>
-            <PlanetOrb pal={type.pal} ink={type.ink} mood={type.mood} size={190} condensing floating={false} ariaLabel="행성 응결 중" />
+          <div css={{ margin: '24px 0 18px', animation: `${pulse} 1.1s ease-in-out infinite` }}>
+            <PlanetOrb pal={type.pal} ink={type.ink} mood={type.mood} size={150} condensing floating={false} ariaLabel="행성 응결 중" />
           </div>
           <SubCopy>행성 좌표 응결 중…</SubCopy>
         </Stage>
@@ -458,11 +458,11 @@ export default function PlanetTest({ questions = QUESTIONS, types = TYPES, bridg
       {stage === 'result' && type && (
         <Stage>
           <MonoTag>PLANET FOUND · TYPE {result.code}</MonoTag>
-          <div css={{ margin: '22px 0 16px' }}>
-            <PlanetOrb pal={type.pal} ink={type.ink} mood={type.mood} size={185} ariaLabel={`${type.name} 행성`} />
+          <div css={{ margin: '14px 0 10px' }}>
+            <PlanetOrb pal={type.pal} ink={type.ink} mood={type.mood} size={145} ariaLabel={`${type.name} 행성`} />
           </div>
           <SubCopy>당신의 소비 행성은</SubCopy>
-          <Headline css={{ margin: '4px 0 8px', color: type.pal[0], fontSize: 'clamp(24px, 3.4vw, 30px)' }}>{type.name}</Headline>
+          <Headline css={{ margin: '3px 0 6px', color: type.pal[0], fontSize: 'clamp(21px, 2.8vw, 26px)' }}>{type.name}</Headline>
           <SubCopy>{type.def}</SubCopy>
 
           <div css={{
@@ -470,7 +470,7 @@ export default function PlanetTest({ questions = QUESTIONS, types = TYPES, bridg
             gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
             gap: 8,
             width: '100%',
-            margin: '26px 0 18px',
+            margin: '18px 0 12px',
             '@media (max-width: 520px)': { gridTemplateColumns: '1fr', gap: 18 }
           }}>
             {AXIS_ORDER.map(axis => (
@@ -502,7 +502,7 @@ export default function PlanetTest({ questions = QUESTIONS, types = TYPES, bridg
           <Stage>
             <MonoTag>ORBIT STABLE</MonoTag>
             <div css={{ margin: '28px 0 20px' }}>
-              <PlanetOrb pal={type.pal} ink={type.ink} mood={type.mood} size={185} ariaLabel={`${type.name} 행성`} />
+            <PlanetOrb pal={type.pal} ink={type.ink} mood={type.mood} size={185} ariaLabel={`${type.name} 행성`} />
             </div>
             <Headline>이미 가장 안정된 궤도예요 🌱</Headline>
             <SubCopy>세 축 모두 고요하게 돌고 있어요.<br />지금의 리듬을 그대로 지켜주세요 — 관측소가 계속 지켜볼게요.</SubCopy>
