@@ -114,7 +114,7 @@ const Row = styled.button`
 `;
 
 const viewTabs = ['일별', '월별', '연간', '감정별'];
-const filters = ['전체', '지출', '수입', '감정소비', '카테고리', '감정'];
+const filters = ['전체', '지출', '수입', '카테고리', '감정'];
 const emotionSpend = ['스트레스', '외로움', '화남'];
 
 function toDate(item) {
@@ -154,7 +154,6 @@ export default function TransactionsPageDesign({ state, onSelect }) {
   const filtered = state.transactions.filter(item => {
     if (filter === '지출' && item.type !== 'expense') return false;
     if (filter === '수입' && item.type !== 'income') return false;
-    if (filter === '감정소비' && !(item.type === 'expense' && emotionSpend.includes(item.emotion))) return false;
     if (query.trim()) {
       const haystack = `${item.category} ${item.emotion} ${item.situation} ${item.memo}`.toLowerCase();
       if (!haystack.includes(query.trim().toLowerCase())) return false;
@@ -164,7 +163,8 @@ export default function TransactionsPageDesign({ state, onSelect }) {
 
   const expense = state.transactions.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
   const income = state.transactions.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
-  const emotional = state.transactions.filter(t => t.type === 'expense' && emotionSpend.includes(t.emotion)).reduce((s, t) => s + t.amount, 0);
+  const BUDGET = 1500000;
+  const remainingBudget = BUDGET - expense;
 
   const groups = useMemo(() => {
     const map = filtered.reduce((acc, item) => {
@@ -190,7 +190,7 @@ export default function TransactionsPageDesign({ state, onSelect }) {
           ['이번 달 지출', `-${money(expense)}`, 'var(--text)'],
           ['이번 달 수입', `+${money(income)}`, '#3E9578'],
           ['순지출', `+${money(income - expense)}`, 'var(--text)'],
-          ['감정소비', `-${money(emotional)}`, '#7960b8']
+          ['남은 예산', `${remainingBudget >= 0 ? '+' : ''}${money(remainingBudget)}`, remainingBudget >= 0 ? '#6A61C4' : '#FF4757']
         ].map(([label, value, color]) => <GlassCard key={label} padding={18}><small css={{ color: 'var(--sub)', fontWeight: 800 }}>{label}</small><strong css={{ display: 'block', marginTop: 6, fontSize: 20, color }}>{value}</strong></GlassCard>)}
       </Summary>
 

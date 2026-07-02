@@ -5,6 +5,8 @@ import { GlassCard } from '../components/common/GlassCard.jsx';
 import { getEmotion } from '../data/emotions.js';
 
 const Page = styled.div`
+  width: min(100%, 1420px);
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -192,51 +194,39 @@ export default function AnalysisPageDc() {
           })}</div>
         </Card>
 
-        <Card>
-          <div css={{ display: 'flex', flexDirection: 'column', gap: 24, height: '100%', justifyContent: 'center' }}>
-            {/* 가장 주된 지출 감정 */}
-            <div>
-              <h3 css={{ margin: '0 0 4px', fontSize: 16 }}>가장 주된 지출 감정</h3>
-              <p css={{ margin: '0 0 12px', color: 'var(--sub)', fontSize: 12 }}>이번 달 가장 많이 느낀 감정소비예요</p>
-              {(() => {
-                const [name, pct, desc, amount] = emotionDist[0];
-                const emo = getEmotion(name);
-                return (
-                  <div css={{ display: 'flex', alignItems: 'center', gap: 11, background: 'var(--line)', padding: '14px 16px', borderRadius: 12 }}>
-                    <span css={{ width: 14, height: 14, borderRadius: '50%', background: emo.color }} />
-                    <div css={{ flex: 1, minWidth: 0 }}>
-                      <b css={{ fontSize: 15 }}>{name}</b>
-                      <div css={{ color: 'var(--sub)', fontSize: 12, marginTop: 2 }}>{desc}</div>
-                    </div>
-                    <div css={{ textAlign: 'right' }}>
-                      <b css={{ color: emo.color, fontSize: 18, display: 'block' }}>{pct}</b>
-                      <span css={{ color: 'var(--sub)', fontSize: 12, fontWeight: 800 }}>{amount}</span>
-                    </div>
-                  </div>
-                );
-              })()}
+        <Card css={{ padding: 0, overflow: 'hidden' }}>
+          <div css={{ display: 'flex', height: '100%', alignItems: 'center' }}>
+            {/* 왼쪽: 스트레스 */}
+            <div css={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '36px 20px' }}>
+              <div css={{ position: 'relative', width: 130, height: 130, marginBottom: 20 }}>
+                <svg viewBox="0 0 36 36" css={{ width: '100%', height: '100%' }}>
+                  <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#D3D6FF" strokeWidth="3.5" />
+                  <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#5042B3" strokeWidth="3.5" strokeDasharray="43, 100" strokeLinecap="round" />
+                </svg>
+                <div css={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#5042B3' }}>
+                  <span css={{ fontSize: 26, fontWeight: 900, marginBottom: 2 }}>43%</span>
+                  <span css={{ fontSize: 20 }}>{getEmotion('스트레스').icon}</span>
+                </div>
+              </div>
+              <span css={{ color: '#5042B3', fontSize: 16, fontWeight: 800 }}>스트레스</span>
             </div>
 
-            {/* 가장 주된 소비 시간 */}
-            <div>
-              <h3 css={{ margin: '0 0 4px', fontSize: 16 }}>가장 주된 소비 시간</h3>
-              <p css={{ margin: '0 0 12px', color: 'var(--sub)', fontSize: 12 }}>이 시간대에 지갑이 가장 쉽게 열려요</p>
-              {(() => {
-                const peakPoint = points.find(p => p.peak) || points[0];
-                return (
-                  <div css={{ display: 'flex', alignItems: 'center', gap: 11, background: 'var(--line)', padding: '14px 16px', borderRadius: 12 }}>
-                    <span css={{ width: 32, height: 32, borderRadius: '50%', background: '#9E96EE26', color: '#6A61C4', display: 'grid', placeItems: 'center', fontSize: 16 }}>🌙</span>
-                    <div css={{ flex: 1, minWidth: 0 }}>
-                      <b css={{ fontSize: 15 }}>밤 ({peakPoint.label})</b>
-                      <div css={{ color: 'var(--sub)', fontSize: 12, marginTop: 2 }}>감정소비의 대부분이 몰려있어요</div>
-                    </div>
-                    <div css={{ textAlign: 'right' }}>
-                      <b css={{ color: '#6A61C4', fontSize: 18, display: 'block' }}>{peakPoint.value}%</b>
-                      <span css={{ color: 'var(--sub)', fontSize: 12, fontWeight: 800 }}>가장 높음</span>
-                    </div>
-                  </div>
-                );
-              })()}
+            {/* 가운데 구분선 */}
+            <div css={{ width: 1, height: '70%', background: 'var(--line)' }} />
+
+            {/* 오른쪽: 밤 */}
+            <div css={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '36px 20px' }}>
+              <div css={{ position: 'relative', width: 130, height: 130, marginBottom: 20 }}>
+                <svg viewBox="0 0 36 36" css={{ width: '100%', height: '100%' }}>
+                  <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#FFD1DF" strokeWidth="3.5" />
+                  <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#9E355B" strokeWidth="3.5" strokeDasharray="33, 100" strokeLinecap="round" />
+                </svg>
+                <div css={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#9E355B' }}>
+                  <span css={{ fontSize: 26, fontWeight: 900, marginBottom: 2 }}>33%</span>
+                  <span css={{ fontSize: 20 }}>🌙</span>
+                </div>
+              </div>
+              <span css={{ color: '#9E355B', fontSize: 16, fontWeight: 800 }}>밤</span>
             </div>
           </div>
         </Card>
@@ -304,23 +294,33 @@ export default function AnalysisPageDc() {
       <Card>
         <div css={{ display: 'flex', alignItems: 'center', gap: 9, marginBottom: 6 }}><span css={{ width: 24, height: 24, borderRadius: 8, background: 'var(--ink)', color: 'var(--on-ink)', display: 'grid', placeItems: 'center', fontSize: 10, fontWeight: 900 }}>AI</span><b>반복되는 감정소비 패턴</b></div>
         <p css={{ color: 'var(--sub)', fontSize: 12.5, margin: '0 0 22px' }}>AI가 이번 달에 찾은 반복 조합이에요</p>
-        <div css={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', marginBottom: 22 }}>
-          <span css={{ display: 'inline-flex', alignItems: 'center', gap: 7, fontWeight: 900, background: '#9E96EE22', color: '#4A4299', padding: '11px 17px', borderRadius: 14 }}><i css={{ width: 9, height: 9, borderRadius: '50%', background: '#9E96EE' }} />스트레스</span>
-          <span css={{ color: 'var(--sub)' }}>→</span><span css={{ fontWeight: 800, background: 'var(--card)', border: '1px solid var(--line)', padding: '11px 17px', borderRadius: 14 }}>배달</span>
-          <span css={{ color: 'var(--sub)' }}>→</span><span css={{ fontWeight: 800, background: 'var(--card)', border: '1px solid var(--line)', padding: '11px 17px', borderRadius: 14 }}>밤 10시 이후</span>
-          <span css={{ marginLeft: 'auto' }}><b css={{ fontSize: 22, color: '#6A61C4' }}>7</b><span css={{ color: 'var(--sub)', fontSize: 12, fontWeight: 800 }}> 번 반복</span></span>
-        </div>
-        <div css={{ background: '#9E96EE14', borderRadius: 16, padding: '15px 18px', marginBottom: 22, fontWeight: 800 }}>스트레스 받은 밤, 배달로 마음을 달래고 있었어요. 그 순간을 조금만 알아채도 충분해요.</div>
-        <div css={{ border: '1px solid var(--line)', borderRadius: 16, overflow: 'hidden', background: 'var(--card)' }}>
-          <div css={{ display: 'grid', gridTemplateColumns: '84px 1fr auto', gap: 14, padding: '11px 18px', fontSize: 11, color: 'var(--sub)', fontWeight: 900, borderBottom: '1px solid var(--line)' }}><span>날짜</span><span>내역</span><span>금액</span></div>
-          {evidence.map(([date, category, emotion, situation, amount]) => {
-            const emo = getEmotion(emotion);
-            return <div key={date} css={{ display: 'grid', gridTemplateColumns: '84px 1fr auto', gap: 14, alignItems: 'center', padding: '14px 18px', borderBottom: '1px solid var(--line)' }}>
-              <span css={{ color: 'var(--sub)', fontSize: 12, fontWeight: 800 }}>{date}</span>
-              <div css={{ display: 'flex', alignItems: 'center', gap: 9, minWidth: 0 }}><span css={{ width: 8, height: 8, borderRadius: '50%', background: emo.color }} /><b>{category} <span css={{ color: 'var(--sub)', fontWeight: 600 }}>· {situation}</span></b><span css={{ color: emo.text || emo.color, background: `${emo.color}26`, borderRadius: 99, padding: '2px 8px', fontSize: 11, fontWeight: 800 }}>{emotion}</span></div>
-              <b>{amount}</b>
-            </div>;
-          })}
+        
+        <div css={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: 30, alignItems: 'start' }}>
+          {/* 왼쪽: 패턴 요약 */}
+          <div>
+            <div css={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', marginBottom: 22 }}>
+              <span css={{ display: 'inline-flex', alignItems: 'center', gap: 7, fontWeight: 900, background: '#9E96EE22', color: '#4A4299', padding: '11px 17px', borderRadius: 14 }}><i css={{ width: 9, height: 9, borderRadius: '50%', background: '#9E96EE' }} />스트레스</span>
+              <span css={{ color: 'var(--sub)' }}>→</span><span css={{ fontWeight: 800, background: 'var(--card)', border: '1px solid var(--line)', padding: '11px 17px', borderRadius: 14 }}>배달</span>
+              <span css={{ color: 'var(--sub)' }}>→</span><span css={{ fontWeight: 800, background: 'var(--card)', border: '1px solid var(--line)', padding: '11px 17px', borderRadius: 14 }}>밤 10시 이후</span>
+            </div>
+            <div css={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 22 }}>
+              <span css={{ color: '#6A61C4', fontSize: 24, fontWeight: 900 }}>7</span><span css={{ color: 'var(--sub)', fontSize: 14, fontWeight: 800 }}>번 반복</span>
+            </div>
+            <div css={{ background: '#9E96EE14', borderRadius: 16, padding: '15px 18px', fontWeight: 800, lineHeight: 1.6 }}>스트레스 받은 밤, 배달로 마음을 달래고 있었어요. 그 순간을 조금만 알아채도 충분해요.</div>
+          </div>
+
+          {/* 오른쪽: 내역 리스트 */}
+          <div css={{ border: '1px solid var(--line)', borderRadius: 16, overflow: 'hidden', background: 'var(--card)' }}>
+            <div css={{ display: 'grid', gridTemplateColumns: '84px 1fr auto', gap: 14, padding: '11px 18px', fontSize: 11, color: 'var(--sub)', fontWeight: 900, borderBottom: '1px solid var(--line)' }}><span>날짜</span><span>내역</span><span>금액</span></div>
+            {evidence.map(([date, category, emotion, situation, amount]) => {
+              const emo = getEmotion(emotion);
+              return <div key={date} css={{ display: 'grid', gridTemplateColumns: '84px 1fr auto', gap: 14, alignItems: 'center', padding: '14px 18px', borderBottom: '1px solid var(--line)' }}>
+                <span css={{ color: 'var(--sub)', fontSize: 12, fontWeight: 800 }}>{date}</span>
+                <div css={{ display: 'flex', alignItems: 'center', gap: 9, minWidth: 0 }}><span css={{ width: 8, height: 8, borderRadius: '50%', background: emo.color }} /><b>{category} <span css={{ color: 'var(--sub)', fontWeight: 600 }}>· {situation}</span></b><span css={{ color: emo.text || emo.color, background: `${emo.color}26`, borderRadius: 99, padding: '2px 8px', fontSize: 11, fontWeight: 800 }}>{emotion}</span></div>
+                <b>{amount}</b>
+              </div>;
+            })}
+          </div>
         </div>
       </Card>
     </Page>
