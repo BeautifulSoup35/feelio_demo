@@ -47,13 +47,6 @@ const BarTrack = styled.div`
   background: var(--line);
 `;
 
-const kpis = [
-  { label: '총 지출', value: '486,700', unit: '원', sub: '지난달 대비 -2.6%', tone: 'var(--text)', subColor: '#3E9578' },
-  { label: '총 수입', value: '2,600,000', unit: '원', sub: '고정 급여', tone: 'var(--text)', subColor: 'var(--sub)' },
-  { label: '이번 달 순액', value: '+2,113,300', unit: '원', sub: '흑자 유지 중', tone: '#3E9578', subColor: 'var(--sub)' },
-  { label: '감정소비', value: '186,000', unit: '원', sub: '전체 지출의 38%', tone: '#7960b8', subColor: '#7960b8' }
-];
-
 const categoryData = [
   { name: '배달', amount: 82000, prevAmount: 100000, emotion: '스트레스', pctText: '43%' },
   { name: '카페', amount: 54000, prevAmount: 50000, emotion: '설렘', pctText: '28%' },
@@ -74,7 +67,7 @@ const emotionDist = [
   ['평온', '8%', '기분 좋은 여유', '15,000원']
 ];
 
-const monthly = [['2월', 392], ['3월', 445], ['4월', 418], ['5월', 502], ['6월', 473], ['7월', 487]];
+const monthly = [['1월', 350], ['2월', 392], ['3월', 445], ['4월', 418], ['5월', 502], ['6월', 473], ['7월', 487]];
 const times = [['아침', 12], ['점심', 24], ['저녁', 31], ['밤', 33]];
 const evidence = [
   ['6월 12일', '배달', '스트레스', '퇴근 후', '₩23,000'],
@@ -107,13 +100,71 @@ export default function AnalysisPageDc() {
         </div>
       </div>
 
-      <KpiGrid>{kpis.map(item => (
-        <Card key={item.label}>
-          <div css={{ color: 'var(--sub)', fontSize: 12, fontWeight: 900 }}>{item.label}</div>
-          <div css={{ marginTop: 7, color: item.tone, fontSize: 26, fontWeight: 900, letterSpacing: 0 }}>{item.value}<span css={{ fontSize: 14 }}>{item.unit}</span></div>
-          <div css={{ color: item.subColor, fontSize: 12, fontWeight: 800 }}>{item.sub}</div>
+      <KpiGrid>
+        {/* Card 1: 상관관계 트리 */}
+        <Card css={{ display: 'flex', flexDirection: 'column', gap: 10, background: 'linear-gradient(145deg, #1A1829, var(--card))' }}>
+          <div css={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 900, color: '#A59DF6' }}>
+            <span css={{ fontSize: 16 }}>🕸️</span> 위험한 감정 루트
+          </div>
+          <div css={{ fontSize: 13, color: 'var(--sub)', lineHeight: 1.4 }}>가장 가난하게 만드는 루트는</div>
+          <div css={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', marginTop: 'auto' }}>
+            <span css={{ background: '#5b7db133', color: '#7ba2d9', padding: '4px 8px', borderRadius: 6, fontSize: 12, fontWeight: 800 }}>우울함</span>
+            <span css={{ color: 'var(--sub)', fontSize: 10 }}>→</span>
+            <span css={{ background: 'var(--line)', color: 'var(--text)', padding: '4px 8px', borderRadius: 6, fontSize: 12, fontWeight: 800 }}>새벽 2시 쇼핑</span>
+          </div>
         </Card>
-      ))}</KpiGrid>
+
+        {/* Card 2: 팩트체크 리포트 */}
+        <Card css={{ display: 'flex', flexDirection: 'column', gap: 10, background: 'linear-gradient(145deg, #2D1A29, var(--card))' }}>
+          <div css={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 900, color: '#F69D9D' }}>
+            <span css={{ fontSize: 16 }}>🔍</span> 팩트폭행 리포트
+          </div>
+          <div css={{ fontSize: 13, color: 'var(--sub)', lineHeight: 1.4 }}>이번 달 가장 쓸모없는 소비 1위</div>
+          <div css={{ display: 'flex', alignItems: 'center', gap: 16, background: '#F69D9D1a', padding: '16px', borderRadius: 12, marginTop: 'auto' }}>
+            <div css={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: 48, height: 48, borderRadius: '50%', background: '#DE3B40', color: '#FFF', flexShrink: 0, boxShadow: '0 4px 10px rgba(0,0,0,0.2)' }}>
+              <span css={{ fontSize: 10, fontWeight: 900, lineHeight: 1 }}>TOP</span>
+              <span css={{ fontSize: 20, fontWeight: 900, lineHeight: 1, marginTop: 2 }}>1</span>
+            </div>
+            <div css={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 4 }}>
+              <span css={{ background: '#ffffff1a', color: '#F69D9D', fontSize: 11, fontWeight: 800, padding: '4px 10px', borderRadius: 99 }}>스트레스 핑계</span>
+              <div css={{ fontSize: 15, fontWeight: 900, color: '#FFF' }}>택시비</div>
+              <div css={{ fontSize: 24, fontWeight: 900, color: '#F69D9D', marginTop: 2 }}>48,000원</div>
+            </div>
+          </div>
+        </Card>
+
+        {/* Card 3: 소비 위험도 (신호등) */}
+        <Card css={{ display: 'flex', flexDirection: 'column', background: 'linear-gradient(145deg, #292A1A, var(--card))', position: 'relative' }}>
+          <div css={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 900, color: '#F6D99D' }}>
+            <span css={{ fontSize: 16 }}>🚦</span> 소비 위험도
+          </div>
+          <div css={{ display: 'flex', gap: 20, margin: 'auto', background: '#00000040', padding: '18px 28px', borderRadius: 6 }}>
+            <div css={{ width: 30, height: 30, borderRadius: '50%', background: '#3E9578', opacity: 0.2 }} />
+            <div css={{ width: 30, height: 30, borderRadius: '50%', background: '#F1C40F', opacity: 0.2 }} />
+            <div css={{ width: 30, height: 30, borderRadius: '50%', background: '#E74C3C', boxShadow: '0 0 16px #E74C3C' }} />
+          </div>
+          <div css={{ position: 'absolute', bottom: 20, right: 22, fontSize: 11, color: 'var(--sub)', textAlign: 'right', letterSpacing: '-0.02em' }}>
+            스트레스 누적으로 <b css={{ color: '#E74C3C' }}>위험</b> 상태
+          </div>
+        </Card>
+
+        {/* Card 4: 맞춤 챌린지 */}
+        <Card css={{ display: 'flex', flexDirection: 'column', gap: 8, background: 'linear-gradient(145deg, #1A2A22, var(--card))' }}>
+          <div css={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 900, color: '#9DF6C4' }}>
+            <span css={{ fontSize: 16 }}>🎯</span> AI 맞춤 챌린지
+          </div>
+          <div css={{ fontSize: 14, fontWeight: 800, color: 'var(--text)', marginTop: 2 }}>밤 10시 이후 결제 0원</div>
+          <div css={{ marginTop: 'auto' }}>
+            <div css={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: 'var(--sub)', marginBottom: 4, fontWeight: 800 }}>
+              <span>12일 연속 성공!</span>
+              <span css={{ color: '#3E9578' }}>D-18</span>
+            </div>
+            <div css={{ width: '100%', height: 6, background: 'var(--line)', borderRadius: 99, overflow: 'hidden' }}>
+              <div css={{ width: '40%', height: '100%', background: '#3E9578', borderRadius: 99 }} />
+            </div>
+          </div>
+        </Card>
+      </KpiGrid>
 
       <Duo>
         <Card>
@@ -234,14 +285,14 @@ export default function AnalysisPageDc() {
 
       <Duo>
         <Card>
-          <div css={{ display: 'flex', justifyContent: 'space-between' }}><h3 css={{ margin: 0, fontSize: 16 }}>월별 지출 추이</h3><span css={{ color: 'var(--sub)', fontSize: 12, fontWeight: 800 }}>최근 6개월</span></div>
+          <div css={{ display: 'flex', justifyContent: 'space-between' }}><h3 css={{ margin: 0, fontSize: 16 }}>월별 지출 추이</h3><span css={{ color: 'var(--sub)', fontSize: 12, fontWeight: 800 }}>최근 7개월</span></div>
           <p css={{ color: 'var(--sub)', fontSize: 12 }}>지난달보다 <b css={{ color: '#3E9578' }}>2.6% 줄었어요</b></p>
-          <div css={{ display: 'flex', alignItems: 'flex-end', gap: 10, height: 150 }}>{monthly.map(([label, value], index) => {
+          <div css={{ display: 'flex', alignItems: 'flex-end', gap: 8, height: 165, marginTop: 12 }}>{monthly.map(([label, value], index) => {
             const current = index === monthly.length - 1;
             return <div key={label} css={{ flex: 1, height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end' }}>
-              <span css={{ color: current ? '#6A61C4' : 'var(--sub)', fontSize: 10, fontWeight: 800, marginBottom: 7 }}>{(value / 100).toFixed(1)}만</span>
-              <div css={{ width: '100%', maxWidth: 40, height: `${value / 520 * 100}%`, minHeight: 6, borderRadius: '7px 7px 3px 3px', background: current ? 'linear-gradient(180deg,#9E96EE,#B7B0F2)' : 'var(--line)' }} />
-              <span css={{ color: current ? 'var(--text)' : 'var(--sub)', fontSize: 11, fontWeight: current ? 900 : 700, marginTop: 9 }}>{label}</span>
+              <span css={{ color: current ? '#6A61C4' : 'var(--sub)', fontSize: 10, fontWeight: 800, marginBottom: 5, opacity: current ? 1 : 0.6 }}>{(value / 100).toFixed(1)}만</span>
+              <div css={{ width: '100%', height: `${value / 505 * 100}%`, minHeight: 6, borderRadius: 12, background: current ? '#4A4299' : 'var(--line)' }} />
+              <span css={{ color: current ? 'var(--text)' : 'var(--sub)', fontSize: 11, fontWeight: current ? 900 : 600, marginTop: 5 }}>{label}</span>
             </div>;
           })}</div>
         </Card>
@@ -278,14 +329,8 @@ export default function AnalysisPageDc() {
             })}
           </div>
 
-          <div css={{ 
-            marginTop: 'auto', 
-            padding: '20px', 
-            borderRadius: 16, 
-            border: `1px solid ${activeInsight.color}80`, 
-            background: `linear-gradient(145deg, ${activeInsight.color}1a, transparent)` 
-          }}>
-            <div css={{ fontSize: 16, fontWeight: 900, marginBottom: 8, color: 'var(--text)' }}>{activeInsight.title}</div>
+          <div css={{ marginTop: 'auto', paddingTop: 8 }}>
+            <div css={{ fontSize: 16, fontWeight: 900, marginBottom: 6, color: 'var(--text)' }}>{activeInsight.title}</div>
             <div css={{ fontSize: 13, color: 'var(--sub)', lineHeight: 1.5 }}>{activeInsight.desc}</div>
           </div>
         </Card>

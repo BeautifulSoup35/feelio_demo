@@ -51,8 +51,8 @@ const Observatory = styled.section`
   overflow: hidden;
   isolation: isolate;
   border-radius: 26px;
-  padding: clamp(18px, 3vw, 30px) clamp(14px, 3vw, 30px) clamp(22px, 3vw, 30px);
-  min-height: 430px;
+  padding: clamp(22px, 4vw, 44px) clamp(16px, 4vw, 44px) clamp(28px, 4vw, 44px);
+  min-height: 540px;
   display: flex;
   flex-direction: column;
   align-items: center;
