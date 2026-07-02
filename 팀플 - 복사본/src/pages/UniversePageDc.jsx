@@ -3,6 +3,8 @@ import { useState } from 'react';
 import styled from '@emotion/styled';
 import { GlassCard } from '../components/common/GlassCard.jsx';
 import { getEmotion } from '../data/emotions.js';
+import PlanetTest from '../components/universe/PlanetTest.jsx';
+import TheFork from '../components/universe/TheFork.jsx';
 
 const Page = styled.div`
   width: min(100%, 1420px);
@@ -208,39 +210,7 @@ export default function UniversePageDc() {
 
   return (
     <Page>
-      <Cosmic>
-        <div css={{ position: 'absolute', inset: 0, zIndex: -1, background: 'radial-gradient(circle at 82% 22%,rgba(131,201,176,.28),transparent 44%),radial-gradient(circle at 20% 82%,rgba(158,150,238,.24),transparent 46%)' }} />
-        <div css={{ position: 'relative', maxWidth: 440 }}>
-          <div css={{ fontSize: 12, fontWeight: 900, letterSpacing: '.14em', color: 'rgba(255,255,255,.55)', marginBottom: 10 }}>PARALLEL UNIVERSE</div>
-          <div css={{ fontSize: 'clamp(22px, 2.6vw, 28px)', fontWeight: 900, lineHeight: 1.4, color: '#fff' }}>지금의 소비가 이어질 미래와,<br />감정소비를 조금 줄인 미래.</div>
-          <div css={{ fontSize: 14, color: 'rgba(255,255,255,.62)', lineHeight: 1.65, marginTop: 12 }}>두 우주가 이렇게 갈라지고 있어요.</div>
-        </div>
-        <svg viewBox="0 0 520 190" width="100%" height="150" preserveAspectRatio="none" css={{ display: 'block', marginTop: 16, overflow: 'visible' }}>
-          <path d="M40,150 C200,150 300,150 490,150" fill="none" stroke="rgba(200,195,220,.42)" strokeWidth="2.5" strokeDasharray="2 7" strokeLinecap="round" />
-          {/* Background Dashed Path (Unreached) */}
-          <path d="M40,150 C210,150 300,90 490,34" fill="none" stroke="#8FDAC0" strokeWidth="3" strokeDasharray="2 7" strokeLinecap="round" opacity={0.4} />
-          {/* Foreground Solid Path (Reached Progress) */}
-          <path d="M40,150 C210,150 300,90 490,34" fill="none" stroke="#8FDAC0" strokeWidth="3" strokeLinecap="round" 
-            pathLength="100" 
-            strokeDasharray="100" 
-            strokeDashoffset={100 - currentProgress} 
-            css={{ transition: 'stroke-dashoffset 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)' }} 
-          />
-          <circle cx="40" cy="150" r="6" fill="#fff" />
-          <circle cx="490" cy="150" r="5.5" fill="rgba(200,195,220,.6)" />
-          {/* Animated Star */}
-          <g css={{ transform: `translate(${starX}px, ${starY}px)`, transition: 'transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)' }}>
-            <path d="M0 -13l3.4 9.6 9.6 3.4-9.6 3.4L0 13l-3.4-9.6-9.6-3.4 9.6-3.4z" fill="#8FDAC0" />
-            {selectedUniverse === 'alt' && (
-              <circle r="20" fill="#8FDAC0" css={{ opacity: 0, animation: 'ping 1s cubic-bezier(0, 0, 0.2, 1) infinite' }} />
-            )}
-          </g>
-          <circle cx="150" cy="150" r="2" fill="rgba(255,255,255,.4)" />
-          <circle cx="430" cy="52" r="2" fill="rgba(255,255,255,.5)" />
-          <circle cx="330" cy="150" r="1.6" fill="rgba(255,255,255,.3)" />
-        </svg>
-        <div css={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, fontWeight: 900, marginTop: 4 }}><span css={{ color: 'rgba(255,255,255,.55)' }}>지금</span><span css={{ color: '#8FDAC0' }}>목표 도착 ★</span></div>
-      </Cosmic>
+      <TheFork />
 
       <ContentLayout>
         <LeftColumn>
@@ -406,10 +376,7 @@ export default function UniversePageDc() {
                 </TimelineContainer>
               </>
             ) : (
-              <div css={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--sub)', textAlign: 'center', gap: 16 }}>
-                <div css={{ fontSize: 40, opacity: 0.5 }}>👀</div>
-                <div css={{ fontSize: 15, lineHeight: 1.6, fontWeight: 600 }}>왼쪽 카드를 클릭하여<br/>각 우주의 하루 일과를 확인해보세요</div>
-              </div>
+              <PlanetTest />
             )}
           </SchedulePanel>
         </RightColumn>
