@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 /* Feelio · 평행우주 → The Fork (서비스 디자인 정렬판)
  * 두 미래 = 감정 말랑이: 이대로면(스트레스) vs 줄이면(평온).
@@ -28,8 +28,24 @@ function Blob({ x, y, r, emo }) {
   );
 }
 
-export default function TheFork() {
-  const [reduce, setReduce] = useState(30);
+export default function TheFork({ selectedUniverse }) {
+  const [manualReduce, setManualReduce] = useState(30);
+  const targetReduce = selectedUniverse === 'current' ? 0 : selectedUniverse === 'alt' ? 50 : manualReduce;
+  const [reduce, setReduce] = useState(targetReduce);
+
+  useEffect(() => {
+    let frameId;
+    const animate = () => {
+      setReduce(prev => {
+        const diff = targetReduce - prev;
+        if (Math.abs(diff) < 0.1) return targetReduce;
+        frameId = requestAnimationFrame(animate);
+        return prev + diff * 0.12;
+      });
+    };
+    animate();
+    return () => cancelAnimationFrame(frameId);
+  }, [targetReduce]);
   const ifSave = Math.round(IF_STAY * (1 - (reduce / 100) * 0.62));
   const gap = IF_STAY - ifSave;
   const daysFaster = Math.round(reduce * 1.6);
@@ -52,8 +68,12 @@ export default function TheFork() {
 
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
         <div>
-          <div style={{ letterSpacing: "0.16em", fontSize: 11, fontWeight: 700, color: "#7f86a0" }}>PARALLEL UNIVERSE</div>
-          <div style={{ fontSize: "clamp(15px,1.8vw,18px)", fontWeight: 800, letterSpacing: "-0.02em", marginTop: 5 }}>미래는 지금 갈라지고 있어요</div>
+          <div style={{ letterSpacing: "0.16em", fontSize: 11, fontWeight: 700, color: selectedUniverse === 'current' ? ST : selectedUniverse === 'alt' ? CA : "#7f86a0" }}>
+            {selectedUniverse === 'current' ? 'CURRENT UNIVERSE' : selectedUniverse === 'alt' ? 'ALTERNATIVE UNIVERSE' : 'PARALLEL UNIVERSE'}
+          </div>
+          <div style={{ fontSize: "clamp(15px,1.8vw,18px)", fontWeight: 800, letterSpacing: "-0.02em", marginTop: 5 }}>
+            {selectedUniverse === 'current' ? '이대로 소비하면 이렇게 흘러가요' : selectedUniverse === 'alt' ? '감정소비를 줄인 긍정적인 미래' : '미래는 지금 갈라지고 있어요'}
+          </div>
         </div>
         <div style={{ fontSize: 11, letterSpacing: "0.12em", color: "#7f86a0" }}>FIG.01 · THE FORK</div>
       </div>
@@ -110,10 +130,19 @@ export default function TheFork() {
       {/* 슬라이더 */}
       <div style={{ marginTop: 2, padding: "12px 15px", borderRadius: 14, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 9, flexWrap: "wrap", gap: 6 }}>
-          <div style={{ fontSize: 13.5, color: "#c3c8da" }}>감정소비를 <b style={{ color: CA, fontSize: 18 }}>{reduce}%</b> 줄이면</div>
-          <div style={{ fontSize: 12.5, color: "#8a90a6" }}>목표 <b style={{ color: CA }}>{daysFaster}일</b> 단축 · 아끼는 돈 <b style={{ color: "#fff" }}>{won(gap)}원</b></div>
+          {selectedUniverse === 'current' ? (
+            <>
+              <div style={{ fontSize: 13.5, color: "#c3c8da" }}>감정소비를 <b style={{ color: ST, fontSize: 18 }}>유지</b>하면</div>
+              <div style={{ fontSize: 12.5, color: "#8a90a6" }}>변화 없이 돈이 <b style={{ color: ST }}>빠져나갑니다</b></div>
+            </>
+          ) : (
+            <>
+              <div style={{ fontSize: 13.5, color: "#c3c8da" }}>감정소비를 <b style={{ color: CA, fontSize: 18 }}>{reduce}%</b> 줄이면</div>
+              <div style={{ fontSize: 12.5, color: "#8a90a6" }}>목표 <b style={{ color: CA }}>{daysFaster}일</b> 단축 · 아끼는 돈 <b style={{ color: "#fff" }}>{won(gap)}원</b></div>
+            </>
+          )}
         </div>
-        <input type="range" min="0" max="50" value={reduce} onChange={(e) => setReduce(+e.target.value)} aria-label="감정소비 절감 비율" style={{ width: "100%", accentColor: CA, cursor: "pointer" }} />
+        <input type="range" min="0" max="50" value={reduce} onChange={(e) => setManualReduce(+e.target.value)} aria-label="감정소비 절감 비율" style={{ width: "100%", accentColor: CA, cursor: "pointer", opacity: selectedUniverse ? 0.7 : 1 }} disabled={!!selectedUniverse} />
         <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10.5, color: "#5a6079", marginTop: 4 }}>
           <span>지금 그대로</span><span>감정소비 절반으로</span>
         </div>
