@@ -1,4 +1,5 @@
 /** @jsxImportSource @emotion/react */
+import { useState } from 'react';
 import styled from '@emotion/styled';
 import { GlassCard } from '../components/common/GlassCard.jsx';
 import { getEmotion } from '../data/emotions.js';
@@ -43,6 +44,54 @@ const Bars = styled.div`
   margin-top: 20px;
 `;
 
+const FlipContainer = styled.div`
+  perspective: 1200px;
+  cursor: pointer;
+  width: 100%;
+`;
+
+const CardInner = styled.div`
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 280px;
+  transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transform-style: preserve-3d;
+  ${props => props.isFlipped && `transform: rotateX(180deg);`}
+`;
+
+const CardFace = styled(UniverseCard)`
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  top: 0; left: 0;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  margin: 0;
+`;
+
+const CardBack = styled(CardFace)`
+  transform: rotateX(180deg);
+`;
+
+const ScheduleList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 10px;
+  font-size: 13px;
+  line-height: 1.5;
+`;
+
+const TimeRow = styled.div`
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  b { color: ${props => props.color}; min-width: 44px; }
+`;
+
 const ScenarioGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -54,13 +103,43 @@ const ScenarioGrid = styled.div`
 `;
 
 const projection = [['1월', 18, 11], ['2월', 36, 21], ['3월', 55, 30], ['4월', 74, 38], ['5월', 92, 46], ['6월', 112, 52]];
-const scenarios = [
-  ['밤 배달 주 2회 → 1회', '스트레스', '+38,000', '가장 큰 누수예요'],
-  ['습관성 카페 절반으로', '설렘', '+16,000', '작지만 매일 쌓여요'],
-  ['충동 쇼핑 하루만 참기', '설렘', '+24,000', '주말에 몰려요']
-];
 
 export default function UniversePageDc() {
+  const [selectedUniverse, setSelectedUniverse] = useState(null); // 'current' | 'alt' | null
+  
+  const baseProgress = 40;
+
+  // 상승 궤도 (초록)
+  const getUpPoint = (t) => {
+    const p0 = { x: 40, y: 150 }, p1 = { x: 210, y: 150 }, p2 = { x: 300, y: 90 }, p3 = { x: 490, y: 34 };
+    const cx = 3 * (p1.x - p0.x), bx = 3 * (p2.x - p1.x) - cx, ax = p3.x - p0.x - cx - bx;
+    const cy = 3 * (p1.y - p0.y), by = 3 * (p2.y - p1.y) - cy, ay = p3.y - p0.y - cy - by;
+    return { x: (ax * t**3) + (bx * t**2) + (cx * t) + p0.x, y: (ay * t**3) + (by * t**2) + (cy * t) + p0.y };
+  };
+
+  // 평행 궤도 (회색/바닥)
+  const getDownPoint = (t) => {
+    const p0 = { x: 40, y: 150 }, p1 = { x: 200, y: 150 }, p2 = { x: 300, y: 150 }, p3 = { x: 490, y: 150 };
+    const cx = 3 * (p1.x - p0.x), bx = 3 * (p2.x - p1.x) - cx, ax = p3.x - p0.x - cx - bx;
+    const cy = 3 * (p1.y - p0.y), by = 3 * (p2.y - p1.y) - cy, ay = p3.y - p0.y - cy - by;
+    return { x: (ax * t**3) + (bx * t**2) + (cx * t) + p0.x, y: (ay * t**3) + (by * t**2) + (cy * t) + p0.y };
+  };
+
+  let starX, starY, currentProgress;
+  if (selectedUniverse === 'alt') {
+    currentProgress = 100;
+    const pt = getUpPoint(1);
+    starX = pt.x; starY = pt.y;
+  } else if (selectedUniverse === 'current') {
+    currentProgress = baseProgress; // 떨어질때 실선은 기본으로 유지
+    const pt = getDownPoint(1);
+    starX = pt.x; starY = pt.y;
+  } else {
+    currentProgress = baseProgress;
+    const pt = getUpPoint(baseProgress / 100);
+    starX = pt.x; starY = pt.y;
+  }
+
   return (
     <Page>
       <Cosmic>
@@ -72,10 +151,24 @@ export default function UniversePageDc() {
         </div>
         <svg viewBox="0 0 520 190" width="100%" height="150" preserveAspectRatio="none" css={{ display: 'block', marginTop: 16, overflow: 'visible' }}>
           <path d="M40,150 C200,150 300,150 490,150" fill="none" stroke="rgba(200,195,220,.42)" strokeWidth="2.5" strokeDasharray="2 7" strokeLinecap="round" />
-          <path d="M40,150 C210,150 300,90 490,34" fill="none" stroke="#8FDAC0" strokeWidth="3" strokeLinecap="round" />
+          {/* Background Dashed Path (Unreached) */}
+          <path d="M40,150 C210,150 300,90 490,34" fill="none" stroke="#8FDAC0" strokeWidth="3" strokeDasharray="2 7" strokeLinecap="round" opacity={0.4} />
+          {/* Foreground Solid Path (Reached Progress) */}
+          <path d="M40,150 C210,150 300,90 490,34" fill="none" stroke="#8FDAC0" strokeWidth="3" strokeLinecap="round" 
+            pathLength="100" 
+            strokeDasharray="100" 
+            strokeDashoffset={100 - currentProgress} 
+            css={{ transition: 'stroke-dashoffset 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)' }} 
+          />
           <circle cx="40" cy="150" r="6" fill="#fff" />
           <circle cx="490" cy="150" r="5.5" fill="rgba(200,195,220,.6)" />
-          <path d="M490 20l3.4 9.6 9.6 3.4-9.6 3.4L490 46l-3.4-9.6-9.6-3.4 9.6-3.4z" fill="#8FDAC0" />
+          {/* Animated Star */}
+          <g css={{ transform: `translate(${starX}px, ${starY}px)`, transition: 'transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)' }}>
+            <path d="M0 -13l3.4 9.6 9.6 3.4-9.6 3.4L0 13l-3.4-9.6-9.6-3.4 9.6-3.4z" fill="#8FDAC0" />
+            {selectedUniverse === 'alt' && (
+              <circle r="20" fill="#8FDAC0" css={{ opacity: 0, animation: 'ping 1s cubic-bezier(0, 0, 0.2, 1) infinite' }} />
+            )}
+          </g>
           <circle cx="150" cy="150" r="2" fill="rgba(255,255,255,.4)" />
           <circle cx="430" cy="52" r="2" fill="rgba(255,255,255,.5)" />
           <circle cx="330" cy="150" r="1.6" fill="rgba(255,255,255,.3)" />
@@ -84,22 +177,55 @@ export default function UniversePageDc() {
       </Cosmic>
 
       <Duo>
-        <UniverseCard>
-          <div css={{ position: 'absolute', top: -50, right: -40, width: 180, height: 180, borderRadius: '50%', background: 'radial-gradient(circle at 40% 35%,#cfcadb,#a49fb6)', filter: 'blur(10px)', opacity: .4 }} />
-          <div css={{ color: 'var(--sub)', fontSize: 12, fontWeight: 900, letterSpacing: '.04em' }}>현재 우주</div>
-          <h3 css={{ margin: '6px 0 18px', fontSize: 20 }}>지금처럼 소비한 나</h3>
-          <div css={{ color: 'var(--sub)', fontSize: 13 }}>이번 달 감정소비</div>
-          <div css={{ fontSize: 34, fontWeight: 900 }}>-182,000원</div>
-          <p css={{ color: 'var(--sub)', lineHeight: 1.7 }}>외로운 밤의 배달이 지금 속도로 이어지면, 목표까지 <b css={{ color: 'var(--text)' }}>4개월</b>이 더 걸려요.</p>
-        </UniverseCard>
-        <UniverseCard css={{ background: 'linear-gradient(160deg,#83C9B033,var(--card))' }}>
-          <div css={{ position: 'absolute', top: -50, right: -40, width: 180, height: 180, borderRadius: '50%', background: 'radial-gradient(circle at 40% 35%,#C6F0E0,#72CFAD)', filter: 'blur(10px)', opacity: .55 }} />
-          <div css={{ color: '#3E9578', fontSize: 12, fontWeight: 900, letterSpacing: '.04em' }}>다른 우주</div>
-          <h3 css={{ margin: '6px 0 18px', fontSize: 20 }}>감정소비를 줄인 나</h3>
-          <div css={{ color: 'var(--sub)', fontSize: 13 }}>아낄 수 있는 금액</div>
-          <div css={{ fontSize: 34, fontWeight: 900, color: '#3E9578' }}>+62,000원</div>
-          <p css={{ color: 'var(--sub)', lineHeight: 1.7 }}>외로운 밤의 배달을 <b css={{ color: 'var(--text)' }}>절반만</b> 줄이면, 목표에 이만큼 더 가까워져요.</p>
-        </UniverseCard>
+        <FlipContainer onClick={() => setSelectedUniverse(selectedUniverse === 'current' ? null : 'current')}>
+          <CardInner isFlipped={selectedUniverse === 'current'}>
+            <CardFace>
+              <div css={{ position: 'absolute', top: -50, right: -40, width: 180, height: 180, borderRadius: '50%', background: 'radial-gradient(circle at 40% 35%,#cfcadb,#a49fb6)', filter: 'blur(10px)', opacity: .4 }} />
+              <div css={{ color: 'var(--sub)', fontSize: 12, fontWeight: 900, letterSpacing: '.04em' }}>현재 우주</div>
+              <h3 css={{ margin: '6px 0 18px', fontSize: 20 }}>지금처럼 소비한 나</h3>
+              <div css={{ color: 'var(--sub)', fontSize: 13 }}>이번 달 감정소비</div>
+              <div css={{ fontSize: 34, fontWeight: 900 }}>-182,000원</div>
+              <p css={{ color: 'var(--sub)', lineHeight: 1.7, marginTop: 'auto' }}>외로운 밤의 배달이 지금 속도로 이어지면, 목표까지 <b css={{ color: 'var(--text)' }}>4개월</b>이 더 걸려요.</p>
+              <div css={{ fontSize: 11, color: 'var(--sub)', marginTop: 14, textAlign: 'right' }}>클릭해서 스케줄 보기 ↺</div>
+            </CardFace>
+            <CardBack css={{ background: '#252336' }}>
+              <div css={{ color: 'var(--sub)', fontSize: 12, fontWeight: 900, letterSpacing: '.04em' }}>현재 우주의 하루</div>
+              <h3 css={{ margin: '6px 0 14px', fontSize: 18 }}>돈이 모이지 않는 스케줄</h3>
+              <ScheduleList>
+                <TimeRow color="#cfcadb"><b>22:00</b><span>스트레스 폭발, 누워서 배달 앱 탐색</span></TimeRow>
+                <TimeRow color="#cfcadb"><b>23:30</b><span>매운 야식 결제 (-23,000원) 완료</span></TimeRow>
+                <TimeRow color="#cfcadb"><b>08:30</b><span>더부룩한 속, 늦잠으로 택시 탑승 (-9,800원)</span></TimeRow>
+                <TimeRow color="#cfcadb"><b>12:00</b><span>피곤함을 달래려 비싼 커피 수혈 (-6,000원)</span></TimeRow>
+              </ScheduleList>
+              <div css={{ fontSize: 11, color: 'var(--sub)', marginTop: 'auto', textAlign: 'right' }}>돌아가기 ↺</div>
+            </CardBack>
+          </CardInner>
+        </FlipContainer>
+
+        <FlipContainer onClick={() => setSelectedUniverse(selectedUniverse === 'alt' ? null : 'alt')}>
+          <CardInner isFlipped={selectedUniverse === 'alt'}>
+            <CardFace css={{ background: 'linear-gradient(160deg,#83C9B033,var(--card))' }}>
+              <div css={{ position: 'absolute', top: -50, right: -40, width: 180, height: 180, borderRadius: '50%', background: 'radial-gradient(circle at 40% 35%,#C6F0E0,#72CFAD)', filter: 'blur(10px)', opacity: .55 }} />
+              <div css={{ color: '#3E9578', fontSize: 12, fontWeight: 900, letterSpacing: '.04em' }}>다른 우주</div>
+              <h3 css={{ margin: '6px 0 18px', fontSize: 20 }}>감정소비를 줄인 나</h3>
+              <div css={{ color: 'var(--sub)', fontSize: 13 }}>아낄 수 있는 금액</div>
+              <div css={{ fontSize: 34, fontWeight: 900, color: '#3E9578' }}>+62,000원</div>
+              <p css={{ color: 'var(--sub)', lineHeight: 1.7, marginTop: 'auto' }}>외로운 밤의 배달을 <b css={{ color: 'var(--text)' }}>절반만</b> 줄이면, 목표에 이만큼 더 가까워져요.</p>
+              <div css={{ fontSize: 11, color: '#3E957880', marginTop: 14, textAlign: 'right' }}>클릭해서 스케줄 보기 ↺</div>
+            </CardFace>
+            <CardBack css={{ background: 'linear-gradient(160deg,#3E957833,#252336)' }}>
+              <div css={{ color: '#3E9578', fontSize: 12, fontWeight: 900, letterSpacing: '.04em' }}>다른 우주의 하루</div>
+              <h3 css={{ margin: '6px 0 14px', fontSize: 18 }}>가벼워지는 스케줄</h3>
+              <ScheduleList>
+                <TimeRow color="#8FDAC0"><b>22:00</b><span>야식 대신 따뜻한 차 한 잔으로 릴렉스</span></TimeRow>
+                <TimeRow color="#8FDAC0"><b>23:00</b><span>배달비 방어 성공! 가벼운 속으로 취침</span></TimeRow>
+                <TimeRow color="#8FDAC0"><b>07:30</b><span>개운하게 기상, 여유롭게 대중교통 탑승</span></TimeRow>
+                <TimeRow color="#8FDAC0"><b>10:00</b><span>아낀 돈으로 늘어난 적금 이자 확인 (+62,000원)</span></TimeRow>
+              </ScheduleList>
+              <div css={{ fontSize: 11, color: '#3E957880', marginTop: 'auto', textAlign: 'right' }}>돌아가기 ↺</div>
+            </CardBack>
+          </CardInner>
+        </FlipContainer>
       </Duo>
 
       <GlassCard css={{ padding: '26px 30px', borderRadius: 28 }}>
@@ -119,18 +245,6 @@ export default function UniversePageDc() {
         <div css={{ display: 'flex', alignItems: 'center', gap: 10, background: 'linear-gradient(105deg,#83C9B01f,transparent)', borderRadius: 16, padding: '14px 18px', marginTop: 20, fontWeight: 800 }}><span css={{ fontSize: 20, color: '#3E9578' }}>+600,000원</span><span css={{ color: 'var(--sub)' }}>6개월이면 다른 우주가 이만큼 앞서요.</span></div>
       </GlassCard>
 
-      <div>
-        <h3 css={{ margin: '0 0 4px', fontSize: 16 }}>만약에, 이렇게 바꾼다면</h3>
-        <p css={{ margin: '0 0 16px', color: 'var(--sub)', fontSize: 12 }}>작은 레버 하나가 다른 우주를 열어요</p>
-        <ScenarioGrid>{scenarios.map(([lever, emotion, save, note]) => {
-          const emo = getEmotion(emotion);
-          return <GlassCard key={lever} css={{ padding: '20px 22px', display: 'grid', gap: 11 }}>
-            <div css={{ display: 'flex', justifyContent: 'space-between', gap: 8 }}><span css={{ color: emo.text || emo.color, background: `${emo.color}26`, borderRadius: 99, padding: '2px 9px', fontSize: 11, fontWeight: 900 }}>{emotion}</span><b css={{ color: '#3E9578', fontSize: 19 }}>{save}</b></div>
-            <b>{lever}</b>
-            <span css={{ color: 'var(--sub)', fontSize: 12 }}>{note} · 매달</span>
-          </GlassCard>;
-        })}</ScenarioGrid>
-      </div>
     </Page>
   );
 }
