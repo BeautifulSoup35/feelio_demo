@@ -1,426 +1,316 @@
 /** @jsxImportSource @emotion/react */
-import { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import styled from '@emotion/styled';
 import { Global, css } from '@emotion/react';
+import UniversePlanet from '../components/UniversePlanet';
+import SpaceBlob from '../components/SpaceBlob';
+import UniverseConsole from '../components/UniverseConsole';
+import UniverseEasterEgg from '../components/UniverseEasterEgg';
 
-// === Keyframes ===
 const globalStyles = css`
-  @keyframes pu-twinkle { 0%, 100% { opacity: .2 } 50% { opacity: 1 } }
-  @keyframes pu-float { 0%, 100% { transform: translateY(0) } 50% { transform: translateY(-9px) } }
-  @keyframes pu-glow { 0%, 100% { opacity: .6 } 50% { opacity: 1 } }
-  @keyframes pu-spin { from { transform: rotate(0) } to { transform: rotate(360deg) } }
-  @keyframes pu-resultin { from { opacity: 0; transform: translate(-50%, -46%) scale(.96) } to { opacity: 1; transform: translate(-50%, -50%) scale(1) } }
-  @keyframes pu-pop { from { opacity: 0; transform: scale(.9) } to { opacity: 1; transform: none } }
-  @keyframes pu-blink { 0%, 100% { opacity: .35 } 50% { opacity: 1 } }
-  @keyframes pu-fly-a { 0% { transform: translate(580px, 600px) scale(1) rotate(0deg); opacity: 0 } 14% { opacity: 1 } 100% { transform: translate(330px, 205px) scale(.32) rotate(-10deg); opacity: 1 } }
-  @keyframes pu-fly-b { 0% { transform: translate(580px, 600px) scale(1) rotate(0deg); opacity: 0 } 14% { opacity: 1 } 100% { transform: translate(830px, 225px) scale(.32) rotate(10deg); opacity: 1 } }
-  
-  /* 신규 진입 애니메이션 */
+  html, body {
+    overflow: hidden !important;
+  }
+  @keyframes pu-twinkle{0%,100%{opacity:.2}50%{opacity:1}}
+  @keyframes pu-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+  @keyframes pu-glow{0%,100%{opacity:.6}50%{opacity:1}}
+  @keyframes pu-spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+  @keyframes pu-resultin{from{opacity:0;transform:translate(-50%,-46%) scale(.96)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+  @keyframes pu-pop{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:none}}
+  @keyframes pu-blink{0%,100%{opacity:.35}50%{opacity:1}}
+  @keyframes pu-arrive{from{opacity:0}to{opacity:1}}
+  @keyframes pu-recoil{0%{transform:translate(0,0) scale(1)}20%{transform:translate(-16px,11px) scale(1.02,.985)}100%{transform:translate(0,0) scale(1)}}
+  @keyframes pu-fly-a{0%{transform:translate(580px,600px) scale(1) rotate(0deg);opacity:0}14%{opacity:1}100%{transform:translate(330px,205px) scale(.32) rotate(-10deg);opacity:1}}
+  @keyframes pu-fly-b{0%{transform:translate(580px,600px) scale(1) rotate(0deg);opacity:0}14%{opacity:1}100%{transform:translate(830px,225px) scale(.32) rotate(10deg);opacity:1}}
+  @keyframes pu-depart{0%{transform:translate(330px,430px) scale(1) rotate(0deg);opacity:0}14%{opacity:1}100%{transform:translate(948px,344px) scale(.22) rotate(16deg);opacity:1}}
+  @keyframes pu-scan{0%{transform:scale(.4);opacity:.85}100%{transform:scale(3.2);opacity:0}}
+  @keyframes pu-hover{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+  @keyframes pu-selglow{0%,100%{opacity:.5;transform:translate(-50%,-50%) scale(1)}50%{opacity:1;transform:translate(-50%,-50%) scale(1.08)}}
+  @keyframes pu-welldraw{0%{opacity:0}100%{opacity:1}}
+  @keyframes pu-eqfloat{0%,100%{transform:translateY(0);opacity:.5}50%{transform:translateY(-6px);opacity:.85}}
   @keyframes pu-unfold {
-    0% { transform: scaleY(0.005) scaleX(0); opacity: 0; box-shadow: 0 0 100px #fff; }
-    30% { transform: scaleY(0.005) scaleX(1); opacity: 1; box-shadow: 0 0 40px #7FB4E8; }
-    100% { transform: scaleY(1) scaleX(1); opacity: 1; box-shadow: none; }
+    0% { transform: scaleY(0.005) scaleX(0); opacity: 0; }
+    30% { transform: scaleY(0.005) scaleX(1); opacity: 1; }
+    100% { transform: scaleY(1) scaleX(1); opacity: 1; }
   }
   @keyframes pu-flicker {
     0%, 10%, 20%, 30%, 100% { filter: brightness(1); }
-    5%, 15%, 25% { filter: brightness(1.6) contrast(1.2); }
+    5%, 15%, 25% { filter: brightness(1.3) contrast(1.2); }
   }
 `;
-
-// === Data ===
-const universeData = {
-  current: {
-    tag: "현재 우주", title: "지금처럼 소비한 나", metricLabel: "이번 달 감정소비",
-    metric: "-182,000원", accent: "#9E96EE",
-    narrative: "외로운 밤의 배달이 지금 속도로 이어지면, 제주도 여행 목표까지 4개월이 더 걸려요.",
-    goalNote: "제주도 여행 · 4개월 지연", emotionTag: "외로움 · 스트레스",
-  },
-  reduced: {
-    tag: "다른 우주", title: "감정소비를 줄인 나", metricLabel: "매달 아낄 수 있는 금액",
-    metric: "+62,000원", accent: "#82E2C2",
-    narrative: "외로운 밤의 배달을 절반만 줄이면, 목표에 이만큼씩 더 가까워져요.",
-    goalNote: "제주도 여행 · 더 가까이", emotionTag: "평온 · 뿌듯함",
-  }
-};
 
 const Container = styled.div`
   position: relative;
   width: 100%;
-  height: calc(100vh - 120px);
+  height: calc(100vh - 100px);
   display: flex;
   align-items: center;
   justify-content: center;
 `;
 
-// 부모 컴포넌트의 패딩을 덮기 위해 -50px 등 여유를 주고 바깥을 덮습니다.
-const Overlay = styled.div`
-  position: absolute;
-  inset: -60px;
-  background: rgba(14, 15, 23, 0.55);
-  backdrop-filter: blur(16px);
-  z-index: 0;
-  border-radius: 20px;
-  /* 부드럽게 나타나는 효과 */
-  animation: pu-fadein 0.6s ease forwards;
-  @keyframes pu-fadein { from { opacity: 0; } to { opacity: 1; } }
+const PageWrapper = styled.div`
+  position: relative;
+  width: 1160px;
+  height: 660px;
+  border-radius: 28px;
+  overflow: hidden;
+  background: radial-gradient(135% 100% at 50% -10%,#23263e 0%,#14161f 44%,#0a0c14 100%);
+  box-shadow: 0 44px 100px -34px rgba(20,16,30,.72),0 0 0 1px rgba(255,255,255,.06);
+  font-family: system-ui, -apple-system, sans-serif;
+  animation: pu-unfold 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards, pu-flicker 1.2s ease-out forwards;
 `;
 
-const PageWrapper = styled.div`
-  width: min(100%, 1420px);
-  height: 100%;
-  position: relative;
-  overflow: hidden;
-  border-radius: 20px;
-  background: radial-gradient(135% 100% at 50% -10%, #23263e 0%, #14161f 44%, #0a0c14 100%);
-  z-index: 1;
-  /* 펼쳐지는 모션과 깜빡임 모션 동시 적용 */
-  transform-origin: center;
-  animation: pu-unfold 0.85s cubic-bezier(0.16, 1, 0.3, 1) forwards, pu-flicker 0.6s ease-out forwards;
-`;
+const U_DATA = {
+  current: {
+    tag: "현재 우주", title: "지금처럼 소비한 나", metricLabel: "이번 달 감정소비", metric: "-182,000원", accent: "#9E96EE",
+    narratives: [
+      "외로운 밤의 배달이 지금 속도로 이어지면, 제주도 여행 목표까지 4개월이 더 걸려요.",
+      "충동적인 지출은 잠시 위안을 주지만, 장기적인 목표를 멀어지게 만들고 있어요.",
+      "가끔은 밖으로 나가 가벼운 산책을 해보는 건 어떨까요? 기분이 한결 나아질 거예요!"
+    ],
+    goalNote: "제주도 여행 · 4개월 지연", emotionTag: "외로움 · 스트레스"
+  },
+  reduced: {
+    tag: "다른 우주", title: "감정소비를 줄인 나", metricLabel: "매달 아낄 수 있는 금액", metric: "+62,000원", accent: "#82E2C2",
+    narratives: [
+      "외로운 밤의 배달을 절반만 줄이면, 목표에 이만큼씩 더 가까워져요.",
+      "불필요한 소비를 줄인 당신! 제주도의 푸른 바다가 한 뼘 더 가까워졌네요.",
+      "자신의 감정을 잘 다스리는 지금의 모습, 우주에서 가장 반짝이고 있어요! ✨"
+    ],
+    goalNote: "제주도 여행 · 더 가까이", emotionTag: "평온 · 뿌듯함"
+  }
+};
 
 export default function UniversePageDc() {
   const [phase, setPhase] = useState("idle");
   const [selected, setSelected] = useState("");
-  const timerRef = useRef(null);
+  const [from, setFrom] = useState("");
+  const [leverA, setLeverA] = useState(0.5);
+  const [leverB, setLeverB] = useState(0.6);
+  const [egg, setEgg] = useState(false);
+  const [calc, setCalc] = useState(0);
+  const [departTo, setDepartTo] = useState("");
+  const [blobPoke, setBlobPoke] = useState(false);
+  const [narrativeIndex, setNarrativeIndex] = useState(0);
+  
+  const tRef = useRef(null);
+  const stRef = useRef(null);
+  const ivRef = useRef(null);
+  const containerRef = useRef(null);
+  const [scale, setScale] = useState(1);
 
-  const clearTimer = () => {
-    if (timerRef.current) clearTimeout(timerRef.current);
+  useEffect(() => {
+    const ob = new ResizeObserver(entries => {
+      for (let entry of entries) {
+        const { width, height } = entry.contentRect;
+        const scaleW = width / 1160;
+        const scaleH = height / 660;
+        setScale(Math.min(scaleW, scaleH));
+      }
+    });
+    if (containerRef.current) ob.observe(containerRef.current);
+    return () => ob.disconnect();
+  }, []);
+
+  const reset = () => {
+    if (tRef.current) clearTimeout(tRef.current);
+    setPhase("idle"); setSelected(""); setFrom("");
   };
 
-  const selectPlanet = (key) => {
-    clearTimer();
-    setPhase("flying");
-    setSelected(key);
-    timerRef.current = setTimeout(() => {
-      setPhase("result");
+  const select = (key) => {
+    if (tRef.current) clearTimeout(tRef.current);
+    setPhase("flying"); setSelected(key); setFrom(selected); setNarrativeIndex(0);
+    tRef.current = setTimeout(() => setPhase("result"), 1200);
+  };
+
+  const handleBlobClick = () => {
+    if (blobPoke) return;
+    setBlobPoke(true);
+    setTimeout(() => setBlobPoke(false), 450);
+    
+    if (selected && U_DATA[selected]) {
+      const u = U_DATA[selected];
+      setNarrativeIndex(prev => (prev + 1) % u.narratives.length);
+    }
+  };
+
+  const ignite = () => {
+    if (phase !== "idle") return;
+    if (stRef.current) clearTimeout(stRef.current);
+    if (ivRef.current) clearInterval(ivRef.current);
+    setEgg(true); setCalc(0);
+    ivRef.current = setInterval(() => {
+      setCalc(c => {
+        const nc = Math.min(100, c + 4);
+        if (nc >= 100) { clearInterval(ivRef.current); ivRef.current = null; }
+        return nc;
+      });
+    }, 55);
+    stRef.current = setTimeout(() => { setEgg(false); }, 5200);
+  };
+
+  const depart = (key) => {
+    if (phase === "departing") return;
+    if (tRef.current) clearTimeout(tRef.current);
+    setPhase("departing"); setDepartTo(key);
+    tRef.current = setTimeout(() => {
+      setPhase("result"); setSelected(key); setDepartTo("");
     }, 1150);
   };
 
-  const reset = () => {
-    clearTimer();
-    setPhase("idle");
-    setSelected("");
-  };
+  const switchOther = () => depart(selected === "current" ? "reduced" : "current");
 
-  const switchOther = () => {
-    const other = selected === "current" ? "reduced" : "current";
-    clearTimer();
-    setPhase("idle");
-    setSelected("");
-    timerRef.current = setTimeout(() => selectPlanet(other), 640);
+  const dragLever = (key, e) => {
+    if (e.preventDefault) e.preventDefault();
+    const startY = e.clientY != null ? e.clientY : (e.touches && e.touches[0].clientY);
+    const startVal = key === 'leverA' ? leverA : leverB;
+    const move = (ev) => {
+      const cy = ev.clientY != null ? ev.clientY : (ev.touches && ev.touches[0].clientY);
+      let v = startVal - (cy - startY) / 120;
+      v = v < 0 ? 0 : v > 1 ? 1 : v;
+      if (key === 'leverA') setLeverA(v); else setLeverB(v);
+    };
+    const up = () => { window.removeEventListener("pointermove", move); window.removeEventListener("pointerup", up); };
+    window.addEventListener("pointermove", move); window.addEventListener("pointerup", up);
   };
 
   useEffect(() => {
-    return clearTimer;
+    return () => {
+      if (tRef.current) clearTimeout(tRef.current);
+      if (stRef.current) clearTimeout(stRef.current);
+      if (ivRef.current) clearInterval(ivRef.current);
+    };
   }, []);
 
-  const isCurrent = selected === "current";
-  const isReduced = selected === "reduced";
-  const parked = phase === "flying" || phase === "result";
-  const u = universeData[selected] || null;
-
-  const status = phase === "idle" ? "STANDBY · 목적지 선택 대기"
-    : phase === "flying" ? "ENGAGED · " + (isCurrent ? "스트레스" : "평온") + " 우주로 진입"
-    : "ARRIVED · 관측 완료";
+  const parked = phase !== "idle";
+  const u = U_DATA[selected] || null;
+  const otherKey = selected === "current" ? "reduced" : "current";
+  const other = U_DATA[otherKey] || null;
 
   return (
-    <>
+    <Container ref={containerRef}>
       <Global styles={globalStyles} />
-      <Container>
-        <Overlay />
+      <div style={{ transform: `scale(${scale})`, transformOrigin: "center center" }}>
         <PageWrapper>
-          {/* SCENE */}
-          <div style={{ position: "absolute", inset: 0 }}>
-          {/* starfield */}
+
+        <div style={{ position: "absolute", inset: 0, opacity: parked && phase !== "flying" ? 0 : 1, pointerEvents: phase === "idle" ? "auto" : "none", transition: "opacity .45s ease" }}>
           <div style={{ position: "absolute", inset: 0, overflow: "hidden" }}>
-            <div style={{ position: "absolute", left: "6%", top: "60px", width: "2px", height: "2px", borderRadius: "50%", background: "#fff", animation: "pu-twinkle 3.2s ease-in-out infinite" }}></div>
-            <div style={{ position: "absolute", left: "15%", top: "130px", width: "2px", height: "2px", borderRadius: "50%", background: "#fff", animation: "pu-twinkle 2.6s ease-in-out .4s infinite" }}></div>
-            <div style={{ position: "absolute", left: "23%", top: "70px", width: "1.5px", height: "1.5px", borderRadius: "50%", background: "#fff", animation: "pu-twinkle 3.8s ease-in-out .8s infinite" }}></div>
-            <div style={{ position: "absolute", left: "34%", top: "150px", width: "2px", height: "2px", borderRadius: "50%", background: "#fff", animation: "pu-twinkle 3s ease-in-out .2s infinite" }}></div>
-            <div style={{ position: "absolute", left: "46%", top: "56px", width: "1.5px", height: "1.5px", borderRadius: "50%", background: "#fff", animation: "pu-twinkle 2.9s ease-in-out 1s infinite" }}></div>
-            <div style={{ position: "absolute", left: "55%", top: "180px", width: "2px", height: "2px", borderRadius: "50%", background: "#fff", animation: "pu-twinkle 3.4s ease-in-out .6s infinite" }}></div>
-            <div style={{ position: "absolute", left: "64%", top: "90px", width: "2px", height: "2px", borderRadius: "50%", background: "#fff", animation: "pu-twinkle 2.7s ease-in-out .3s infinite" }}></div>
-            <div style={{ position: "absolute", left: "73%", top: "150px", width: "1.5px", height: "1.5px", borderRadius: "50%", background: "#fff", animation: "pu-twinkle 3.6s ease-in-out .9s infinite" }}></div>
-            <div style={{ position: "absolute", left: "82%", top: "64px", width: "2px", height: "2px", borderRadius: "50%", background: "#fff", animation: "pu-twinkle 3.1s ease-in-out .5s infinite" }}></div>
-            <div style={{ position: "absolute", left: "90%", top: "140px", width: "1.5px", height: "1.5px", borderRadius: "50%", background: "#fff", animation: "pu-twinkle 2.8s ease-in-out 1.1s infinite" }}></div>
-            <div style={{ position: "absolute", left: "11%", top: "230px", width: "1.5px", height: "1.5px", borderRadius: "50%", background: "#fff", animation: "pu-twinkle 3.5s ease-in-out .1s infinite" }}></div>
-            <div style={{ position: "absolute", left: "40%", top: "260px", width: "2px", height: "2px", borderRadius: "50%", background: "#fff", animation: "pu-twinkle 3s ease-in-out .7s infinite" }}></div>
-            <div style={{ position: "absolute", left: "60%", top: "280px", width: "1.5px", height: "1.5px", borderRadius: "50%", background: "#fff", animation: "pu-twinkle 2.6s ease-in-out 1.2s infinite" }}></div>
-            <div style={{ position: "absolute", left: "78%", top: "250px", width: "2px", height: "2px", borderRadius: "50%", background: "#fff", animation: "pu-twinkle 3.3s ease-in-out .35s infinite" }}></div>
-            <div style={{ position: "absolute", left: "88%", top: "300px", width: "1.5px", height: "1.5px", borderRadius: "50%", background: "#fff", animation: "pu-twinkle 3.1s ease-in-out .9s infinite" }}></div>
-            <div style={{ position: "absolute", left: "28%", top: "320px", width: "1.5px", height: "1.5px", borderRadius: "50%", background: "#fff", animation: "pu-twinkle 2.9s ease-in-out .5s infinite" }}></div>
+             <div style={{ position:"absolute",left:"6%",top:60,width:2,height:2,borderRadius:"50%",background:"#fff",animation:"pu-twinkle 3.2s ease-in-out infinite" }}></div>
+             <div style={{ position:"absolute",left:"15%",top:130,width:2,height:2,borderRadius:"50%",background:"#fff",animation:"pu-twinkle 2.6s ease-in-out .4s infinite" }}></div>
+             <div style={{ position:"absolute",left:"23%",top:70,width:1.5,height:1.5,borderRadius:"50%",background:"#fff",animation:"pu-twinkle 3.8s ease-in-out .8s infinite" }}></div>
+             <div style={{ position:"absolute",left:"82%",top:64,width:2,height:2,borderRadius:"50%",background:"#fff",animation:"pu-twinkle 3.1s ease-in-out .5s infinite" }}></div>
           </div>
 
-          {/* PLANET A */}
-          <div
-            onClick={() => selectPlanet("current")}
-            css={{
-              position: "absolute", left: "330px", top: "205px", transform: "translate(-50%,-50%)",
-              cursor: "pointer", zIndex: 4, '&:hover': { filter: "brightness(1.08)" }
-            }}
-          >
-            <div style={{ position: "relative", width: "108px", height: "108px" }}>
-              <div style={{ position: "absolute", left: "50%", top: "50%", transform: "translate(-50%,-50%)", width: "196px", height: "196px", borderRadius: "50%", background: "radial-gradient(circle,rgba(158,150,238,.5),transparent 60%)", filter: "blur(15px)", animation: "pu-glow 4.4s ease-in-out infinite" }}></div>
-              <div style={{ position: "relative", width: "100%", height: "100%", borderRadius: "50%", overflow: "hidden", background: "radial-gradient(circle at 38% 30%,rgba(200,188,246,.5),rgba(129,112,208,.36) 58%,rgba(84,68,160,.26) 100%)", boxShadow: "inset -5px -8px 20px rgba(48,36,96,.38),inset 7px 6px 16px rgba(255,255,255,.3),0 0 34px -4px rgba(158,150,238,.55)", backdropFilter: "blur(3px)", animation: "pu-float 6s ease-in-out infinite" }}>
-                <div style={{ position: "absolute", inset: "-25%", background: "radial-gradient(circle at 32% 42%,rgba(255,255,255,.28),transparent 38%),radial-gradient(circle at 72% 66%,rgba(120,100,200,.5),transparent 46%),radial-gradient(circle at 60% 24%,rgba(184,172,242,.42),transparent 40%)", animation: "pu-spin 20s linear infinite", opacity: .78 }}></div>
-                <div style={{ position: "absolute", left: "24px", top: "22px", width: "26px", height: "12px", borderRadius: "50%", background: "rgba(255,255,255,.4)", filter: "blur(4px)" }}></div>
-              </div>
-              {isCurrent && (
-                <div style={{ position: "absolute", left: "50%", top: "50%", transform: "translate(-50%,-50%)", width: "132px", height: "132px", borderRadius: "50%", border: "1.5px solid rgba(158,150,238,.7)", boxShadow: "0 0 22px -3px rgba(158,150,238,.6)", animation: "pu-pop .35s ease" }}></div>
-              )}
+          <div onClick={() => select("current")} style={{ position: "absolute", left: 330, top: 196, transform: "translate(-50%,-50%)", cursor: "pointer", zIndex: 4 }}>
+            <div style={{ position: "relative", width: 150, height: 150 }}>
+              <div style={{ position: "absolute", left: "50%", top: "50%", transform: "translate(-50%,-50%)", width: 232, height: 232, borderRadius: "50%", background: "radial-gradient(circle,rgba(158,150,238,.5),transparent 60%)", filter: "blur(16px)", animation: "pu-glow 4.4s ease-in-out infinite" }}></div>
+              <UniversePlanet tone="stress" size={150} />
+              {selected === "current" && <div style={{ position: "absolute", left: "50%", top: "50%", width: 222, height: 222, borderRadius: "50%", background: "radial-gradient(circle,rgba(158,150,238,.6),transparent 62%)", filter: "blur(14px)", animation: "pu-selglow 1.7s ease-in-out infinite" }}></div>}
             </div>
-            <div style={{ position: "absolute", left: "50%", top: "122px", transform: "translateX(-50%)", whiteSpace: "nowrap", textAlign: "center", opacity: parked ? 0 : 1, transition: "opacity .3s ease" }}>
-              <div style={{ font: "600 12.5px system-ui", color: "#ECEBF0" }}>지금처럼 소비한 나</div>
-              <div style={{ font: "400 10px system-ui", color: "#9E96EE", marginTop: "2px", letterSpacing: ".02em" }}>스트레스 우주</div>
+            <div style={{ position: "absolute", left: "50%", top: 170, transform: "translateX(-50%)", whiteSpace: "nowrap", textAlign: "center", opacity: parked ? 0 : 1, transition: "opacity .3s ease" }}>
+              <div style={{ font: "600 13px system-ui", color: "#ECEBF0" }}>지금처럼 소비한 나</div>
             </div>
           </div>
 
-          {/* PLANET B */}
-          <div
-            onClick={() => selectPlanet("reduced")}
-            css={{
-              position: "absolute", left: "830px", top: "225px", transform: "translate(-50%,-50%)",
-              cursor: "pointer", zIndex: 4, '&:hover': { filter: "brightness(1.08)" }
-            }}
-          >
-            <div style={{ position: "relative", width: "94px", height: "94px" }}>
-              <div style={{ position: "absolute", left: "50%", top: "50%", transform: "translate(-50%,-50%)", width: "176px", height: "176px", borderRadius: "50%", background: "radial-gradient(circle,rgba(130,226,194,.5),transparent 60%)", filter: "blur(15px)", animation: "pu-glow 4s ease-in-out .6s infinite" }}></div>
-              <div style={{ position: "relative", width: "100%", height: "100%", borderRadius: "50%", overflow: "hidden", background: "radial-gradient(circle at 38% 30%,rgba(190,240,220,.52),rgba(111,211,179,.38) 58%,rgba(63,165,136,.26) 100%)", boxShadow: "inset -5px -7px 18px rgba(20,86,66,.36),inset 6px 5px 14px rgba(255,255,255,.32),0 0 32px -4px rgba(130,226,194,.55)", backdropFilter: "blur(3px)", animation: "pu-float 5.4s ease-in-out .4s infinite" }}>
-                <div style={{ position: "absolute", inset: "-25%", background: "radial-gradient(circle at 34% 44%,rgba(255,255,255,.3),transparent 38%),radial-gradient(circle at 70% 64%,rgba(70,180,150,.5),transparent 46%),radial-gradient(circle at 58% 24%,rgba(170,235,210,.42),transparent 40%)", animation: "pu-spin 17s linear infinite reverse", opacity: .78 }}></div>
-                <div style={{ position: "absolute", left: "20px", top: "19px", width: "22px", height: "10px", borderRadius: "50%", background: "rgba(255,255,255,.42)", filter: "blur(4px)" }}></div>
-              </div>
-              {isReduced && (
-                <div style={{ position: "absolute", left: "50%", top: "50%", transform: "translate(-50%,-50%)", width: "118px", height: "118px", borderRadius: "50%", border: "1.5px solid rgba(130,226,194,.7)", boxShadow: "0 0 22px -3px rgba(130,226,194,.6)", animation: "pu-pop .35s ease" }}></div>
-              )}
+          <div onClick={() => select("reduced")} style={{ position: "absolute", left: 830, top: 196, transform: "translate(-50%,-50%)", cursor: "pointer", zIndex: 4 }}>
+            <div style={{ position: "relative", width: 150, height: 150 }}>
+              <div style={{ position: "absolute", left: "50%", top: "50%", transform: "translate(-50%,-50%)", width: 232, height: 232, borderRadius: "50%", background: "radial-gradient(circle,rgba(130,226,194,.5),transparent 60%)", filter: "blur(16px)", animation: "pu-glow 4s ease-in-out .6s infinite" }}></div>
+              <UniversePlanet tone="calm" size={150} />
+              {selected === "reduced" && <div style={{ position: "absolute", left: "50%", top: "50%", width: 222, height: 222, borderRadius: "50%", background: "radial-gradient(circle,rgba(130,226,194,.6),transparent 62%)", filter: "blur(14px)", animation: "pu-selglow 1.7s ease-in-out infinite" }}></div>}
+              {egg && <div style={{ position: "absolute", left: "50%", top: "50%", width: 230, height: 230, borderRadius: "50%", background: "radial-gradient(circle,rgba(130,226,194,.6),transparent 62%)", filter: "blur(15px)", animation: "pu-selglow 1.1s ease-in-out infinite" }}></div>}
             </div>
-            <div style={{ position: "absolute", left: "50%", top: "108px", transform: "translateX(-50%)", whiteSpace: "nowrap", textAlign: "center", opacity: parked ? 0 : 1, transition: "opacity .3s ease" }}>
-              <div style={{ font: "600 12.5px system-ui", color: "#ECEBF0" }}>감정소비를 줄인 나</div>
-              <div style={{ font: "400 10px system-ui", color: "#82E2C2", marginTop: "2px", letterSpacing: ".02em" }}>평온 우주</div>
+            <div style={{ position: "absolute", left: "50%", top: 170, transform: "translateX(-50%)", whiteSpace: "nowrap", textAlign: "center", opacity: parked ? 0 : 1, transition: "opacity .3s ease" }}>
+              <div style={{ font: "600 13px system-ui", color: "#ECEBF0" }}>감정소비를 줄인 나</div>
             </div>
           </div>
         </div>
 
-        {/* HEADER */}
-        <div style={{ position: "absolute", left: "34px", top: "26px", zIndex: 12 }}>
+        <div style={{ position: "absolute", left: 34, top: 26, zIndex: 12 }}>
           <div style={{ font: "600 11px system-ui", letterSpacing: ".16em", color: "#8f8c9c" }}>PARALLEL UNIVERSE</div>
-          <div style={{ font: "600 21px system-ui", color: "#ECEBF0", marginTop: "4px" }}>미래는 지금 갈라지고 있어요</div>
+          <div style={{ font: "600 21px system-ui", color: "#ECEBF0", marginTop: 4 }}>미래는 지금 갈라지고 있어요</div>
         </div>
 
-        {/* SHIP (FLYING A) */}
-        {phase === "flying" && selected === "current" && (
-          <div style={{ position: "absolute", left: 0, top: 0, zIndex: 7, animation: "pu-fly-a 1.15s cubic-bezier(.42,.08,.5,1) forwards" }}>
-            <div style={{ position: "relative", width: "120px", height: "96px", transform: "translate(-50%,-50%)" }}>
-              <div style={{ position: "absolute", left: "50%", bottom: "-4px", transform: "translateX(-50%)", width: "74px", height: "26px", borderRadius: "50%", background: "radial-gradient(circle,rgba(130,226,194,.85),transparent 70%)", filter: "blur(6px)" }}></div>
-              <div style={{ position: "absolute", left: "50%", bottom: "22px", transform: "translateX(-50%)", width: "120px", height: "34px", borderRadius: "50%", background: "linear-gradient(180deg,#e9e6f4,#b6b1cf 52%,#918cae)", boxShadow: "0 8px 18px -8px rgba(0,0,0,.6),inset 0 2px 4px rgba(255,255,255,.5)" }}></div>
-              <div style={{ position: "absolute", left: "50%", bottom: "30px", transform: "translateX(-50%)", width: "96px", height: "7px", borderRadius: "50%", background: "linear-gradient(90deg,#F6A96B,#F4A7C4,#9E96EE,#7FB4E8,#82E2C2,#F5D06B)", opacity: .6 }}></div>
-              <div style={{ position: "absolute", left: "50%", bottom: "36px", transform: "translateX(-50%)", width: "64px", height: "52px", borderRadius: "50% 50% 46% 46%", background: "radial-gradient(circle at 46% 36%,rgba(214,206,248,.95),rgba(150,138,214,.85))", boxShadow: "inset 0 -6px 10px rgba(120,105,180,.4),inset 0 5px 9px rgba(255,255,255,.5)" }}></div>
+        {(phase === "flying" || phase === "departing") && (
+          <div style={{ position: "absolute", left: 0, top: 0, zIndex: 20, animation: (phase === "departing" ? "pu-depart 1.3s cubic-bezier(.45,.05,.35,1)" : (selected === "current" ? "pu-fly-a 1.2s cubic-bezier(.42,.08,.5,1)" : "pu-fly-b 1.2s cubic-bezier(.42,.08,.5,1)")) + " forwards" }}>
+            <div style={{ position: "relative", width: 120, height: 96, transform: "translate(-50%,-50%)" }}>
+              <div style={{ position: "absolute", left: "50%", bottom: -4, transform: "translateX(-50%)", width: 74, height: 26, borderRadius: "50%", background: "radial-gradient(circle,rgba(130,226,194,.85),transparent 70%)", filter: "blur(6px)" }}></div>
+              <div style={{ position: "absolute", left: "50%", bottom: 22, transform: "translateX(-50%)", width: 120, height: 34, borderRadius: "50%", background: "linear-gradient(180deg,#e9e6f4,#b6b1cf 52%,#918cae)", boxShadow: "0 8px 18px -8px rgba(0,0,0,.6),inset 0 2px 4px rgba(255,255,255,.5)" }}></div>
+              <div style={{ position: "absolute", left: "50%", bottom: 30, transform: "translateX(-50%)", width: 96, height: 7, borderRadius: "50%", background: "linear-gradient(90deg,#F6A96B,#F4A7C4,#9E96EE,#7FB4E8,#82E2C2,#F5D06B)", opacity: .6 }}></div>
+              <div style={{ position: "absolute", left: "50%", bottom: 36, transform: "translateX(-50%)", width: 64, height: 52, borderRadius: "50% 50% 46% 46%", background: "radial-gradient(circle at 46% 36%,rgba(214,206,248,.95),rgba(150,138,214,.85))", boxShadow: "inset 0 -6px 10px rgba(120,105,180,.4),inset 0 5px 9px rgba(255,255,255,.5)" }}></div>
             </div>
           </div>
         )}
 
-        {/* SHIP (FLYING B) */}
-        {phase === "flying" && selected === "reduced" && (
-          <div style={{ position: "absolute", left: 0, top: 0, zIndex: 7, animation: "pu-fly-b 1.15s cubic-bezier(.42,.08,.5,1) forwards" }}>
-            <div style={{ position: "relative", width: "120px", height: "96px", transform: "translate(-50%,-50%)" }}>
-              <div style={{ position: "absolute", left: "50%", bottom: "-4px", transform: "translateX(-50%)", width: "74px", height: "26px", borderRadius: "50%", background: "radial-gradient(circle,rgba(130,226,194,.85),transparent 70%)", filter: "blur(6px)" }}></div>
-              <div style={{ position: "absolute", left: "50%", bottom: "22px", transform: "translateX(-50%)", width: "120px", height: "34px", borderRadius: "50%", background: "linear-gradient(180deg,#e9e6f4,#b6b1cf 52%,#918cae)", boxShadow: "0 8px 18px -8px rgba(0,0,0,.6),inset 0 2px 4px rgba(255,255,255,.5)" }}></div>
-              <div style={{ position: "absolute", left: "50%", bottom: "30px", transform: "translateX(-50%)", width: "96px", height: "7px", borderRadius: "50%", background: "linear-gradient(90deg,#F6A96B,#F4A7C4,#9E96EE,#7FB4E8,#82E2C2,#F5D06B)", opacity: .6 }}></div>
-              <div style={{ position: "absolute", left: "50%", bottom: "36px", transform: "translateX(-50%)", width: "64px", height: "52px", borderRadius: "50% 50% 46% 46%", background: "radial-gradient(circle at 46% 36%,rgba(214,206,248,.95),rgba(150,138,214,.85))", boxShadow: "inset 0 -6px 10px rgba(120,105,180,.4),inset 0 5px 9px rgba(255,255,255,.5)" }}></div>
-            </div>
-          </div>
-        )}
-
-        {/* CONSOLE */}
-        <div style={{
-          position: "absolute", left: 0, right: 0, bottom: 0, aspectRatio: "1160 / 300", zIndex: 5,
-          transform: parked ? "translateY(48px)" : "none",
-          opacity: parked ? 0 : 1,
-          pointerEvents: parked ? "none" : "auto",
-          transition: "opacity .5s ease, transform .6s cubic-bezier(.5,.05,.2,1)"
-        }}>
-          <svg viewBox="0 0 1160 300" xmlns="http://www.w3.org/2000/svg" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", display: "block" }} aria-hidden="true">
-            <defs>
-              <linearGradient id="cn-glass" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#ffffff" stopOpacity=".10"/><stop offset="1" stopColor="#ffffff" stopOpacity=".045"/></linearGradient>
-              <linearGradient id="cn-wing" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#ffffff" stopOpacity=".07"/><stop offset="1" stopColor="#ffffff" stopOpacity=".03"/></linearGradient>
-              <linearGradient id="cn-inset" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#000000" stopOpacity=".38"/><stop offset=".3" stopColor="#000000" stopOpacity="0"/></linearGradient>
-              <linearGradient id="cn-bez" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#000000" stopOpacity=".26"/><stop offset=".55" stopColor="#000000" stopOpacity=".06"/><stop offset="1" stopColor="#ffffff" stopOpacity=".05"/></linearGradient>
-            </defs>
-            <g id="console-base">
-              <path d="M0,120 L360,74 Q382,70 404,70 L756,70 Q778,70 800,74 L1160,120 L1160,320 L0,320 Z" fill="url(#cn-glass)"/>
-              <path d="M0,120 L360,74 Q382,70 404,70 L756,70 Q778,70 800,74 L1160,120" fill="none" stroke="rgba(255,255,255,.13)" strokeWidth="1"/>
-              <path d="M368,88 L404,84 L756,84 L792,88" fill="none" stroke="rgba(255,255,255,.15)" strokeWidth="1"/>
-            </g>
-            <g id="deco-left">
-              <path d="M0,120 L360,74 L360,92 L18,138 Z" fill="url(#cn-wing)"/>
-              <line x1="46" y1="156" x2="150" y2="156" stroke="rgba(255,255,255,.09)" strokeWidth="1"/>
-              <circle cx="60" cy="182" r="2.8" fill="#7FB4E8"/>
-              <circle cx="80" cy="182" r="2.8" fill="rgba(255,255,255,.26)"/>
-              <circle cx="100" cy="182" r="2.8" fill="rgba(255,255,255,.18)"/>
-              <rect x="46" y="202" width="22" height="12" rx="6" fill="rgba(0,0,0,.24)" stroke="rgba(255,255,255,.1)"/>
-              <circle cx="52" cy="208" r="3.4" fill="rgba(255,255,255,.5)"/>
-              <line x1="82" y1="208" x2="150" y2="208" stroke="rgba(255,255,255,.09)" strokeWidth="1"/>
-              <line x1="46" y1="226" x2="128" y2="226" stroke="rgba(255,255,255,.08)" strokeWidth="1"/>
-            </g>
-            <g id="deco-right">
-              <path d="M1160,120 L800,74 L800,92 L1142,138 Z" fill="url(#cn-wing)"/>
-              <line x1="1010" y1="156" x2="1114" y2="156" stroke="rgba(255,255,255,.09)" strokeWidth="1"/>
-              <circle cx="1100" cy="182" r="2.8" fill="#F5D06B"/>
-              <circle cx="1080" cy="182" r="2.8" fill="rgba(255,255,255,.26)"/>
-              <circle cx="1060" cy="182" r="2.8" fill="rgba(255,255,255,.18)"/>
-              <rect x="1092" y="202" width="22" height="12" rx="6" fill="rgba(0,0,0,.24)" stroke="rgba(255,255,255,.1)"/>
-              <circle cx="1108" cy="208" r="3.4" fill="rgba(255,255,255,.5)"/>
-              <line x1="1010" y1="208" x2="1078" y2="208" stroke="rgba(255,255,255,.09)" strokeWidth="1"/>
-              <line x1="1032" y1="226" x2="1114" y2="226" stroke="rgba(255,255,255,.08)" strokeWidth="1"/>
-            </g>
-            <g id="emotion-rail">
-              <circle cx="498" cy="98" r="3" fill="#F6A96B"/>
-              <circle cx="521" cy="98" r="3" fill="#F4A7C4"/>
-              <circle cx="544" cy="98" r="3" fill="#F5D06B"/>
-              <circle cx="567" cy="98" r="3" fill="#9E96EE"/>
-              <circle cx="590" cy="98" r="3" fill="#7FB4E8"/>
-              <circle cx="613" cy="98" r="3" fill="#F08A7E"/>
-              <circle cx="636" cy="98" r="3" fill="#82E2C2"/>
-              <circle cx="659" cy="98" r="3" fill="#B8B4C4"/>
-            </g>
-            <g id="telemetry">
-              <rect x="466" y="120" width="228" height="24" rx="8" fill="rgba(0,0,0,.30)"/>
-              <rect x="466" y="120" width="228" height="24" rx="8" fill="url(#cn-inset)"/>
-              <rect x="466.5" y="120.5" width="227" height="23" rx="7.5" fill="none" stroke="rgba(255,255,255,.07)" strokeWidth="1"/>
-            </g>
-            <g id="btn-slot-left">
-              <rect x="330" y="158" width="210" height="66" rx="15" fill="rgba(0,0,0,.24)"/>
-              <rect x="330" y="158" width="210" height="66" rx="15" fill="url(#cn-bez)"/>
-              <rect x="330.5" y="158.5" width="209" height="65" rx="14.5" fill="none" stroke="rgba(255,255,255,.08)" strokeWidth="1"/>
-            </g>
-            <g id="btn-slot-right">
-              <rect x="620" y="158" width="210" height="66" rx="15" fill="rgba(0,0,0,.24)"/>
-              <rect x="620" y="158" width="210" height="66" rx="15" fill="url(#cn-bez)"/>
-              <rect x="620.5" y="158.5" width="209" height="65" rx="14.5" fill="none" stroke="rgba(255,255,255,.08)" strokeWidth="1"/>
-            </g>
-            <g id="ignition">
-              <circle cx="580" cy="191" r="31" fill="rgba(0,0,0,.28)"/>
-              <circle cx="580" cy="191" r="31" fill="url(#cn-inset)"/>
-              <circle cx="580" cy="191" r="31" fill="none" stroke="rgba(255,255,255,.1)" strokeWidth="1"/>
-              <circle cx="580" cy="191" r="26" fill="none" stroke="#8B7EE8" strokeOpacity=".22" strokeWidth="1" strokeDasharray="2 5"/>
-              <circle cx="580" cy="191" r="18" fill="url(#cn-glass)" stroke="rgba(255,255,255,.14)" strokeWidth="1"/>
-              <circle cx="580" cy="191" r="18" fill="url(#cn-bez)"/>
-              <line x1="580" y1="178" x2="580" y2="186" stroke="#8B7EE8" strokeWidth="2.4" strokeLinecap="round"/>
-              <text x="580" y="234" textAnchor="middle" fill="rgba(255,255,255,.3)" style={{ font: "600 7px ui-monospace,Menlo,monospace", letterSpacing: ".14em" }}>SYNC</text>
-            </g>
-            <g id="controls-detail">
-              <circle cx="282" cy="90" r="1.6" fill="rgba(255,255,255,.2)"/>
-              <circle cx="878" cy="90" r="1.6" fill="rgba(255,255,255,.2)"/>
-              <circle cx="200" cy="112" r="1.6" fill="rgba(255,255,255,.16)"/>
-              <circle cx="960" cy="112" r="1.6" fill="rgba(255,255,255,.16)"/>
-            </g>
-          </svg>
-
-          <div style={{ position: "absolute", left: "40.17%", top: "40%", width: "19.66%", height: "8%", display: "flex", alignItems: "center", justifyContent: "center", gap: "7px", pointerEvents: "none" }}>
-            <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#8B7EE8", animation: "pu-blink 1.4s ease-in-out infinite", flex: "none" }}></span>
-            <span style={{ font: "600 9px ui-monospace,Menlo,monospace", letterSpacing: ".1em", color: "#9a97a8", whiteSpace: "nowrap" }}>{status}</span>
-          </div>
-
-          <button
-            onClick={() => selectPlanet("current")}
-            style={{ position: "absolute", left: "29.31%", top: "55%", width: "16.55%", height: "17.33%", border: "none", padding: 0, background: "transparent", cursor: "pointer" }}
-          >
-            <div css={{
-              position: "relative", width: "100%", height: "100%", borderRadius: "13px",
-              background: "linear-gradient(180deg,rgba(255,255,255,.13),rgba(255,255,255,.03))",
-              border: "1px solid rgba(255,255,255,.14)", boxShadow: "0 3px 7px rgba(0,0,0,.34),inset 0 1px 0 rgba(255,255,255,.2)",
-              display: "flex", alignItems: "center", gap: "11px", padding: "0 15px", boxSizing: "border-box",
-              transition: "transform .15s ease,box-shadow .2s ease",
-              '&:hover': { transform: "translateY(-2px)", boxShadow: "0 6px 12px rgba(0,0,0,.38),inset 0 1px 0 rgba(255,255,255,.24)" }
-            }}>
-              <span style={{ width: "9px", height: "9px", borderRadius: "50%", background: "rgba(255,255,255,.24)", flex: "none", transition: ".25s" }}></span>
-              <span style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", lineHeight: 1.22 }}>
-                <span style={{ font: "600 13.5px system-ui", color: "#ECEBF0" }}>현재 우주로</span>
-                <span style={{ font: "500 8.5px ui-monospace,Menlo,monospace", color: "#8f8c9c", letterSpacing: ".1em" }}>PLANET-01 · STRESS</span>
-              </span>
-              <span style={{ marginLeft: "auto", display: "flex", gap: "2.5px" }}>
-                <i style={{ width: "1.5px", height: "18px", background: "rgba(255,255,255,.1)", display: "block" }}></i>
-                <i style={{ width: "1.5px", height: "18px", background: "rgba(255,255,255,.1)", display: "block" }}></i>
-                <i style={{ width: "1.5px", height: "18px", background: "rgba(255,255,255,.1)", display: "block" }}></i>
-              </span>
-              {isCurrent && (
-                <>
-                  <span style={{ position: "absolute", inset: 0, borderRadius: "13px", border: "1.5px solid rgba(158,150,238,.65)", boxShadow: "inset 0 2px 7px rgba(0,0,0,.4),0 0 18px -4px rgba(158,150,238,.7)", pointerEvents: "none" }}></span>
-                  <span style={{ position: "absolute", left: "15px", top: "50%", transform: "translateY(-50%)", width: "9px", height: "9px", borderRadius: "50%", background: "#9E96EE", boxShadow: "0 0 9px #9E96EE", pointerEvents: "none" }}></span>
-                </>
-              )}
-            </div>
-          </button>
-
-          <button
-            onClick={() => selectPlanet("reduced")}
-            style={{ position: "absolute", left: "54.14%", top: "55%", width: "16.55%", height: "17.33%", border: "none", padding: 0, background: "transparent", cursor: "pointer" }}
-          >
-            <div css={{
-              position: "relative", width: "100%", height: "100%", borderRadius: "13px",
-              background: "linear-gradient(180deg,rgba(255,255,255,.13),rgba(255,255,255,.03))",
-              border: "1px solid rgba(255,255,255,.14)", boxShadow: "0 3px 7px rgba(0,0,0,.34),inset 0 1px 0 rgba(255,255,255,.2)",
-              display: "flex", alignItems: "center", gap: "11px", padding: "0 15px", boxSizing: "border-box",
-              transition: "transform .15s ease,box-shadow .2s ease",
-              '&:hover': { transform: "translateY(-2px)", boxShadow: "0 6px 12px rgba(0,0,0,.38),inset 0 1px 0 rgba(255,255,255,.24)" }
-            }}>
-              <span style={{ width: "9px", height: "9px", borderRadius: "50%", background: "rgba(255,255,255,.24)", flex: "none", transition: ".25s" }}></span>
-              <span style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", lineHeight: 1.22 }}>
-                <span style={{ font: "600 13.5px system-ui", color: "#ECEBF0" }}>다른 우주로</span>
-                <span style={{ font: "500 8.5px ui-monospace,Menlo,monospace", color: "#8f8c9c", letterSpacing: ".1em" }}>PLANET-02 · CALM</span>
-              </span>
-              <span style={{ marginLeft: "auto", display: "flex", gap: "2.5px" }}>
-                <i style={{ width: "1.5px", height: "18px", background: "rgba(255,255,255,.1)", display: "block" }}></i>
-                <i style={{ width: "1.5px", height: "18px", background: "rgba(255,255,255,.1)", display: "block" }}></i>
-                <i style={{ width: "1.5px", height: "18px", background: "rgba(255,255,255,.1)", display: "block" }}></i>
-              </span>
-              {isReduced && (
-                <>
-                  <span style={{ position: "absolute", inset: 0, borderRadius: "13px", border: "1.5px solid rgba(130,226,194,.65)", boxShadow: "inset 0 2px 7px rgba(0,0,0,.4),0 0 18px -4px rgba(130,226,194,.7)", pointerEvents: "none" }}></span>
-                  <span style={{ position: "absolute", left: "15px", top: "50%", transform: "translateY(-50%)", width: "9px", height: "9px", borderRadius: "50%", background: "#82E2C2", boxShadow: "0 0 9px #82E2C2", pointerEvents: "none" }}></span>
-                </>
-              )}
-            </div>
-          </button>
+        <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, aspectRatio: "1160 / 300", zIndex: 5, transform: parked ? "translateY(48px)" : "none", opacity: parked ? 0 : 1, pointerEvents: parked ? "none" : "auto", transition: "opacity .5s ease, transform .6s cubic-bezier(.5,.05,.2,1)" }}>
+          <UniverseConsole 
+            leverA={leverA} leverB={leverB} 
+            startLeverA={(e) => dragLever("leverA", e)} startLeverB={(e) => dragLever("leverB", e)}
+            ignite={ignite} recommending={egg} 
+            statusText={phase === "idle" ? (egg ? "CALC · 평행우주 연산 중" : "STANDBY · 목적지 선택 대기") : phase === "flying" ? "ENGAGED · 우주로 진입" : "ARRIVED · 관측 완료"}
+            selectCurrent={() => select("current")} selectReduced={() => select("reduced")}
+            leftOn={selected === "current"} rightOn={selected === "reduced"}
+          />
         </div>
 
-        {/* BIG RESULT PANEL */}
-        {phase === "result" && u && (
-          <>
-            <div style={{ position: "absolute", inset: 0, zIndex: 15, background: "radial-gradient(80% 70% at 50% 42%,rgba(8,9,14,.52),rgba(8,9,14,.8))", pointerEvents: "none" }}></div>
-            <div style={{ position: "absolute", left: "50%", top: "46%", zIndex: 16, width: "600px", transform: "translate(-50%,-50%)", animation: "pu-resultin .55s cubic-bezier(.2,.7,.3,1)" }}>
-              <div style={{ borderRadius: "22px", padding: "30px 34px 26px", background: "rgba(255,255,255,.055)", border: "1px solid rgba(255,255,255,.13)", boxShadow: "0 30px 70px -24px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.12)", backdropFilter: "blur(14px)" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                  <span style={{ display: "inline-flex", alignItems: "center", gap: "8px", font: "600 11px system-ui", letterSpacing: ".06em", color: u.accent }}>
-                    <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: u.accent, boxShadow: `0 0 8px ${u.accent}` }}></span>{u.tag}
-                  </span>
-                  <span style={{ font: "600 9.5px ui-monospace,Menlo,monospace", letterSpacing: ".14em", color: "#8f8c9c" }}>OBSERVATION COMPLETE</span>
+        {(phase === "result" || phase === "departing") && (
+          <div style={{ position: "absolute", inset: 0, zIndex: 15, overflow: "hidden", animation: "pu-arrive .6s ease" }}>
+            <div style={{ position: "absolute", left: "-340px", bottom: "-640px", zIndex: 0, animation: phase === "departing" ? "pu-recoil 1.1s cubic-bezier(.2,.8,.3,1)" : "none" }}>
+              <UniversePlanet tone={selected === "reduced" ? "calm" : "stress"} size={1000} />
+            </div>
+
+            <div onClick={() => depart(otherKey)} style={{ position: "absolute", left: 948, top: 344, transform: "translate(-50%,-50%)", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 6, zIndex: 1 }}>
+              <UniversePlanet tone={otherKey === "reduced" ? "calm" : "stress"} size={212} />
+              {phase === "result" && (
+                <div style={{ textAlign: "center" }}>
+                  <div style={{ font: "600 12.5px system-ui", color: "#ECEBF0" }}>{other && other.title}</div>
+                  <div style={{ font: "400 10.5px system-ui", color: "#9a97a8", marginTop: 6 }}>눌러서 이 우주로 이동</div>
                 </div>
-                <div style={{ font: "700 27px/1.2 system-ui", color: "#ECEBF0", marginTop: "14px", letterSpacing: "-.01em" }}>{u.title}</div>
-                <div style={{ font: "400 11px system-ui", color: "#9a97a8", marginTop: "16px" }}>{u.metricLabel}</div>
-                <div style={{ font: "800 48px/1 system-ui", color: u.accent, marginTop: "6px", letterSpacing: "-.02em" }}>{u.metric}</div>
-                <div style={{ font: "400 14px/1.6 system-ui", color: "#c9c6d4", marginTop: "16px", maxWidth: "520px" }}>{u.narrative}</div>
-                <div style={{ display: "flex", gap: "10px", marginTop: "18px" }}>
-                  <span style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "7px 13px", borderRadius: "11px", background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)", font: "500 11.5px system-ui", color: "#c9c6d4" }}>🎯 {u.goalNote}</span>
-                  <span style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "7px 13px", borderRadius: "11px", background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)", font: "500 11.5px system-ui", color: "#c9c6d4" }}>
-                    <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: u.accent }}></span>{u.emotionTag}
-                  </span>
+              )}
+            </div>
+
+            {phase === "result" && u && (
+              <div style={{ position: "absolute", left: 206, top: 266, display: "flex", alignItems: "center", gap: 0, zIndex: 2 }}>
+                <div style={{ animation: "pu-hover 4.5s ease-in-out infinite" }}>
+                  <SpaceBlob size={150} speaking={true} poked={blobPoke} onClick={handleBlobClick} />
                 </div>
-                <div style={{ display: "flex", gap: "10px", marginTop: "24px" }}>
-                  <button
-                    onClick={switchOther}
-                    css={{ flex: 1, padding: "13px", borderRadius: "13px", border: "1px solid rgba(255,255,255,.16)", background: "rgba(255,255,255,.06)", color: "#ECEBF0", font: "600 13px system-ui", cursor: "pointer", transition: ".2s", '&:hover': { background: "rgba(255,255,255,.12)" } }}
-                  >다른 우주로 항행 →</button>
-                  <button
-                    onClick={reset}
-                    css={{ padding: "13px 20px", borderRadius: "13px", border: "1px solid rgba(255,255,255,.1)", background: "transparent", color: "#9a97a8", font: "600 13px system-ui", cursor: "pointer", transition: ".2s", '&:hover': { color: "#ECEBF0" } }}
-                  >다시 선택</button>
+                <div style={{ width: 16, height: 16, background: "rgba(255,255,255,.94)", transform: "rotate(45deg)", marginLeft: -8, marginRight: -8, borderRadius: 3, alignSelf: "center", position: "relative", top: 8 }}></div>
+                <div style={{ maxWidth: 400, padding: "18px 22px", borderRadius: 20, background: "rgba(255,255,255,.94)", boxShadow: "0 18px 44px -18px rgba(0,0,0,.6)", animation: "pu-pop .5s ease .15s both", position: "relative" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 7, font: "600 10.5px system-ui", letterSpacing: ".03em", color: u.accent }}>
+                    <span style={{ width: 7, height: 7, borderRadius: "50%", background: u.accent }}></span>{u.tag} · {u.title}
+                  </div>
+                  <div style={{ font: "400 11px system-ui", color: "#8A837A", marginTop: 14 }}>{u.metricLabel}</div>
+                  <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginTop: 3 }}>
+                    <span style={{ font: "800 40px/1 system-ui", color: u.accent, letterSpacing: "-.02em" }}>{u.metric}</span>
+                    <span style={{ font: "700 15px system-ui", color: u.accent }}>{u.metric.includes("-") ? "▼" : "▲"}</span>
+                  </div>
+                  <div style={{ height: 1, background: "rgba(50,42,32,.09)", margin: "15px 0" }}></div>
+                  <div style={{ font: "400 13px/1.6 system-ui", color: "#3A352F" }}>{u.narratives[narrativeIndex]}</div>
+                  <div style={{ display: "flex", gap: 8, marginTop: 16 }}>
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "7px 12px", borderRadius: 11, background: "rgba(50,42,32,.055)", font: "600 11px system-ui", color: "#5c564e" }}>🎯 {u.goalNote}</span>
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "7px 12px", borderRadius: 11, background: "rgba(50,42,32,.055)", font: "600 11px system-ui", color: "#5c564e" }}><span style={{ width: 8, height: 8, borderRadius: "50%", background: u.accent }}></span>{u.emotionTag}</span>
+                  </div>
                 </div>
               </div>
-            </div>
-          </>
+            )}
+
+            {phase === "result" && (
+              <button onClick={reset} style={{ position: "absolute", right: 34, bottom: 28, zIndex: 3, display: "inline-flex", alignItems: "center", gap: 9, padding: "7px 8px 7px 16px", borderRadius: 24, border: "1px solid rgba(255,255,255,.14)", background: "rgba(255,255,255,.06)", color: "#c9c6d4", font: "600 12px system-ui", cursor: "pointer", backdropFilter: "blur(8px)" }}>
+                콘솔로 돌아가기 <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 26, height: 26, borderRadius: "50%", background: "rgba(255,255,255,.12)", fontSize: 13 }}>↩</span>
+              </button>
+            )}
+          </div>
+        )}
+
+        {egg && (
+          <UniverseEasterEgg 
+            eggPct={Math.round(calc)} calc={calc}
+            eggDistA={((calc / 100) * 4.24).toFixed(2)} eggTimeA={Math.round((calc / 100) * 37)}
+            eggDistB={((calc / 100) * 7.81).toFixed(2)} eggTimeB={Math.round((calc / 100) * 63)}
+            eggCurv={((calc / 100) * 0.83).toFixed(2)}
+          />
         )}
       </PageWrapper>
-      </Container>
-    </>
+      </div>
+    </Container>
   );
 }
