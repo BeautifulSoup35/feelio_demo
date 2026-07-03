@@ -1,5 +1,5 @@
 /** @jsxImportSource @emotion/react */
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useRef } from 'react';
 import styled from '@emotion/styled';
 import { EmotionBlob } from '../components/common/EmotionBlob.jsx';
 import { GlassCard } from '../components/common/GlassCard.jsx';
@@ -437,6 +437,7 @@ function ridgePath(cx, width, height, base = 172) {
 export default function HomePageDesign({ state, onRoute, selectedDate, onSelectDate }) {
   const selected = selectedDate || new Date(2026, 6, 1);
   const [visibleMonth, setVisibleMonth] = useState(() => new Date(selected.getFullYear(), selected.getMonth(), 1));
+  const lastClickTimeRef = useRef({});
 
   useEffect(() => {
     setVisibleMonth(prev => {
@@ -471,10 +472,15 @@ export default function HomePageDesign({ state, onRoute, selectedDate, onSelectD
     onSelectDate?.(next);
     return next;
   });
+
   const selectDay = (day, dateKey) => {
-    if (dateKey === selectedDayKey) {
+    const now = Date.now();
+    const lastClick = lastClickTimeRef.current[dateKey] || 0;
+
+    if (dateKey === selectedDayKey || now - lastClick < 600) {
       onRoute?.('transactions');
     } else {
+      lastClickTimeRef.current[dateKey] = now;
       onSelectDate?.(new Date(visibleMonth.getFullYear(), visibleMonth.getMonth(), day));
     }
   };

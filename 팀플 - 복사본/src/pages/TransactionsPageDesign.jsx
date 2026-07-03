@@ -335,23 +335,19 @@ function toDate(item) {
   return new Date(item.date);
 }
 
-function groupLabel(item, view, filter) {
-  if (filter === '카테고리') return item.category || '미분류';
-  if (filter === '감정' || view === '감정별') return item.emotion || '감정 없음';
+function groupLabel(item, view) {
+  if (view === '감정별') return item.emotion || '감정 없음';
   const date = toDate(item);
   const year = date.getFullYear();
   const month = date.getMonth() + 1;
   const day = date.getDate();
   const weekday = ['일', '월', '화', '수', '목', '금', '토'][date.getDay()];
   if (view === '월별') return `${year}년 ${month}월`;
-
-  if (view === '감정별') return item.emotion || '감정 없음';
   return `${year}년 ${month}월 ${day}일 (${weekday})`;
+}
 
-
-function groupKey(item, view, filter) {
-  if (filter === '카테고리') return item.category || '미분류';
-  if (filter === '감정' || view === '감정별') return item.emotion || '';
+function groupKey(item, view) {
+  if (view === '감정별') return item.emotion || '';
   const date = toDate(item);
   if (view === '월별') return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
   return item.date;
@@ -466,7 +462,7 @@ export default function TransactionsPageDesign({ state, onSelect }) {
 
     return Object.entries(map)
       .sort((a, b) => {
-        if (filter === '카테고리' || filter === '감정' || view === '감정별') return a[0].localeCompare(b[0], 'ko');
+        if (view === '감정별') return a[0].localeCompare(b[0], 'ko');
         return b[1].key.localeCompare(a[1].key);
       })
       .map(([label, group]) => ({
