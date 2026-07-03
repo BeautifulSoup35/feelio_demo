@@ -121,7 +121,9 @@ function toDate(item) {
   return new Date(item.date);
 }
 
-function groupLabel(item, view) {
+function groupLabel(item, view, filter) {
+  if (filter === '카테고리') return item.category || '미분류';
+  if (filter === '감정' || view === '감정별') return item.emotion || '감정 없음';
   const date = toDate(item);
   const year = date.getFullYear();
   const month = date.getMonth() + 1;
@@ -129,12 +131,12 @@ function groupLabel(item, view) {
   const weekday = ['일', '월', '화', '수', '목', '금', '토'][date.getDay()];
   if (view === '월별') return `${year}년 ${month}월`;
   if (view === '연간') return `${year}년`;
-  if (view === '감정별') return item.emotion || '감정 없음';
   return `${month}월 ${day}일 (${weekday})`;
 }
 
-function groupKey(item, view) {
-  if (view === '감정별') return item.emotion || '';
+function groupKey(item, view, filter) {
+  if (filter === '카테고리') return item.category || '미분류';
+  if (filter === '감정' || view === '감정별') return item.emotion || '';
   const date = toDate(item);
   if (view === '연간') return String(date.getFullYear());
   if (view === '월별') return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
@@ -168,20 +170,23 @@ export default function TransactionsPageDesign({ state, onSelect }) {
 
   const groups = useMemo(() => {
     const map = filtered.reduce((acc, item) => {
-      const label = groupLabel(item, view);
-      const key = groupKey(item, view);
+      const label = groupLabel(item, view, filter);
+      const key = groupKey(item, view, filter);
       if (!acc[label]) acc[label] = { key, items: [] };
       acc[label].items.push(item);
       return acc;
     }, {});
 
     return Object.entries(map)
-      .sort((a, b) => view === '감정별' ? a[0].localeCompare(b[0], 'ko') : b[1].key.localeCompare(a[1].key))
+      .sort((a, b) => {
+        if (filter === '카테고리' || filter === '감정' || view === '감정별') return a[0].localeCompare(b[0], 'ko');
+        return b[1].key.localeCompare(a[1].key);
+      })
       .map(([label, group]) => ({
         label,
         items: group.items.sort((a, b) => new Date(b.date) - new Date(a.date))
       }));
-  }, [filtered, view]);
+  }, [filtered, view, filter]);
 
   return (
     <Wrap>
