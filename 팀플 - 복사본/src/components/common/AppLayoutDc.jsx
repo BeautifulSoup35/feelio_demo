@@ -84,6 +84,13 @@ const IconButton = styled.button`
 
 export function AppLayoutDc({ route, title, state, actions, onRoute, onProfile, children }) {
   const colors = getAurora(state.aurora).colors;
+  const now = new Date();
+  const liveDate = now.toLocaleDateString('ko-KR', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    weekday: 'long'
+  });
 
   return (
     <Shell mode={state.mode}>
@@ -95,7 +102,7 @@ export function AppLayoutDc({ route, title, state, actions, onRoute, onProfile, 
       <Main>
         <Top>
           <div>
-            <p>2026년 7월 1일 수요일</p>
+            <p>{liveDate}</p>
             <h1>{title}</h1>
           </div>
           <IconButton type="button" onClick={actions.toggleMode} aria-label="화면 모드 전환">

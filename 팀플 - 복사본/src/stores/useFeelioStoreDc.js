@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { mockGoals } from '../data/mockGoals.js';
+import { mockTransactions } from '../data/mockTransactions.js';
 
-const STORAGE_KEY = 'feelio-dc-react-state-v3';
+const STORAGE_KEY = 'feelio-dc-react-state-v4-temp-seed';
 
 const initialState = {
   isLoggedIn: false,
@@ -10,7 +11,7 @@ const initialState = {
   aurora: '블루',
   user: { nickname: '서연', provider: 'Google' },
   goals: mockGoals,
-  transactions: [],
+  transactions: mockTransactions,
   toast: ''
 };
 
@@ -37,7 +38,7 @@ export function useFeelioStore() {
         isLoggedIn: true,
         user: { ...prev.user, provider },
         goals: mockGoals,
-        transactions: [],
+        transactions: mockTransactions,
         toast: ''
       }));
     },
