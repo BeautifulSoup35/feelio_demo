@@ -55,9 +55,9 @@ const categoryData = [
 ];
 
 const aiInsights = [
-  { emotion: '외로움', percent: 61, color: '#5b7db1', title: '새벽 1시, 외로우면 지갑이 샌다', desc: '자정~새벽 소비의 78%가 \'외로움\' 태그' },
-  { emotion: '불안', percent: 22, color: '#a68b55', title: '월급날 다음 3일이 제일 위험해', desc: '불안 소비가 평소의 2.3배로 튐' },
-  { emotion: '신남', percent: 17, color: '#b15b76', title: '기분이 들뜨면 지출도 들뜬다', desc: '신남 태그 날 하루 평균 지출 49,200원' }
+  { emotion: '외로움', percent: 61, amount: '113,000원', color: '#5b7db1', title: '새벽 1시, 외로우면 지갑이 샌다', desc: '자정~새벽 소비의 78%가 \'외로움\' 태그' },
+  { emotion: '불안', percent: 22, amount: '41,000원', color: '#a68b55', title: '월급날 다음 3일이 제일 위험해', desc: '불안 소비가 평소의 2.3배로 튐' },
+  { emotion: '신남', percent: 17, amount: '31,500원', color: '#b15b76', title: '기분이 들뜨면 지출도 들뜬다', desc: '신남 태그 날 하루 평균 지출 49,200원' }
 ];
 
 const emotionDist = [
@@ -75,9 +75,51 @@ const evidence = [
   ['6월 22일', '배달', '스트레스', '혼자 있음', '₩18,000']
 ];
 
-export default function AnalysisPageDc() {
-  const [activeInsight, setActiveInsight] = useState(aiInsights[0]);
-  const [isSaveMode, setIsSaveMode] = useState(false);
+export default function AnalysisPageDc({ state }) {
+  const isDark = state?.mode === 'dark';
+  const [flippedCards, setFlippedCards] = useState({});
+  const [activeChartTab, setActiveChartTab] = useState('category');
+
+  const toggleFlip = (emotion) => {
+    setFlippedCards(prev => ({ ...prev, [emotion]: !prev[emotion] }));
+  };
+
+  const chartConfig = {
+    category: { 
+      label: '배달', percent: 43, icon: '🍔', color: '#4E7EF0',
+      segments: [
+        { name: '배달', percent: 43, amount: '82,000원', color: '#4E7EF0' },
+        { name: '카페', percent: 28, amount: '54,000원', color: '#86C9FF' },
+        { name: '쇼핑', percent: 21, amount: '39,000원', color: '#B4AAF2' },
+        { name: '편의점', percent: 8,  amount: '15,000원', color: '#E2E8FF' }
+      ]
+    },
+    time: { 
+      label: '밤', percent: 33, icon: '🌙', color: '#9E355B',
+      segments: [
+        { name: '밤', percent: 33, color: '#9E355B' },
+        { name: '저녁', percent: 31, color: '#D46187' },
+        { name: '점심', percent: 24, color: '#F49CB0' },
+        { name: '아침', percent: 12, color: '#FFD1DF' }
+      ]
+    },
+    emotion: { 
+      label: '스트레스', percent: 43, icon: getEmotion('스트레스').icon, color: '#5042B3',
+      segments: [
+        { name: '스트레스', percent: 43, color: '#5042B3' },
+        { name: '외로움', percent: 28, color: '#6A61C4' },
+        { name: '설렘', percent: 21, color: '#9E96EE' },
+        { name: '평온', percent: 8,  color: '#D3D6FF' }
+      ]
+    }
+  };
+  const activeChart = chartConfig[activeChartTab];
+
+  const getPolarCoord = (percent, radius) => {
+    const angleDeg = -90 + (percent * 3.6);
+    const angleRad = (angleDeg * Math.PI) / 180;
+    return { x: 18 + radius * Math.cos(angleRad), y: 18 + radius * Math.sin(angleRad) };
+  };
 
   const points = times.map(([label, value], index) => {
     const x = ((index + .5) / times.length) * 100;
@@ -102,46 +144,45 @@ export default function AnalysisPageDc() {
 
       <KpiGrid>
         {/* Card 1: 상관관계 트리 */}
-        <Card css={{ display: 'flex', flexDirection: 'column', gap: 10, background: 'linear-gradient(145deg, #1A1829, var(--card))' }}>
-          <div css={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 900, color: '#A59DF6' }}>
+        <Card css={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <div css={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 900, color: '#7265E3' }}>
             <span css={{ fontSize: 16 }}>🕸️</span> 위험한 감정 루트
           </div>
-          <div css={{ fontSize: 13, color: 'var(--sub)', lineHeight: 1.4 }}>가장 가난하게 만드는 루트는</div>
-          <div css={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', marginTop: 'auto' }}>
-            <span css={{ background: '#5b7db133', color: '#7ba2d9', padding: '4px 8px', borderRadius: 6, fontSize: 12, fontWeight: 800 }}>우울함</span>
-            <span css={{ color: 'var(--sub)', fontSize: 10 }}>→</span>
-            <span css={{ background: 'var(--line)', color: 'var(--text)', padding: '4px 8px', borderRadius: 6, fontSize: 12, fontWeight: 800 }}>새벽 2시 쇼핑</span>
+          <div css={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, flexWrap: 'wrap', marginTop: 'auto', marginBottom: 'auto' }}>
+            <span css={{ background: '#5b7db133', color: '#4B70A6', padding: '8px 14px', borderRadius: 8, fontSize: 16, fontWeight: 800 }}>우울함</span>
+            <span css={{ color: 'var(--sub)', fontSize: 14 }}>➔</span>
+            <span css={{ background: 'var(--line)', color: 'var(--text)', padding: '8px 14px', borderRadius: 8, fontSize: 16, fontWeight: 800 }}>새벽 2시 쇼핑</span>
           </div>
         </Card>
 
         {/* Card 2: 팩트체크 리포트 */}
-        <Card css={{ display: 'flex', flexDirection: 'column', gap: 10, background: 'linear-gradient(145deg, #2D1A29, var(--card))' }}>
-          <div css={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 900, color: '#F69D9D' }}>
+        <Card css={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <div css={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 900, color: '#E74C3C' }}>
             <span css={{ fontSize: 16 }}>🔍</span> 팩트폭행 리포트
           </div>
           <div css={{ fontSize: 13, color: 'var(--sub)', lineHeight: 1.4 }}>이번 달 가장 쓸모없는 소비 1위</div>
-          <div css={{ display: 'flex', alignItems: 'center', gap: 16, background: '#F69D9D1a', padding: '16px', borderRadius: 12, marginTop: 'auto' }}>
+          <div css={{ display: 'flex', alignItems: 'center', gap: 16, background: '#E74C3C1a', padding: '16px', borderRadius: 12, marginTop: 'auto' }}>
             <div css={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: 48, height: 48, borderRadius: '50%', background: '#DE3B40', color: '#FFF', flexShrink: 0, boxShadow: '0 4px 10px rgba(0,0,0,0.2)' }}>
               <span css={{ fontSize: 10, fontWeight: 900, lineHeight: 1 }}>TOP</span>
               <span css={{ fontSize: 20, fontWeight: 900, lineHeight: 1, marginTop: 2 }}>1</span>
             </div>
             <div css={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 4 }}>
-              <span css={{ background: '#ffffff1a', color: '#F69D9D', fontSize: 11, fontWeight: 800, padding: '4px 10px', borderRadius: 99 }}>스트레스 핑계</span>
-              <div css={{ fontSize: 15, fontWeight: 900, color: '#FFF' }}>택시비</div>
-              <div css={{ fontSize: 24, fontWeight: 900, color: '#F69D9D', marginTop: 2 }}>48,000원</div>
+              <span css={{ background: '#E74C3C1a', color: '#E74C3C', fontSize: 11, fontWeight: 800, padding: '4px 10px', borderRadius: 99 }}>스트레스 핑계</span>
+              <div css={{ fontSize: 15, fontWeight: 900, color: 'var(--text)' }}>택시비</div>
+              <div css={{ fontSize: 24, fontWeight: 900, color: '#E74C3C', marginTop: 2 }}>48,000원</div>
             </div>
           </div>
         </Card>
 
         {/* Card 3: 소비 위험도 (신호등) */}
-        <Card css={{ display: 'flex', flexDirection: 'column', background: 'linear-gradient(145deg, #292A1A, var(--card))', position: 'relative' }}>
-          <div css={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 900, color: '#F6D99D' }}>
+        <Card css={{ display: 'flex', flexDirection: 'column', position: 'relative' }}>
+          <div css={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 900, color: '#F1C40F' }}>
             <span css={{ fontSize: 16 }}>🚦</span> 소비 위험도
           </div>
-          <div css={{ display: 'flex', gap: 20, margin: 'auto', background: '#00000040', padding: '18px 28px', borderRadius: 6 }}>
-            <div css={{ width: 30, height: 30, borderRadius: '50%', background: '#3E9578', opacity: 0.2 }} />
-            <div css={{ width: 30, height: 30, borderRadius: '50%', background: '#F1C40F', opacity: 0.2 }} />
-            <div css={{ width: 30, height: 30, borderRadius: '50%', background: '#E74C3C', boxShadow: '0 0 16px #E74C3C' }} />
+          <div css={{ display: 'flex', gap: 16, margin: 'auto', background: isDark ? '#00000040' : '#222222', padding: '15px 23px', borderRadius: 6 }}>
+            <div css={{ width: 44, height: 44, borderRadius: '50%', background: '#3E9578', opacity: 0.2 }} />
+            <div css={{ width: 44, height: 44, borderRadius: '50%', background: '#F1C40F', opacity: 0.2 }} />
+            <div css={{ width: 44, height: 44, borderRadius: '50%', background: '#E74C3C', boxShadow: '0 0 16px #E74C3C' }} />
           </div>
           <div css={{ position: 'absolute', bottom: 20, right: 22, fontSize: 11, color: 'var(--sub)', textAlign: 'right', letterSpacing: '-0.02em' }}>
             스트레스 누적으로 <b css={{ color: '#E74C3C' }}>위험</b> 상태
@@ -149,8 +190,8 @@ export default function AnalysisPageDc() {
         </Card>
 
         {/* Card 4: 맞춤 챌린지 */}
-        <Card css={{ display: 'flex', flexDirection: 'column', gap: 8, background: 'linear-gradient(145deg, #1A2A22, var(--card))' }}>
-          <div css={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 900, color: '#9DF6C4' }}>
+        <Card css={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <div css={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 900, color: '#3E9578' }}>
             <span css={{ fontSize: 16 }}>🎯</span> AI 맞춤 챌린지
           </div>
           <div css={{ fontSize: 14, fontWeight: 800, color: 'var(--text)', marginTop: 2 }}>밤 10시 이후 결제 0원</div>
@@ -170,30 +211,10 @@ export default function AnalysisPageDc() {
         <Card>
           <div css={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
             <div>
-              <h3 css={{ margin: '0 0 4px', fontSize: 16 }}>카테고리별 지출</h3>
+              <h3 css={{ margin: '0 0 4px', fontSize: 16 }}>목표 예산 현황</h3>
               <p css={{ margin: '0 0 22px', color: 'var(--sub)', fontSize: 12 }}>
-                {isSaveMode ? '저번달 대비 5% 절감 예산을 목표로 달리고 있어요' : <span>가장 큰 지출은 <b css={{ color: 'var(--text)' }}>배달</b>이에요</span>}
+                저번달 대비 5% 절감 예산을 목표로 달리고 있어요
               </p>
-            </div>
-            {/* 절약모드 토글 */}
-            <div 
-              onClick={() => setIsSaveMode(!isSaveMode)}
-              css={{
-                display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer',
-                background: isSaveMode ? '#3E95781a' : 'var(--line)', 
-                padding: '6px 12px', borderRadius: 99, transition: '0.3s'
-              }}
-            >
-              <span css={{ fontSize: 12, fontWeight: 800, color: isSaveMode ? '#3E9578' : 'var(--sub)' }}>절약모드</span>
-              <div css={{
-                width: 32, height: 18, borderRadius: 99, background: isSaveMode ? '#3E9578' : 'var(--sub)',
-                position: 'relative', transition: '0.3s'
-              }}>
-                <div css={{
-                  width: 14, height: 14, background: '#FFF', borderRadius: '50%',
-                  position: 'absolute', top: 2, left: isSaveMode ? 16 : 2, transition: 'transform 0.3s'
-                }}/>
-              </div>
             </div>
           </div>
 
@@ -202,82 +223,119 @@ export default function AnalysisPageDc() {
             const budget = data.prevAmount * 0.95;
             const progress = (data.amount / budget) * 100;
             const isOver = progress > 100;
-            // 일반 모드일 때의 바 길이 (제일 큰 배달을 100%로 잡기 위한 로직)
-            const maxAmount = categoryData[0].amount;
-            const normalWidth = (data.amount / maxAmount) * 100;
 
-            return <div key={data.name}>
-              <div css={{ display: 'flex', justifyContent: 'space-between', gap: 10, marginBottom: 9 }}>
-                <div css={{ display: 'flex', alignItems: 'center', gap: 9 }}>
-                  <b>{data.name}</b>
-                  <span css={{ fontSize: 11, fontWeight: 800, color: emo.text || emo.color, background: `${emo.color}26`, padding: '2px 9px', borderRadius: 99 }}>{data.emotion}</span>
+            return <div key={data.name} css={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {/* 1줄: 카테고리 정보 및 금액 */}
+              <div css={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+                <div css={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <b css={{ fontSize: 14 }}>{data.name}</b>
+                  <span css={{ fontSize: 11, fontWeight: 800, color: emo.text || emo.color, background: `${emo.color}26`, padding: '2px 8px', borderRadius: 6 }}>{data.emotion}</span>
                 </div>
-                <div css={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-                  <b>{data.amount.toLocaleString()}원</b>
-                  {isSaveMode ? (
-                    <span css={{ 
-                      fontSize: 12, fontWeight: 800, width: 44, textAlign: 'right', 
-                      color: isOver ? '#FF4757' : 'var(--sub)' 
-                    }}>
-                      {Math.round(progress)}%
-                    </span>
-                  ) : (
-                    <b css={{ color: 'var(--sub)', width: 38, textAlign: 'right' }}>{data.pctText}</b>
-                  )}
+                <div css={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
+                  <span css={{ fontSize: 15, fontWeight: 900, color: isOver ? '#FF4757' : 'var(--text)' }}>{data.amount.toLocaleString()}원</span>
+                  <span css={{ fontSize: 11, fontWeight: 700, color: 'var(--sub)' }}>/ {budget.toLocaleString()}원</span>
                 </div>
               </div>
-              <BarTrack css={{ background: isSaveMode ? 'rgba(255,255,255,0.06)' : 'var(--line)' }}>
-                <div css={{ 
-                  width: isSaveMode ? `${Math.min(progress, 100)}%` : `${normalWidth}%`, 
-                  height: '100%', 
-                  borderRadius: 99, 
-                  background: isSaveMode && isOver ? '#FF4757' : `linear-gradient(90deg, ${emo.color}9e, ${emo.color})`,
-                  transition: 'width 0.4s ease, background 0.4s ease'
-                }} />
-              </BarTrack>
-              {isSaveMode && (
-                <div css={{ display: 'flex', justifyContent: 'space-between', marginTop: 6, fontSize: 11, color: 'var(--sub)' }}>
-                  <span>{isOver ? <b css={{ color: '#FF4757' }}>예산 초과!</b> : '목표 예산'}</span>
-                  <span>{budget.toLocaleString()}원</span>
+
+              {/* 2줄: 얇은 바 그래프 및 달성률 */}
+              <div css={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <BarTrack css={{ flex: 1, height: 8, background: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)' }}>
+                  <div css={{ 
+                    width: `${Math.min(progress, 100)}%`, 
+                    height: '100%', 
+                    borderRadius: 99, 
+                    background: isOver ? '#FF4757' : `linear-gradient(90deg, ${emo.color}9e, ${emo.color})`,
+                    transition: 'width 0.4s ease, background 0.4s ease'
+                  }} />
+                </BarTrack>
+                <div css={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', width: 38 }}>
+                  <span css={{ fontSize: 12, fontWeight: 800, color: isOver ? '#FF4757' : 'var(--sub)' }}>
+                    {Math.round(progress)}%
+                  </span>
                 </div>
-              )}
+              </div>
             </div>;
           })}</div>
         </Card>
 
-        <Card css={{ padding: 0, overflow: 'hidden' }}>
-          <div css={{ display: 'flex', height: '100%', alignItems: 'center' }}>
-            {/* 왼쪽: 스트레스 */}
-            <div css={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '36px 20px' }}>
-              <div css={{ position: 'relative', width: 130, height: 130, marginBottom: 20 }}>
-                <svg viewBox="0 0 36 36" css={{ width: '100%', height: '100%' }}>
-                  <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#D3D6FF" strokeWidth="3.5" />
-                  <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#5042B3" strokeWidth="3.5" strokeDasharray="43, 100" strokeLinecap="round" />
+        <Card css={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+          <h3 css={{ margin: '0 0 20px', fontSize: 16 }}>나의 소비 코어</h3>
+          
+          <div css={{ display: 'flex', flex: 1, gap: 16, alignItems: 'center' }}>
+            {/* 메인 원형 그래프 영역 (왼쪽) */}
+            <div css={{ flex: 1.5, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+              <div css={{ position: 'relative', width: '100%', maxWidth: 210, aspectRatio: '1/1', marginBottom: 12 }}>
+                <svg viewBox="-8 -8 52 52" css={{ width: '100%', height: '100%', overflow: 'visible' }}>
+                  {activeChart.segments.reduce((acc, seg, idx) => {
+                    const offset = acc.total;
+                    acc.total += seg.percent;
+                    acc.elements.push(
+                      <path 
+                        key={`path-${idx}`} 
+                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" 
+                        fill="none" 
+                        stroke={seg.color} 
+                        strokeWidth="4" 
+                        strokeDasharray={`${seg.percent}, 100`} 
+                        strokeDashoffset={`-${offset}`}
+                        strokeLinecap="round" 
+                        css={{ transition: 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)' }} 
+                      />
+                    );
+                    
+                    const midPercent = offset + seg.percent / 2;
+                    const { x, y } = getPolarCoord(midPercent, 22.5); // 반지름을 선보다 바깥으로
+                    const isLeft = x < 18;
+                    const textLabel = activeChartTab === 'category' ? seg.amount : `${seg.percent}%`;
+                    
+                    if (seg.percent > 4) {
+                      acc.elements.push(
+                        <text
+                          key={`txt-${idx}`}
+                          x={x} y={y}
+                          fill={seg.color}
+                          fontSize="2.4"
+                          fontWeight="800"
+                          textAnchor={isLeft ? 'end' : 'start'}
+                          alignmentBaseline="middle"
+                          css={{ transition: 'all 0.4s ease' }}
+                        >
+                          {seg.name} {textLabel}
+                        </text>
+                      );
+                    }
+                    return acc;
+                  }, { total: 0, elements: [] }).elements}
                 </svg>
-                <div css={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#5042B3' }}>
-                  <span css={{ fontSize: 26, fontWeight: 900, marginBottom: 2 }}>43%</span>
-                  <span css={{ fontSize: 20 }}>{getEmotion('스트레스').icon}</span>
+                <div css={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: activeChart.color, transition: 'color 0.4s ease' }}>
+                  <span css={{ fontSize: 38, fontWeight: 900, marginBottom: 2 }}>{activeChart.percent}%</span>
+                  <span css={{ fontSize: 24 }}>{activeChart.icon}</span>
                 </div>
               </div>
-              <span css={{ color: '#5042B3', fontSize: 16, fontWeight: 800 }}>스트레스</span>
+              <span css={{ color: activeChart.color, fontSize: 16, fontWeight: 800, transition: 'color 0.4s ease' }}>1위는 '{activeChart.label}'</span>
             </div>
 
-            {/* 가운데 구분선 */}
-            <div css={{ width: 1, height: '70%', background: 'var(--line)' }} />
-
-            {/* 오른쪽: 밤 */}
-            <div css={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '36px 20px' }}>
-              <div css={{ position: 'relative', width: 130, height: 130, marginBottom: 20 }}>
-                <svg viewBox="0 0 36 36" css={{ width: '100%', height: '100%' }}>
-                  <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#FFD1DF" strokeWidth="3.5" />
-                  <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#9E355B" strokeWidth="3.5" strokeDasharray="33, 100" strokeLinecap="round" />
-                </svg>
-                <div css={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#9E355B' }}>
-                  <span css={{ fontSize: 26, fontWeight: 900, marginBottom: 2 }}>33%</span>
-                  <span css={{ fontSize: 20 }}>🌙</span>
-                </div>
-              </div>
-              <span css={{ color: '#9E355B', fontSize: 16, fontWeight: 800 }}>밤</span>
+            {/* 세로 탭 버튼 영역 (오른쪽) */}
+            <div css={{ display: 'flex', flexDirection: 'column', gap: 10, flex: 0.8 }}>
+              {[
+                { id: 'category', text: '가장 많이 쓴 곳' },
+                { id: 'time', text: '주로 쓴 시간' },
+                { id: 'emotion', text: '주된 감정' }
+              ].map(tab => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveChartTab(tab.id)}
+                  css={{
+                    padding: '14px 16px', fontSize: 13, fontWeight: 800, borderRadius: 12, cursor: 'pointer', textAlign: 'left',
+                    background: activeChartTab === tab.id ? 'var(--text)' : 'var(--line)',
+                    color: activeChartTab === tab.id ? 'var(--bg-1)' : 'var(--sub)',
+                    transition: 'all 0.3s', border: 'none', display: 'flex', justifyContent: 'space-between', alignItems: 'center'
+                  }}
+                >
+                  {activeChartTab === tab.id && <span css={{ opacity: 0.5, fontSize: 14 }}>◀</span>}
+                  {tab.text}
+                </button>
+              ))}
             </div>
           </div>
         </Card>
@@ -298,73 +356,101 @@ export default function AnalysisPageDc() {
         </Card>
 
         <Card css={{ display: 'flex', flexDirection: 'column' }}>
-          <div css={{ display: 'flex', alignItems: 'center', gap: 9, marginBottom: 16 }}><span css={{ width: 24, height: 24, borderRadius: 8, background: 'var(--ink)', color: 'var(--on-ink)', display: 'grid', placeItems: 'center', fontSize: 10, fontWeight: 900 }}>AI</span><b css={{ fontSize: 16 }}>감정소비 분석</b></div>
+          <div css={{ display: 'flex', alignItems: 'center', gap: 9, marginBottom: 6 }}><span css={{ width: 24, height: 24, borderRadius: 8, background: 'var(--ink)', color: 'var(--on-ink)', display: 'grid', placeItems: 'center', fontSize: 10, fontWeight: 900 }}>AI</span><b css={{ fontSize: 16 }}>감정소비 분석</b></div>
           <p css={{ color: 'var(--sub)', fontSize: 12, marginBottom: 20 }}>이번 달 지출에 가장 큰 영향을 미친 감정들이에요.</p>
           
-          <div css={{ display: 'flex', gap: 10, marginBottom: 24 }}>
+          <div css={{ display: 'flex', gap: 12, flex: 1 }}>
             {aiInsights.map(insight => {
-               const isActive = activeInsight.emotion === insight.emotion;
+               const isFlipped = flippedCards[insight.emotion];
                return (
-                 <button 
+                 <div 
                    key={insight.emotion}
-                   onClick={() => setActiveInsight(insight)}
-                   css={{ 
-                     flex: 1, 
-                     padding: '16px 14px', 
-                     borderRadius: 14, 
-                     border: `1px solid ${isActive ? insight.color : insight.color + '40'}`, 
-                     background: isActive ? insight.color + '26' : 'transparent',
-                     cursor: 'pointer',
-                     transition: 'all 0.2s',
-                     display: 'flex',
-                     flexDirection: 'column',
-                     alignItems: 'flex-start',
-                     gap: 6
-                   }}
+                   css={{ flex: 1, perspective: 1200, minHeight: 210, cursor: 'pointer' }}
+                   onClick={() => toggleFlip(insight.emotion)}
                  >
-                   <span css={{ fontSize: 13, color: 'var(--sub)', fontWeight: 800 }}>{insight.emotion}</span>
-                   <b css={{ fontSize: 24, color: 'var(--text)' }}>{insight.percent}%</b>
-                 </button>
+                   <div css={{
+                     width: '100%', height: '100%', position: 'relative',
+                     transition: 'transform 0.7s cubic-bezier(0.4, 0, 0.2, 1)',
+                     transformStyle: 'preserve-3d',
+                     transform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)'
+                   }}>
+                     {/* 앞면 (Front) */}
+                     <div css={{
+                       position: 'absolute', inset: 0, backfaceVisibility: 'hidden',
+                       padding: '24px 20px', borderRadius: 16, 
+                       border: `1px solid ${insight.color + '40'}`, 
+                       background: 'var(--card)',
+                       display: 'flex', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'center', gap: 3,
+                       boxShadow: '0 4px 12px rgba(0,0,0,0.03)'
+                     }}>
+                       <span css={{ fontSize: 16, color: 'var(--sub)', fontWeight: 800 }}>{insight.emotion}</span>
+                       <b css={{ fontSize: 36, color: 'var(--text)', lineHeight: 1 }}>{insight.percent}%</b>
+                       <span css={{ fontSize: 14, color: insight.color, fontWeight: 900 }}>{insight.amount}</span>
+                     </div>
+                     
+                     {/* 뒷면 (Back) */}
+                     <div css={{
+                       position: 'absolute', inset: 0, backfaceVisibility: 'hidden',
+                       transform: 'rotateY(180deg)',
+                       padding: '24px 20px', borderRadius: 16,
+                       border: `1.5px solid ${insight.color}`, 
+                       background: insight.color + '15',
+                       display: 'flex', flexDirection: 'column', justifyContent: 'center',
+                       boxShadow: `0 8px 24px ${insight.color}20`
+                     }}>
+                       <div css={{ fontSize: 16, fontWeight: 900, marginBottom: 12, color: 'var(--text)', wordBreak: 'keep-all', lineHeight: 1.3 }}>{insight.title}</div>
+                       <div css={{ fontSize: 13, color: 'var(--sub)', lineHeight: 1.5, wordBreak: 'keep-all' }}>{insight.desc}</div>
+                     </div>
+                   </div>
+                 </div>
                )
             })}
-          </div>
-
-          <div css={{ marginTop: 'auto', paddingTop: 8 }}>
-            <div css={{ fontSize: 16, fontWeight: 900, marginBottom: 6, color: 'var(--text)' }}>{activeInsight.title}</div>
-            <div css={{ fontSize: 13, color: 'var(--sub)', lineHeight: 1.5 }}>{activeInsight.desc}</div>
           </div>
         </Card>
       </Duo>
 
-      <Card>
-        <div css={{ display: 'flex', alignItems: 'center', gap: 9, marginBottom: 6 }}><span css={{ width: 24, height: 24, borderRadius: 8, background: 'var(--ink)', color: 'var(--on-ink)', display: 'grid', placeItems: 'center', fontSize: 10, fontWeight: 900 }}>AI</span><b>반복되는 감정소비 패턴</b></div>
-        <p css={{ color: 'var(--sub)', fontSize: 12.5, margin: '0 0 22px' }}>AI가 이번 달에 찾은 반복 조합이에요</p>
-        
-        <div css={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: 30, alignItems: 'start' }}>
+      <Card css={{ display: 'flex', flexDirection: 'column', minHeight: 410 }}>
+        <div css={{ display: 'flex', flex: 1, gap: 40, alignItems: 'stretch' }}>
           {/* 왼쪽: 패턴 요약 */}
-          <div>
-            <div css={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', marginBottom: 22 }}>
-              <span css={{ display: 'inline-flex', alignItems: 'center', gap: 7, fontWeight: 900, background: '#9E96EE22', color: '#4A4299', padding: '11px 17px', borderRadius: 14 }}><i css={{ width: 9, height: 9, borderRadius: '50%', background: '#9E96EE' }} />스트레스</span>
-              <span css={{ color: 'var(--sub)' }}>→</span><span css={{ fontWeight: 800, background: 'var(--card)', border: '1px solid var(--line)', padding: '11px 17px', borderRadius: 14 }}>배달</span>
-              <span css={{ color: 'var(--sub)' }}>→</span><span css={{ fontWeight: 800, background: 'var(--card)', border: '1px solid var(--line)', padding: '11px 17px', borderRadius: 14 }}>밤 10시 이후</span>
+          <div css={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', paddingTop: 8, paddingLeft: 10, paddingRight: 10 }}>
+            {/* 상단 타이틀 영역 (왼쪽으로 이동) */}
+            <div css={{ display: 'flex', alignItems: 'center', gap: 9, marginBottom: 6 }}>
+              <span css={{ width: 24, height: 24, borderRadius: 8, background: 'var(--ink)', color: 'var(--on-ink)', display: 'grid', placeItems: 'center', fontSize: 10, fontWeight: 900 }}>AI</span>
+              <b css={{ fontSize: 16 }}>반복되는 감정소비 패턴</b>
             </div>
-            <div css={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 22 }}>
-              <span css={{ color: '#6A61C4', fontSize: 24, fontWeight: 900 }}>7</span><span css={{ color: 'var(--sub)', fontSize: 14, fontWeight: 800 }}>번 반복</span>
+            <p css={{ color: 'var(--sub)', fontSize: 13, margin: '0 0 45px', fontWeight: 600 }}>AI가 이번 달에 찾은 반복 조합이에요</p>
+
+            <div css={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', marginBottom: 30 }}>
+              <div css={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <span css={{ display: 'inline-flex', alignItems: 'center', gap: 7, fontWeight: 900, background: '#9E96EE22', color: '#4A4299', padding: '13px 18px', borderRadius: 14, fontSize: 15 }}><i css={{ width: 9, height: 9, borderRadius: '50%', background: '#9E96EE' }} />스트레스</span>
+                <span css={{ color: 'var(--sub)' }}>→</span><span css={{ fontWeight: 800, background: 'var(--card)', border: '1px solid var(--line)', padding: '13px 18px', borderRadius: 14, fontSize: 15 }}>배달</span>
+                <span css={{ color: 'var(--sub)' }}>→</span><span css={{ fontWeight: 800, background: 'var(--card)', border: '1px solid var(--line)', padding: '13px 18px', borderRadius: 14, fontSize: 15 }}>밤 10시 이후</span>
+              </div>
+              <div css={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
+                <span css={{ color: '#6A61C4', fontSize: 44, fontWeight: 900, lineHeight: 1 }}>7</span><span css={{ color: 'var(--sub)', fontSize: 16, fontWeight: 800 }}>번 반복</span>
+              </div>
             </div>
-            <div css={{ background: '#9E96EE14', borderRadius: 16, padding: '15px 18px', fontWeight: 800, lineHeight: 1.6 }}>스트레스 받은 밤, 배달로 마음을 달래고 있었어요. 그 순간을 조금만 알아채도 충분해요.</div>
+            <div css={{ background: '#9E96EE14', borderRadius: 16, padding: '20px 24px', fontWeight: 800, lineHeight: 1.6, fontSize: 14 }}>스트레스 받은 밤, 배달로 마음을 달래고 있었어요. 그 순간을 조금만 알아채도 충분해요.</div>
           </div>
 
-          {/* 오른쪽: 내역 리스트 */}
-          <div css={{ border: '1px solid var(--line)', borderRadius: 16, overflow: 'hidden', background: 'var(--card)' }}>
-            <div css={{ display: 'grid', gridTemplateColumns: '84px 1fr auto', gap: 14, padding: '11px 18px', fontSize: 11, color: 'var(--sub)', fontWeight: 900, borderBottom: '1px solid var(--line)' }}><span>날짜</span><span>내역</span><span>금액</span></div>
-            {evidence.map(([date, category, emotion, situation, amount]) => {
-              const emo = getEmotion(emotion);
-              return <div key={date} css={{ display: 'grid', gridTemplateColumns: '84px 1fr auto', gap: 14, alignItems: 'center', padding: '14px 18px', borderBottom: '1px solid var(--line)' }}>
-                <span css={{ color: 'var(--sub)', fontSize: 12, fontWeight: 800 }}>{date}</span>
-                <div css={{ display: 'flex', alignItems: 'center', gap: 9, minWidth: 0 }}><span css={{ width: 8, height: 8, borderRadius: '50%', background: emo.color }} /><b>{category} <span css={{ color: 'var(--sub)', fontWeight: 600 }}>· {situation}</span></b><span css={{ color: emo.text || emo.color, background: `${emo.color}26`, borderRadius: 99, padding: '2px 8px', fontSize: 11, fontWeight: 800 }}>{emotion}</span></div>
-                <b>{amount}</b>
-              </div>;
-            })}
+          {/* 가운데: 세로 구분선 */}
+          <div css={{ width: 1, background: 'var(--line)' }} />
+
+          {/* 오른쪽: 내역 리스트 (표) */}
+          <div css={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+            <div css={{ border: '1px solid var(--line)', borderRadius: 16, overflow: 'hidden', background: 'var(--card)', display: 'flex', flexDirection: 'column', height: '100%' }}>
+              <div css={{ display: 'grid', gridTemplateColumns: '84px 1fr auto', gap: 14, padding: '11px 18px', fontSize: 11, color: 'var(--sub)', fontWeight: 900, borderBottom: '1px solid var(--line)' }}><span>날짜</span><span>내역</span><span>금액</span></div>
+              <div css={{ overflowY: 'auto', flex: 1, paddingBottom: 10 }}>
+                {evidence.map(([date, category, emotion, situation, amount], idx) => {
+                  const emo = getEmotion(emotion);
+                  return <div key={`${date}-${idx}`} css={{ display: 'grid', gridTemplateColumns: '84px 1fr auto', gap: 14, alignItems: 'center', padding: '16px 18px', borderBottom: '1px solid var(--line)' }}>
+                    <span css={{ color: 'var(--sub)', fontSize: 12, fontWeight: 800 }}>{date}</span>
+                    <div css={{ display: 'flex', alignItems: 'center', gap: 9, minWidth: 0 }}><span css={{ width: 8, height: 8, borderRadius: '50%', background: emo.color }} /><b>{category} <span css={{ color: 'var(--sub)', fontWeight: 600 }}>· {situation}</span></b><span css={{ color: emo.text || emo.color, background: `${emo.color}26`, borderRadius: 99, padding: '2px 8px', fontSize: 11, fontWeight: 800 }}>{emotion}</span></div>
+                    <b>{amount}</b>
+                  </div>;
+                })}
+              </div>
+            </div>
           </div>
         </div>
       </Card>
