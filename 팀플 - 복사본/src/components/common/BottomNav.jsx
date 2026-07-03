@@ -11,6 +11,7 @@ const Bar = styled.nav`
   grid-template-columns: repeat(5, 1fr);
   gap: 4px;
   padding: 8px;
+  padding-bottom: calc(8px + env(safe-area-inset-bottom));
   border-radius: 22px;
   background: var(--card-strong);
   border: 1px solid var(--card-border);

@@ -46,7 +46,7 @@ const Main = styled.main`
   padding: clamp(22px, 2.4vw, 32px) clamp(24px, 3vw, 54px) 42px 268px;
 
   @media (max-width: 820px) {
-    padding: 22px 16px 96px;
+    padding: 22px 16px calc(96px + env(safe-area-inset-bottom));
   }
 `;
 
@@ -82,6 +82,27 @@ const IconButton = styled.button`
   backdrop-filter: blur(20px);
 `;
 
+const TopRight = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+`;
+
+const MobileProfile = styled(IconButton)`
+  display: none;
+  background: linear-gradient(135deg, #FF8A62, #F2C766);
+  color: #fff;
+  font-weight: 900;
+  font-size: 16px;
+  border: 0;
+  
+  @media (max-width: 820px) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+`;
+
 export function AppLayoutDc({ route, title, state, actions, onRoute, onProfile, children }) {
   const colors = getAurora(state.aurora).colors;
   const now = new Date();
@@ -105,9 +126,14 @@ export function AppLayoutDc({ route, title, state, actions, onRoute, onProfile, 
             <p>{liveDate}</p>
             <h1>{title}</h1>
           </div>
-          <IconButton type="button" onClick={actions.toggleMode} aria-label="화면 모드 전환">
-            {state.mode === 'dark' ? '☀' : '☾'}
-          </IconButton>
+          <TopRight>
+            <IconButton type="button" onClick={actions.toggleMode} aria-label="화면 모드 전환">
+              {state.mode === 'dark' ? '☀' : '☾'}
+            </IconButton>
+            <MobileProfile type="button" onClick={onProfile} aria-label="프로필 열기">
+              {state.user?.nickname?.slice(0, 1) || '나'}
+            </MobileProfile>
+          </TopRight>
         </Top>
         {children}
       </Main>
