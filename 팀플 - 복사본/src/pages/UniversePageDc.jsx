@@ -1,381 +1,316 @@
 /** @jsxImportSource @emotion/react */
-import { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import styled from '@emotion/styled';
-import { GlassCard } from '../components/common/GlassCard.jsx';
-import { getEmotion } from '../data/emotions.js';
-import PlanetTest from '../components/universe/PlanetTest.jsx';
-import TheFork from '../components/universe/TheFork.jsx';
+import { Global, css } from '@emotion/react';
+import UniversePlanet from '../components/UniversePlanet';
+import SpaceBlob from '../components/SpaceBlob';
+import UniverseConsole from '../components/UniverseConsole';
+import UniverseEasterEgg from '../components/UniverseEasterEgg';
 
-const Page = styled.div`
-  width: min(100%, 1420px);
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-`;
-
-const ContentLayout = styled.div`
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(320px, .42fr);
-  gap: 20px;
-  align-items: stretch;
-
-  @media (max-width: 980px) {
-    grid-template-columns: 1fr;
+const globalStyles = css`
+  html, body {
+    overflow: hidden !important;
+  }
+  @keyframes pu-twinkle{0%,100%{opacity:.2}50%{opacity:1}}
+  @keyframes pu-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+  @keyframes pu-glow{0%,100%{opacity:.6}50%{opacity:1}}
+  @keyframes pu-spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+  @keyframes pu-resultin{from{opacity:0;transform:translate(-50%,-46%) scale(.96)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+  @keyframes pu-pop{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:none}}
+  @keyframes pu-blink{0%,100%{opacity:.35}50%{opacity:1}}
+  @keyframes pu-arrive{from{opacity:0}to{opacity:1}}
+  @keyframes pu-recoil{0%{transform:translate(0,0) scale(1)}20%{transform:translate(-16px,11px) scale(1.02,.985)}100%{transform:translate(0,0) scale(1)}}
+  @keyframes pu-fly-a{0%{transform:translate(580px,600px) scale(1) rotate(0deg);opacity:0}14%{opacity:1}100%{transform:translate(330px,205px) scale(.32) rotate(-10deg);opacity:1}}
+  @keyframes pu-fly-b{0%{transform:translate(580px,600px) scale(1) rotate(0deg);opacity:0}14%{opacity:1}100%{transform:translate(830px,225px) scale(.32) rotate(10deg);opacity:1}}
+  @keyframes pu-depart{0%{transform:translate(330px,430px) scale(1) rotate(0deg);opacity:0}14%{opacity:1}100%{transform:translate(948px,344px) scale(.22) rotate(16deg);opacity:1}}
+  @keyframes pu-scan{0%{transform:scale(.4);opacity:.85}100%{transform:scale(3.2);opacity:0}}
+  @keyframes pu-hover{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+  @keyframes pu-selglow{0%,100%{opacity:.5;transform:translate(-50%,-50%) scale(1)}50%{opacity:1;transform:translate(-50%,-50%) scale(1.08)}}
+  @keyframes pu-welldraw{0%{opacity:0}100%{opacity:1}}
+  @keyframes pu-eqfloat{0%,100%{transform:translateY(0);opacity:.5}50%{transform:translateY(-6px);opacity:.85}}
+  @keyframes pu-unfold {
+    0% { transform: scaleY(0.005) scaleX(0); opacity: 0; }
+    30% { transform: scaleY(0.005) scaleX(1); opacity: 1; }
+    100% { transform: scaleY(1) scaleX(1); opacity: 1; }
+  }
+  @keyframes pu-flicker {
+    0%, 10%, 20%, 30%, 100% { filter: brightness(1); }
+    5%, 15%, 25% { filter: brightness(1.3) contrast(1.2); }
   }
 `;
 
-const LeftColumn = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-`;
-
-const RightColumn = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
-
-const SchedulePanel = styled(GlassCard)`
-  padding: 32px 28px;
-  height: 100%;
-  border-radius: 28px;
-  display: flex;
-  flex-direction: column;
-`;
-
-const Cosmic = styled.div`
-  position: relative;
-  overflow: hidden;
-  border-radius: 28px;
-  padding: 30px 32px;
-  background: linear-gradient(150deg, #2A2740, #151327 62%);
-  box-shadow: var(--shadow);
-  isolation: isolate;
-`;
-
-const Duo = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-
-  @media (max-width: 860px) {
-    grid-template-columns: 1fr;
-  }
-`;
-
-const UniverseCard = styled(GlassCard)`
-  position: relative;
-  overflow: hidden;
-  padding: 28px;
-`;
-
-const Bars = styled.div`
-  display: flex;
-  align-items: flex-end;
-  gap: 14px;
-  height: 150px;
-  margin-top: 20px;
-`;
-
-const FlipContainer = styled.div`
-  perspective: 1200px;
-  cursor: pointer;
-  width: 100%;
-`;
-
-const CardInner = styled.div`
+const Container = styled.div`
   position: relative;
   width: 100%;
-  height: 100%;
-  min-height: 280px;
-  transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
-  transform-style: preserve-3d;
-  ${props => props.isFlipped && `transform: rotateX(180deg);`}
-`;
-
-const CardFace = styled(UniverseCard)`
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  backface-visibility: hidden;
-  top: 0; left: 0;
+  height: calc(100vh - 100px);
   display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
-  margin: 0;
-`;
-
-const CardBack = styled(CardFace)`
-  transform: rotateX(180deg);
-`;
-
-const TimelineContainer = styled.div`
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  margin-top: 18px;
-  padding-left: 6px;
-  &::before {
-    content: '';
-    position: absolute;
-    top: 10px;
-    bottom: 10px;
-    left: 28px;
-    width: 2px;
-    background: rgba(255,255,255,0.15);
-  }
-`;
-
-const TimelineItem = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  position: relative;
-`;
-
-const TimeCircle = styled.div`
-  width: 46px;
-  height: 46px;
-  border-radius: 50%;
-  border: 3px solid ${props => props.color};
-  background: ${props => props.bg || '#252336'};
-  color: #fff;
-  display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: 13px;
-  font-weight: 900;
-  z-index: 1;
-  flex-shrink: 0;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
 `;
 
-const TimelineContent = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  flex: 1;
+const PageWrapper = styled.div`
+  position: relative;
+  width: 1160px;
+  height: 660px;
+  border-radius: 28px;
+  overflow: hidden;
+  background: radial-gradient(135% 100% at 50% -10%,#23263e 0%,#14161f 44%,#0a0c14 100%);
+  box-shadow: 0 44px 100px -34px rgba(20,16,30,.72),0 0 0 1px rgba(255,255,255,.06);
+  font-family: system-ui, -apple-system, sans-serif;
+  animation: pu-unfold 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards, pu-flicker 1.2s ease-out forwards;
 `;
 
-const ScenarioGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
-
-  @media (max-width: 860px) {
-    grid-template-columns: 1fr;
+const U_DATA = {
+  current: {
+    tag: "현재 우주", title: "지금처럼 소비한 나", metricLabel: "이번 달 감정소비", metric: "-182,000원", accent: "#9E96EE",
+    narratives: [
+      "외로운 밤의 배달이 지금 속도로 이어지면, 제주도 여행 목표까지 4개월이 더 걸려요.",
+      "충동적인 지출은 잠시 위안을 주지만, 장기적인 목표를 멀어지게 만들고 있어요.",
+      "가끔은 밖으로 나가 가벼운 산책을 해보는 건 어떨까요? 기분이 한결 나아질 거예요!"
+    ],
+    goalNote: "제주도 여행 · 4개월 지연", emotionTag: "외로움 · 스트레스"
+  },
+  reduced: {
+    tag: "다른 우주", title: "감정소비를 줄인 나", metricLabel: "매달 아낄 수 있는 금액", metric: "+62,000원", accent: "#82E2C2",
+    narratives: [
+      "외로운 밤의 배달을 절반만 줄이면, 목표에 이만큼씩 더 가까워져요.",
+      "불필요한 소비를 줄인 당신! 제주도의 푸른 바다가 한 뼘 더 가까워졌네요.",
+      "자신의 감정을 잘 다스리는 지금의 모습, 우주에서 가장 반짝이고 있어요! ✨"
+    ],
+    goalNote: "제주도 여행 · 더 가까이", emotionTag: "평온 · 뿌듯함"
   }
-`;
-
-const projection = [['1월', 18, 11], ['2월', 36, 21], ['3월', 55, 30], ['4월', 74, 38], ['5월', 92, 46], ['6월', 112, 52]];
+};
 
 export default function UniversePageDc() {
-  const [selectedUniverse, setSelectedUniverse] = useState(null); // 'current' | 'alt' | null
+  const [phase, setPhase] = useState("idle");
+  const [selected, setSelected] = useState("");
+  const [from, setFrom] = useState("");
+  const [leverA, setLeverA] = useState(0.5);
+  const [leverB, setLeverB] = useState(0.6);
+  const [egg, setEgg] = useState(false);
+  const [calc, setCalc] = useState(0);
+  const [departTo, setDepartTo] = useState("");
+  const [blobPoke, setBlobPoke] = useState(false);
+  const [narrativeIndex, setNarrativeIndex] = useState(0);
   
-  const baseProgress = 40;
+  const tRef = useRef(null);
+  const stRef = useRef(null);
+  const ivRef = useRef(null);
+  const containerRef = useRef(null);
+  const [scale, setScale] = useState(1);
 
-  // 상승 궤도 (초록)
-  const getUpPoint = (t) => {
-    const p0 = { x: 40, y: 150 }, p1 = { x: 210, y: 150 }, p2 = { x: 300, y: 90 }, p3 = { x: 490, y: 34 };
-    const cx = 3 * (p1.x - p0.x), bx = 3 * (p2.x - p1.x) - cx, ax = p3.x - p0.x - cx - bx;
-    const cy = 3 * (p1.y - p0.y), by = 3 * (p2.y - p1.y) - cy, ay = p3.y - p0.y - cy - by;
-    return { x: (ax * t**3) + (bx * t**2) + (cx * t) + p0.x, y: (ay * t**3) + (by * t**2) + (cy * t) + p0.y };
+  useEffect(() => {
+    const ob = new ResizeObserver(entries => {
+      for (let entry of entries) {
+        const { width, height } = entry.contentRect;
+        const scaleW = width / 1160;
+        const scaleH = height / 660;
+        setScale(Math.min(scaleW, scaleH));
+      }
+    });
+    if (containerRef.current) ob.observe(containerRef.current);
+    return () => ob.disconnect();
+  }, []);
+
+  const reset = () => {
+    if (tRef.current) clearTimeout(tRef.current);
+    setPhase("idle"); setSelected(""); setFrom("");
   };
 
-  // 평행 궤도 (회색/바닥)
-  const getDownPoint = (t) => {
-    const p0 = { x: 40, y: 150 }, p1 = { x: 200, y: 150 }, p2 = { x: 300, y: 150 }, p3 = { x: 490, y: 150 };
-    const cx = 3 * (p1.x - p0.x), bx = 3 * (p2.x - p1.x) - cx, ax = p3.x - p0.x - cx - bx;
-    const cy = 3 * (p1.y - p0.y), by = 3 * (p2.y - p1.y) - cy, ay = p3.y - p0.y - cy - by;
-    return { x: (ax * t**3) + (bx * t**2) + (cx * t) + p0.x, y: (ay * t**3) + (by * t**2) + (cy * t) + p0.y };
+  const select = (key) => {
+    if (tRef.current) clearTimeout(tRef.current);
+    setPhase("flying"); setSelected(key); setFrom(selected); setNarrativeIndex(0);
+    tRef.current = setTimeout(() => setPhase("result"), 1200);
   };
 
-  let starX, starY, currentProgress;
-  if (selectedUniverse === 'alt') {
-    currentProgress = 100;
-    const pt = getUpPoint(1);
-    starX = pt.x; starY = pt.y;
-  } else if (selectedUniverse === 'current') {
-    currentProgress = baseProgress; // 떨어질때 실선은 기본으로 유지
-    const pt = getDownPoint(1);
-    starX = pt.x; starY = pt.y;
-  } else {
-    currentProgress = baseProgress;
-    const pt = getUpPoint(baseProgress / 100);
-    starX = pt.x; starY = pt.y;
-  }
+  const handleBlobClick = () => {
+    if (blobPoke) return;
+    setBlobPoke(true);
+    setTimeout(() => setBlobPoke(false), 450);
+    
+    if (selected && U_DATA[selected]) {
+      const u = U_DATA[selected];
+      setNarrativeIndex(prev => (prev + 1) % u.narratives.length);
+    }
+  };
+
+  const ignite = () => {
+    if (phase !== "idle") return;
+    if (stRef.current) clearTimeout(stRef.current);
+    if (ivRef.current) clearInterval(ivRef.current);
+    setEgg(true); setCalc(0);
+    ivRef.current = setInterval(() => {
+      setCalc(c => {
+        const nc = Math.min(100, c + 4);
+        if (nc >= 100) { clearInterval(ivRef.current); ivRef.current = null; }
+        return nc;
+      });
+    }, 55);
+    stRef.current = setTimeout(() => { setEgg(false); }, 5200);
+  };
+
+  const depart = (key) => {
+    if (phase === "departing") return;
+    if (tRef.current) clearTimeout(tRef.current);
+    setPhase("departing"); setDepartTo(key);
+    tRef.current = setTimeout(() => {
+      setPhase("result"); setSelected(key); setDepartTo("");
+    }, 1150);
+  };
+
+  const switchOther = () => depart(selected === "current" ? "reduced" : "current");
+
+  const dragLever = (key, e) => {
+    if (e.preventDefault) e.preventDefault();
+    const startY = e.clientY != null ? e.clientY : (e.touches && e.touches[0].clientY);
+    const startVal = key === 'leverA' ? leverA : leverB;
+    const move = (ev) => {
+      const cy = ev.clientY != null ? ev.clientY : (ev.touches && ev.touches[0].clientY);
+      let v = startVal - (cy - startY) / 120;
+      v = v < 0 ? 0 : v > 1 ? 1 : v;
+      if (key === 'leverA') setLeverA(v); else setLeverB(v);
+    };
+    const up = () => { window.removeEventListener("pointermove", move); window.removeEventListener("pointerup", up); };
+    window.addEventListener("pointermove", move); window.addEventListener("pointerup", up);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (tRef.current) clearTimeout(tRef.current);
+      if (stRef.current) clearTimeout(stRef.current);
+      if (ivRef.current) clearInterval(ivRef.current);
+    };
+  }, []);
+
+  const parked = phase !== "idle";
+  const u = U_DATA[selected] || null;
+  const otherKey = selected === "current" ? "reduced" : "current";
+  const other = U_DATA[otherKey] || null;
 
   return (
-    <Page>
-      <ContentLayout>
-        <LeftColumn>
-          <TheFork selectedUniverse={selectedUniverse} />
-          <Duo>
-            <FlipContainer onClick={() => setSelectedUniverse(selectedUniverse === 'current' ? null : 'current')}>
-              <CardInner isFlipped={selectedUniverse === 'current'}>
-                <CardFace>
-                  <div css={{ position: 'absolute', top: -50, right: -40, width: 180, height: 180, borderRadius: '50%', background: 'radial-gradient(circle at 40% 35%,#cfcadb,#a49fb6)', filter: 'blur(10px)', opacity: .4 }} />
-                  <div css={{ color: 'var(--sub)', fontSize: 12, fontWeight: 900, letterSpacing: '.04em' }}>현재 우주</div>
-                  <h3 css={{ margin: '6px 0 18px', fontSize: 20 }}>지금처럼 소비한 나</h3>
-                  <div css={{ color: 'var(--sub)', fontSize: 13 }}>이번 달 감정소비</div>
-                  <div css={{ fontSize: 34, fontWeight: 900 }}>-182,000원</div>
-                  <p css={{ color: 'var(--sub)', lineHeight: 1.7, marginTop: 'auto' }}>외로운 밤의 배달이 지금 속도로 이어지면, 목표까지 <b css={{ color: 'var(--text)' }}>4개월</b>이 더 걸려요.</p>
-                  <div css={{ fontSize: 11, color: 'var(--sub)', marginTop: 14, textAlign: 'right' }}>클릭해서 스케줄 보기 ↺</div>
-                </CardFace>
-                <CardBack css={{ background: '#252336' }}>
-                  <div css={{ color: 'var(--sub)', fontSize: 12, fontWeight: 900, letterSpacing: '.04em' }}>현재 우주의 하루</div>
-                  <h3 css={{ margin: '6px 0 14px', fontSize: 18 }}>이대로 가면... 텅장 예약입니다 💸</h3>
-                  <p css={{ color: 'var(--sub)', lineHeight: 1.6, fontSize: 14 }}>스트레스 풀려다 지갑이 풀려버리는 루트.<br/>배달 앱 VIP 달성은 축하드리지만, 통장 잔고는 매일 눈물을 흘리고 있어요. 이대로면 6개월 뒤 60만원 증발 확정!</p>
-                  <div css={{ fontSize: 11, color: 'var(--sub)', marginTop: 'auto', textAlign: 'right' }}>돌아가기 ↺</div>
-                </CardBack>
-              </CardInner>
-            </FlipContainer>
+    <Container ref={containerRef}>
+      <Global styles={globalStyles} />
+      <div style={{ transform: `scale(${scale})`, transformOrigin: "center center" }}>
+        <PageWrapper>
 
-            <FlipContainer onClick={() => setSelectedUniverse(selectedUniverse === 'alt' ? null : 'alt')}>
-              <CardInner isFlipped={selectedUniverse === 'alt'}>
-                <CardFace css={{ background: 'linear-gradient(160deg,#83C9B033,var(--card))' }}>
-                  <div css={{ position: 'absolute', top: -50, right: -40, width: 180, height: 180, borderRadius: '50%', background: 'radial-gradient(circle at 40% 35%,#C6F0E0,#72CFAD)', filter: 'blur(10px)', opacity: .55 }} />
-                  <div css={{ color: '#3E9578', fontSize: 12, fontWeight: 900, letterSpacing: '.04em' }}>다른 우주</div>
-                  <h3 css={{ margin: '6px 0 18px', fontSize: 20 }}>감정소비를 줄인 나</h3>
-                  <div css={{ color: 'var(--sub)', fontSize: 13 }}>아낄 수 있는 금액</div>
-                  <div css={{ fontSize: 34, fontWeight: 900, color: '#3E9578' }}>+62,000원</div>
-                  <p css={{ color: 'var(--sub)', lineHeight: 1.7, marginTop: 'auto' }}>외로운 밤의 배달을 <b css={{ color: 'var(--text)' }}>절반만</b> 줄이면, 목표에 이만큼 더 가까워져요.</p>
-                  <div css={{ fontSize: 11, color: '#3E957880', marginTop: 14, textAlign: 'right' }}>클릭해서 스케줄 보기 ↺</div>
-                </CardFace>
-                <CardBack css={{ background: 'linear-gradient(160deg,#3E957833,#252336)' }}>
-                  <div css={{ color: '#3E9578', fontSize: 12, fontWeight: 900, letterSpacing: '.04em' }}>다른 우주의 하루</div>
-                  <h3 css={{ margin: '6px 0 14px', fontSize: 18 }}>참으면 복이 와요! 📈</h3>
-                  <p css={{ color: 'var(--sub)', lineHeight: 1.6, fontSize: 14 }}>작은 인내가 모여 통장이 두둑해지는 지름길.<br/>조금만 참으면 6개월 뒤 60만원 이상의 이득! 여유롭게 제주도 왕복 항공권 겟!</p>
-                  <div css={{ fontSize: 11, color: '#3E957880', marginTop: 'auto', textAlign: 'right' }}>돌아가기 ↺</div>
-                </CardBack>
-              </CardInner>
-            </FlipContainer>
-          </Duo>
-        </LeftColumn>
+        <div style={{ position: "absolute", inset: 0, opacity: parked && phase !== "flying" ? 0 : 1, pointerEvents: phase === "idle" ? "auto" : "none", transition: "opacity .45s ease" }}>
+          <div style={{ position: "absolute", inset: 0, overflow: "hidden" }}>
+             <div style={{ position:"absolute",left:"6%",top:60,width:2,height:2,borderRadius:"50%",background:"#fff",animation:"pu-twinkle 3.2s ease-in-out infinite" }}></div>
+             <div style={{ position:"absolute",left:"15%",top:130,width:2,height:2,borderRadius:"50%",background:"#fff",animation:"pu-twinkle 2.6s ease-in-out .4s infinite" }}></div>
+             <div style={{ position:"absolute",left:"23%",top:70,width:1.5,height:1.5,borderRadius:"50%",background:"#fff",animation:"pu-twinkle 3.8s ease-in-out .8s infinite" }}></div>
+             <div style={{ position:"absolute",left:"82%",top:64,width:2,height:2,borderRadius:"50%",background:"#fff",animation:"pu-twinkle 3.1s ease-in-out .5s infinite" }}></div>
+          </div>
 
-        <RightColumn css={{ perspective: 1200, height: '100%' }}>
-          <div css={{
-            position: 'relative', width: '100%', height: '100%', minHeight: 600,
-            transition: 'transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)',
-            transformStyle: 'preserve-3d',
-            transform: selectedUniverse ? 'rotateY(180deg)' : 'none'
-          }}>
-            {/* 앞면: 기질 테스트 */}
-            <div css={{ position: 'absolute', inset: 0, backfaceVisibility: 'hidden' }}>
-              <PlanetTest css={{ height: '100%' }} />
+          <div onClick={() => select("current")} style={{ position: "absolute", left: 330, top: 196, transform: "translate(-50%,-50%)", cursor: "pointer", zIndex: 4 }}>
+            <div style={{ position: "relative", width: 150, height: 150 }}>
+              <div style={{ position: "absolute", left: "50%", top: "50%", transform: "translate(-50%,-50%)", width: 232, height: 232, borderRadius: "50%", background: "radial-gradient(circle,rgba(158,150,238,.5),transparent 60%)", filter: "blur(16px)", animation: "pu-glow 4.4s ease-in-out infinite" }}></div>
+              <UniversePlanet tone="stress" size={150} />
+              {selected === "current" && <div style={{ position: "absolute", left: "50%", top: "50%", width: 222, height: 222, borderRadius: "50%", background: "radial-gradient(circle,rgba(158,150,238,.6),transparent 62%)", filter: "blur(14px)", animation: "pu-selglow 1.7s ease-in-out infinite" }}></div>}
             </div>
-
-            {/* 뒷면: 스케줄 패널 */}
-            <div css={{ position: 'absolute', inset: 0, backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}>
-              <SchedulePanel>
-                {selectedUniverse === 'current' ? (
-                  <>
-                    <div css={{ color: 'var(--sub)', fontSize: 12, fontWeight: 900, letterSpacing: '.04em' }}>현재 우주 타임라인</div>
-                    <h3 css={{ margin: '6px 0 24px', fontSize: 20 }}>돈이 모이지 않는 스케줄</h3>
-                    <TimelineContainer>
-                      <TimelineItem>
-                        <TimeCircle color="#cfcadb" bg="#252336">18:30</TimeCircle>
-                        <TimelineContent>
-                          <div css={{ fontSize: 13, color: '#cfcadb', fontWeight: 500 }}>퇴근길 스트레스, 편의점 캔맥주 충동구매</div>
-                          <div css={{ fontSize: 13, color: '#ff7a6b', fontWeight: 800 }}>-12,000원</div>
-                        </TimelineContent>
-                      </TimelineItem>
-                      <TimelineItem>
-                        <TimeCircle color="#cfcadb" bg="#252336">20:00</TimeCircle>
-                        <TimelineContent>
-                          <div css={{ fontSize: 13, color: '#cfcadb', fontWeight: 500 }}>유튜브 보다가 쇼핑몰 할인 광고 클릭</div>
-                        </TimelineContent>
-                      </TimelineItem>
-                      <TimelineItem>
-                        <TimeCircle color="#cfcadb" bg="#252336">22:00</TimeCircle>
-                        <TimelineContent>
-                          <div css={{ fontSize: 13, color: '#cfcadb', fontWeight: 500 }}>스트레스 폭발, 누워서 배달 앱 탐색</div>
-                        </TimelineContent>
-                      </TimelineItem>
-                      <TimelineItem>
-                        <TimeCircle color="#cfcadb" bg="#252336">23:30</TimeCircle>
-                        <TimelineContent>
-                          <div css={{ fontSize: 13, color: '#cfcadb', fontWeight: 500 }}>매운 야식 결제 완료</div>
-                          <div css={{ fontSize: 13, color: '#ff7a6b', fontWeight: 800 }}>-23,000원</div>
-                        </TimelineContent>
-                      </TimelineItem>
-                      <TimelineItem>
-                        <TimeCircle color="#cfcadb" bg="#252336">02:00</TimeCircle>
-                        <TimelineContent>
-                          <div css={{ fontSize: 13, color: '#cfcadb', fontWeight: 500 }}>소화불량으로 뒤척이다 새벽 감성 쇼핑</div>
-                          <div css={{ fontSize: 13, color: '#ff7a6b', fontWeight: 800 }}>-45,000원</div>
-                        </TimelineContent>
-                      </TimelineItem>
-                      <TimelineItem>
-                        <TimeCircle color="#cfcadb" bg="#252336">08:30</TimeCircle>
-                        <TimelineContent>
-                          <div css={{ fontSize: 13, color: '#cfcadb', fontWeight: 500 }}>더부룩한 속, 늦잠으로 인한 택시 탑승</div>
-                          <div css={{ fontSize: 13, color: '#ff7a6b', fontWeight: 800 }}>-9,800원</div>
-                        </TimelineContent>
-                      </TimelineItem>
-                      <TimelineItem>
-                        <TimeCircle color="#cfcadb" bg="#252336">12:00</TimeCircle>
-                        <TimelineContent>
-                          <div css={{ fontSize: 13, color: '#cfcadb', fontWeight: 500 }}>피곤함을 달래려 비싼 커피 수혈</div>
-                          <div css={{ fontSize: 13, color: '#ff7a6b', fontWeight: 800 }}>-6,000원</div>
-                        </TimelineContent>
-                      </TimelineItem>
-                    </TimelineContainer>
-                  </>
-                ) : selectedUniverse === 'alt' ? (
-                  <>
-                    <div css={{ color: '#3E9578', fontSize: 12, fontWeight: 900, letterSpacing: '.04em' }}>다른 우주 타임라인</div>
-                    <h3 css={{ margin: '6px 0 24px', fontSize: 20 }}>가벼워지는 스케줄</h3>
-                    <TimelineContainer>
-                      <TimelineItem>
-                        <TimeCircle color="#8FDAC0" bg="#1a2522">18:30</TimeCircle>
-                        <TimelineContent>
-                          <div css={{ fontSize: 13, color: '#8FDAC0', fontWeight: 500 }}>퇴근길 산책하며 스트레스 날리기</div>
-                          <div css={{ fontSize: 13, color: '#3E9578', fontWeight: 800 }}>0원</div>
-                        </TimelineContent>
-                      </TimelineItem>
-                      <TimelineItem>
-                        <TimeCircle color="#8FDAC0" bg="#1a2522">20:00</TimeCircle>
-                        <TimelineContent>
-                          <div css={{ fontSize: 13, color: '#8FDAC0', fontWeight: 500 }}>건강한 집밥으로 가벼운 저녁 식사</div>
-                        </TimelineContent>
-                      </TimelineItem>
-                      <TimelineItem>
-                        <TimeCircle color="#8FDAC0" bg="#1a2522">22:00</TimeCircle>
-                        <TimelineContent>
-                          <div css={{ fontSize: 13, color: '#8FDAC0', fontWeight: 500 }}>야식 대신 따뜻한 차 한 잔으로 릴렉스</div>
-                        </TimelineContent>
-                      </TimelineItem>
-                      <TimelineItem>
-                        <TimeCircle color="#8FDAC0" bg="#1a2522">23:00</TimeCircle>
-                        <TimelineContent>
-                          <div css={{ fontSize: 13, color: '#8FDAC0', fontWeight: 500 }}>배달비 방어 성공! 가벼운 속으로 취침</div>
-                        </TimelineContent>
-                      </TimelineItem>
-                      <TimelineItem>
-                        <TimeCircle color="#8FDAC0" bg="#1a2522">07:30</TimeCircle>
-                        <TimelineContent>
-                          <div css={{ fontSize: 13, color: '#8FDAC0', fontWeight: 500 }}>개운하게 기상, 여유롭게 대중교통 탑승</div>
-                        </TimelineContent>
-                      </TimelineItem>
-                      <TimelineItem>
-                        <TimeCircle color="#8FDAC0" bg="#1a2522">10:00</TimeCircle>
-                        <TimelineContent>
-                          <div css={{ fontSize: 13, color: '#8FDAC0', fontWeight: 500 }}>늘어난 적금 이자 확인</div>
-                          <div css={{ fontSize: 13, color: '#3E9578', fontWeight: 800 }}>+62,000원</div>
-                        </TimelineContent>
-                      </TimelineItem>
-                    </TimelineContainer>
-                  </>
-                ) : null}
-              </SchedulePanel>
+            <div style={{ position: "absolute", left: "50%", top: 170, transform: "translateX(-50%)", whiteSpace: "nowrap", textAlign: "center", opacity: parked ? 0 : 1, transition: "opacity .3s ease" }}>
+              <div style={{ font: "600 13px system-ui", color: "#ECEBF0" }}>지금처럼 소비한 나</div>
             </div>
           </div>
-        </RightColumn>
-      </ContentLayout>
-    </Page>
+
+          <div onClick={() => select("reduced")} style={{ position: "absolute", left: 830, top: 196, transform: "translate(-50%,-50%)", cursor: "pointer", zIndex: 4 }}>
+            <div style={{ position: "relative", width: 150, height: 150 }}>
+              <div style={{ position: "absolute", left: "50%", top: "50%", transform: "translate(-50%,-50%)", width: 232, height: 232, borderRadius: "50%", background: "radial-gradient(circle,rgba(130,226,194,.5),transparent 60%)", filter: "blur(16px)", animation: "pu-glow 4s ease-in-out .6s infinite" }}></div>
+              <UniversePlanet tone="calm" size={150} />
+              {selected === "reduced" && <div style={{ position: "absolute", left: "50%", top: "50%", width: 222, height: 222, borderRadius: "50%", background: "radial-gradient(circle,rgba(130,226,194,.6),transparent 62%)", filter: "blur(14px)", animation: "pu-selglow 1.7s ease-in-out infinite" }}></div>}
+              {egg && <div style={{ position: "absolute", left: "50%", top: "50%", width: 230, height: 230, borderRadius: "50%", background: "radial-gradient(circle,rgba(130,226,194,.6),transparent 62%)", filter: "blur(15px)", animation: "pu-selglow 1.1s ease-in-out infinite" }}></div>}
+            </div>
+            <div style={{ position: "absolute", left: "50%", top: 170, transform: "translateX(-50%)", whiteSpace: "nowrap", textAlign: "center", opacity: parked ? 0 : 1, transition: "opacity .3s ease" }}>
+              <div style={{ font: "600 13px system-ui", color: "#ECEBF0" }}>감정소비를 줄인 나</div>
+            </div>
+          </div>
+        </div>
+
+        <div style={{ position: "absolute", left: 34, top: 26, zIndex: 12 }}>
+          <div style={{ font: "600 11px system-ui", letterSpacing: ".16em", color: "#8f8c9c" }}>PARALLEL UNIVERSE</div>
+          <div style={{ font: "600 21px system-ui", color: "#ECEBF0", marginTop: 4 }}>미래는 지금 갈라지고 있어요</div>
+        </div>
+
+        {(phase === "flying" || phase === "departing") && (
+          <div style={{ position: "absolute", left: 0, top: 0, zIndex: 20, animation: (phase === "departing" ? "pu-depart 1.3s cubic-bezier(.45,.05,.35,1)" : (selected === "current" ? "pu-fly-a 1.2s cubic-bezier(.42,.08,.5,1)" : "pu-fly-b 1.2s cubic-bezier(.42,.08,.5,1)")) + " forwards" }}>
+            <div style={{ position: "relative", width: 120, height: 96, transform: "translate(-50%,-50%)" }}>
+              <div style={{ position: "absolute", left: "50%", bottom: -4, transform: "translateX(-50%)", width: 74, height: 26, borderRadius: "50%", background: "radial-gradient(circle,rgba(130,226,194,.85),transparent 70%)", filter: "blur(6px)" }}></div>
+              <div style={{ position: "absolute", left: "50%", bottom: 22, transform: "translateX(-50%)", width: 120, height: 34, borderRadius: "50%", background: "linear-gradient(180deg,#e9e6f4,#b6b1cf 52%,#918cae)", boxShadow: "0 8px 18px -8px rgba(0,0,0,.6),inset 0 2px 4px rgba(255,255,255,.5)" }}></div>
+              <div style={{ position: "absolute", left: "50%", bottom: 30, transform: "translateX(-50%)", width: 96, height: 7, borderRadius: "50%", background: "linear-gradient(90deg,#F6A96B,#F4A7C4,#9E96EE,#7FB4E8,#82E2C2,#F5D06B)", opacity: .6 }}></div>
+              <div style={{ position: "absolute", left: "50%", bottom: 36, transform: "translateX(-50%)", width: 64, height: 52, borderRadius: "50% 50% 46% 46%", background: "radial-gradient(circle at 46% 36%,rgba(214,206,248,.95),rgba(150,138,214,.85))", boxShadow: "inset 0 -6px 10px rgba(120,105,180,.4),inset 0 5px 9px rgba(255,255,255,.5)" }}></div>
+            </div>
+          </div>
+        )}
+
+        <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, aspectRatio: "1160 / 300", zIndex: 5, transform: parked ? "translateY(48px)" : "none", opacity: parked ? 0 : 1, pointerEvents: parked ? "none" : "auto", transition: "opacity .5s ease, transform .6s cubic-bezier(.5,.05,.2,1)" }}>
+          <UniverseConsole 
+            leverA={leverA} leverB={leverB} 
+            startLeverA={(e) => dragLever("leverA", e)} startLeverB={(e) => dragLever("leverB", e)}
+            ignite={ignite} recommending={egg} 
+            statusText={phase === "idle" ? (egg ? "CALC · 평행우주 연산 중" : "STANDBY · 목적지 선택 대기") : phase === "flying" ? "ENGAGED · 우주로 진입" : "ARRIVED · 관측 완료"}
+            selectCurrent={() => select("current")} selectReduced={() => select("reduced")}
+            leftOn={selected === "current"} rightOn={selected === "reduced"}
+          />
+        </div>
+
+        {(phase === "result" || phase === "departing") && (
+          <div style={{ position: "absolute", inset: 0, zIndex: 15, overflow: "hidden", animation: "pu-arrive .6s ease" }}>
+            <div style={{ position: "absolute", left: "-340px", bottom: "-640px", zIndex: 0, animation: phase === "departing" ? "pu-recoil 1.1s cubic-bezier(.2,.8,.3,1)" : "none" }}>
+              <UniversePlanet tone={selected === "reduced" ? "calm" : "stress"} size={1000} />
+            </div>
+
+            <div onClick={() => depart(otherKey)} style={{ position: "absolute", left: 948, top: 344, transform: "translate(-50%,-50%)", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 6, zIndex: 1 }}>
+              <UniversePlanet tone={otherKey === "reduced" ? "calm" : "stress"} size={212} />
+              {phase === "result" && (
+                <div style={{ textAlign: "center" }}>
+                  <div style={{ font: "600 12.5px system-ui", color: "#ECEBF0" }}>{other && other.title}</div>
+                  <div style={{ font: "400 10.5px system-ui", color: "#9a97a8", marginTop: 6 }}>눌러서 이 우주로 이동</div>
+                </div>
+              )}
+            </div>
+
+            {phase === "result" && u && (
+              <div style={{ position: "absolute", left: 206, top: 266, display: "flex", alignItems: "center", gap: 0, zIndex: 2 }}>
+                <div style={{ animation: "pu-hover 4.5s ease-in-out infinite" }}>
+                  <SpaceBlob size={150} speaking={true} poked={blobPoke} onClick={handleBlobClick} />
+                </div>
+                <div style={{ width: 16, height: 16, background: "rgba(255,255,255,.94)", transform: "rotate(45deg)", marginLeft: -8, marginRight: -8, borderRadius: 3, alignSelf: "center", position: "relative", top: 8 }}></div>
+                <div style={{ maxWidth: 400, padding: "18px 22px", borderRadius: 20, background: "rgba(255,255,255,.94)", boxShadow: "0 18px 44px -18px rgba(0,0,0,.6)", animation: "pu-pop .5s ease .15s both", position: "relative" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 7, font: "600 10.5px system-ui", letterSpacing: ".03em", color: u.accent }}>
+                    <span style={{ width: 7, height: 7, borderRadius: "50%", background: u.accent }}></span>{u.tag} · {u.title}
+                  </div>
+                  <div style={{ font: "400 11px system-ui", color: "#8A837A", marginTop: 14 }}>{u.metricLabel}</div>
+                  <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginTop: 3 }}>
+                    <span style={{ font: "800 40px/1 system-ui", color: u.accent, letterSpacing: "-.02em" }}>{u.metric}</span>
+                    <span style={{ font: "700 15px system-ui", color: u.accent }}>{u.metric.includes("-") ? "▼" : "▲"}</span>
+                  </div>
+                  <div style={{ height: 1, background: "rgba(50,42,32,.09)", margin: "15px 0" }}></div>
+                  <div style={{ font: "400 13px/1.6 system-ui", color: "#3A352F" }}>{u.narratives[narrativeIndex]}</div>
+                  <div style={{ display: "flex", gap: 8, marginTop: 16 }}>
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "7px 12px", borderRadius: 11, background: "rgba(50,42,32,.055)", font: "600 11px system-ui", color: "#5c564e" }}>🎯 {u.goalNote}</span>
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "7px 12px", borderRadius: 11, background: "rgba(50,42,32,.055)", font: "600 11px system-ui", color: "#5c564e" }}><span style={{ width: 8, height: 8, borderRadius: "50%", background: u.accent }}></span>{u.emotionTag}</span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {phase === "result" && (
+              <button onClick={reset} style={{ position: "absolute", right: 34, bottom: 28, zIndex: 3, display: "inline-flex", alignItems: "center", gap: 9, padding: "7px 8px 7px 16px", borderRadius: 24, border: "1px solid rgba(255,255,255,.14)", background: "rgba(255,255,255,.06)", color: "#c9c6d4", font: "600 12px system-ui", cursor: "pointer", backdropFilter: "blur(8px)" }}>
+                콘솔로 돌아가기 <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 26, height: 26, borderRadius: "50%", background: "rgba(255,255,255,.12)", fontSize: 13 }}>↩</span>
+              </button>
+            )}
+          </div>
+        )}
+
+        {egg && (
+          <UniverseEasterEgg 
+            eggPct={Math.round(calc)} calc={calc}
+            eggDistA={((calc / 100) * 4.24).toFixed(2)} eggTimeA={Math.round((calc / 100) * 37)}
+            eggDistB={((calc / 100) * 7.81).toFixed(2)} eggTimeB={Math.round((calc / 100) * 63)}
+            eggCurv={((calc / 100) * 0.83).toFixed(2)}
+          />
+        )}
+      </PageWrapper>
+      </div>
+    </Container>
   );
 }
