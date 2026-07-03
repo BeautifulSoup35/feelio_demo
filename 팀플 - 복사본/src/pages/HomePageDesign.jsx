@@ -151,30 +151,39 @@ const Pebble = styled.button`
     if (empty) return '1px solid transparent';
     return (selected || today) ? `1.5px solid rgba(255,255,255,${dark ? '.68' : '.96'})` : '1px solid var(--line)';
   }};
-  background: ${({ empty, color, strong, dark }) => {
+  background: ${({ empty, color, strong, dark, today }) => {
     if (empty) return 'transparent';
-    if (!color) return 'linear-gradient(150deg, rgba(255,255,255,.26), transparent)';
+    if (!color) {
+      if (today) return dark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.06)';
+      return 'linear-gradient(150deg, rgba(255,255,255,.26), transparent)';
+    }
     const alpha1 = strong ? (dark ? '9C' : 'B4') : (dark ? '60' : '7C');
     const alpha2 = dark ? '12' : '26';
     const highlight = dark ? '.12' : '.34';
     return `radial-gradient(circle at 40% 24%, rgba(255,255,255,${highlight}), transparent 44%), linear-gradient(150deg, ${color}${alpha1}, ${color}${alpha2})`;
   }};
-  color: ${({ empty, color, dark }) => {
+  color: ${({ empty, color, today, dark }) => {
     if (empty) return 'transparent';
+    if (today && !color) return dark ? '#ffffff' : '#000000'; // 오늘 날짜 엄청 찐하게
     return color ? (dark ? '#F3F1F8' : '#fff') : 'var(--sub)';
   }};
   font-size: clamp(11px, .9vw, 13px);
-  font-weight: ${({ selected, today }) => (selected || today) ? 800 : 700};
+  font-weight: ${({ selected, today }) => {
+    if (today) return 900;
+    if (selected) return 800;
+    return 700;
+  }};
   cursor: ${({ empty }) => empty ? 'default' : 'pointer'};
   pointer-events: ${({ empty }) => empty ? 'none' : 'auto'};
   backdrop-filter: ${({ empty }) => empty ? 'none' : 'blur(16px) saturate(1.35)'};
   -webkit-backdrop-filter: ${({ empty }) => empty ? 'none' : 'blur(16px) saturate(1.35)'};
   box-shadow: ${({ empty, selected, today, dark }) => {
     if (empty) return 'none';
-    const glow = (selected || today) ? `, 0 0 0 3px rgba(255,255,255,${dark ? '.16' : '.28'})` : '';
+    const selectedRing = selected ? `, 0 0 0 3.5px #A1A6B4, 0 0 14px rgba(161,166,180,0.8)` : '';
+    const todayRing = (!selected && today) ? `, 0 0 0 2.5px rgba(161,166,180,0.45)` : '';
     return dark
-      ? `inset 0 1px 1px rgba(255,255,255,.16), inset 0 0 14px rgba(255,255,255,.03), 0 8px 20px -16px rgba(0,0,0,.55)${glow}`
-      : `inset 0 1px 1.5px rgba(255,255,255,.5), inset 0 -8px 20px rgba(70,55,44,.045), 0 12px 26px -22px rgba(70,55,44,.36)${glow}`;
+      ? `inset 0 1px 1px rgba(255,255,255,.16), inset 0 0 14px rgba(255,255,255,.03), 0 8px 20px -16px rgba(0,0,0,.55)${selectedRing}${todayRing}`
+      : `inset 0 1px 1.5px rgba(255,255,255,.5), inset 0 -8px 20px rgba(70,55,44,.045), 0 12px 26px -22px rgba(70,55,44,.36)${selectedRing}${todayRing}`;
   }};
 `;
 
@@ -452,7 +461,7 @@ export default function HomePageDesign({ state, onRoute, selectedDate, onSelectD
   const goalPct = percent(goal.current, goal.target);
   const dark = state.mode === 'dark';
   const days = calendarDays(state.transactions, visibleMonth);
-  const selectedDayKey = dayKey(selected);
+  const selectedDayKey = `${selected.getFullYear()}-${String(selected.getMonth() + 1).padStart(2, '0')}-${String(selected.getDate()).padStart(2, '0')}`;
   const ridgeData = hasEnoughRidgeData ? emotionRidge(monthlyEmotionTransactions) : defaultRidgeData;
   const ridgePeak = ridgeData.reduce((max, item) => item[1] > max[1] ? item : max, ridgeData[0]);
   const slot = 560 / ridgeData.length;
@@ -462,8 +471,12 @@ export default function HomePageDesign({ state, onRoute, selectedDate, onSelectD
     onSelectDate?.(next);
     return next;
   });
-  const selectDay = (day) => {
-    onSelectDate?.(new Date(visibleMonth.getFullYear(), visibleMonth.getMonth(), day));
+  const selectDay = (day, dateKey) => {
+    if (dateKey === selectedDayKey) {
+      onRoute?.('transactions');
+    } else {
+      onSelectDate?.(new Date(visibleMonth.getFullYear(), visibleMonth.getMonth(), day));
+    }
   };
 
   return (
@@ -532,7 +545,7 @@ export default function HomePageDesign({ state, onRoute, selectedDate, onSelectD
               if (item.empty) return <Pebble key={item.id} empty disabled aria-hidden="true" />;
               const color = item.emotion ? getEmotion(item.emotion).color : undefined;
               const dateKey = `${visibleMonth.getFullYear()}-${String(visibleMonth.getMonth() + 1).padStart(2, '0')}-${String(item.day).padStart(2, '0')}`;
-              return <Pebble key={item.id} color={color} strong={item.strong} selected={dateKey === selectedDayKey} today={item.today} dark={dark} onClick={() => selectDay(item.day)}>{item.day}</Pebble>;
+              return <Pebble key={item.id} color={color} strong={item.strong} selected={dateKey === selectedDayKey} today={item.today} dark={dark} onClick={() => selectDay(item.day, dateKey)}>{item.day}</Pebble>;
             })}
           </PebbleGrid>
           <Legend>{['스트레스', '외로움', '평온', '뿌듯함'].map(name => <span key={name}><i style={{ background: getEmotion(name).color }} />{name}</span>)}</Legend>
