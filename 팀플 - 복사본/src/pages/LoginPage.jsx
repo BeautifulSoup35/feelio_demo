@@ -1,4 +1,5 @@
 /** @jsxImportSource @emotion/react */
+import { useEffect, useState } from 'react';
 import styled from '@emotion/styled';
 import { EmotionBlob } from '../components/common/EmotionBlob.jsx';
 import { stepIn } from '../styles/animations.js';
@@ -42,7 +43,8 @@ const HeroContent = styled.div`
 
   h1 span {
     display: block;
-    color: #A68BEA;
+    color: ${({ accent }) => accent};
+    transition: color .35s ease;
   }
 
   p {
@@ -156,29 +158,62 @@ const ModeButton = styled.button`
   backdrop-filter: blur(20px);
 `;
 
+const heroSlides = [
+  {
+    emotion: '스트레스',
+    accent: '#A68BEA',
+    eyebrow: '스트레스였던 밤',
+    title: '그 소비의 이유를 읽어드릴게요',
+    copy: 'feelio는 감정에 따라 반복되는 소비 패턴을 분석해, 나도 몰랐던 소비의 이유를 인사이트로 건네는 감정 가계부예요.'
+  },
+  {
+    emotion: '외로움',
+    accent: '#6EA7E8',
+    eyebrow: '외로웠던 새벽',
+    title: '지갑이 열린 순간을 함께 볼게요',
+    copy: '기록이 쌓이면 어떤 시간, 어떤 마음에서 소비가 반복되는지 말랑한 신호로 보여드려요.'
+  },
+  {
+    emotion: '뿌듯함',
+    accent: '#E5B84E',
+    eyebrow: '뿌듯했던 하루',
+    title: '좋은 소비는 더 선명하게 남겨요',
+    copy: '아낄 소비와 지켜도 되는 소비를 구분해, 목표에 가까워지는 흐름을 부드럽게 이어가요.'
+  }
+];
+
 export default function LoginPage({ mode, onToggleMode, onLogin }) {
+  const [slideIndex, setSlideIndex] = useState(0);
+  const slide = heroSlides[slideIndex];
   const pills = [
     ['감정 태그 기록', '#F28AB7'],
     ['AI 패턴 분석', '#A68BEA'],
     ['평행우주 목표', '#83C9B0']
   ];
 
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setSlideIndex(index => (index + 1) % heroSlides.length);
+    }, 3200);
+    return () => window.clearInterval(timer);
+  }, []);
+
   return (
     <Page>
       <ModeButton type="button" onClick={onToggleMode} aria-label="화면 모드 전환">
-        {mode === 'dark' ? '☾' : '☼'}
+        {mode === 'dark' ? '☀' : '☾'}
       </ModeButton>
       <Hero>
         <strong>feelio</strong>
-        <HeroContent>
+        <HeroContent accent={slide.accent}>
           <BlobSpot>
             <i style={{ width: 10, height: 10, left: -6, top: 54, background: '#F2C766' }} />
             <i style={{ width: 12, height: 12, right: -2, top: 40, background: '#F28AB7' }} />
             <i style={{ width: 9, height: 9, right: -18, bottom: 34, background: '#83C9B0' }} />
-            <EmotionBlob emotion="스트레스" size={150} />
+            <EmotionBlob emotion={slide.emotion} size={150} />
           </BlobSpot>
-          <h1><span>스트레스였던 밤</span>그 소비의 이유를 읽어드릴게요</h1>
-          <p>feelio는 감정에 따라 반복되는 소비 패턴을 분석해, 나도 몰랐던 소비의 이유를 인사이트로 건네는 감정 가계부예요.</p>
+          <h1><span>{slide.eyebrow}</span>{slide.title}</h1>
+          <p>{slide.copy}</p>
           <Pills>
             {pills.map(([label, color]) => <span key={label}><i style={{ background: color }} />{label}</span>)}
           </Pills>
@@ -198,4 +233,3 @@ export default function LoginPage({ mode, onToggleMode, onLogin }) {
     </Page>
   );
 }
-
