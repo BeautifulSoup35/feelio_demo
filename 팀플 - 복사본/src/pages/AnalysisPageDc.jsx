@@ -12,17 +12,89 @@ const Page = styled.div`
   gap: 20px;
 `;
 
-const KpiGrid = styled.div`
+const InsightRail = styled(GlassCard)`
+  min-height: 66px;
+  padding: 10px 12px;
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 14px;
+  gap: 0;
+  overflow: hidden;
 
   @media (max-width: 960px) {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   @media (max-width: 560px) {
     grid-template-columns: 1fr;
+  }
+`;
+const InsightItem = styled.div`
+  min-height: 46px;
+  padding: 6px 16px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  column-gap: 10px;
+  border-right: 1px solid var(--line);
+
+  &:last-of-type {
+    border-right: 0;
+  }
+
+  @media (max-width: 960px) {
+    &:nth-of-type(2) {
+      border-right: 0;
+    }
+
+    &:nth-of-type(n + 3) {
+      border-top: 1px solid var(--line);
+    }
+  }
+
+  @media (max-width: 560px) {
+    border-right: 0;
+
+    &:nth-of-type(n + 2) {
+      border-top: 1px solid var(--line);
+    }
+  }
+`;
+const RiskSignal = styled.span`
+  width: 52px;
+  height: 24px;
+  padding: 5px 6px;
+  display: inline-grid;
+  grid-template-columns: repeat(3, 1fr);
+  align-items: center;
+  justify-items: center;
+  gap: 5px;
+  border-radius: 7px;
+  background: rgba(25, 25, 34, .78);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .10), 0 8px 18px -16px rgba(0, 0, 0, .55);
+
+  i {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    display: block;
+    opacity: .34;
+  }
+
+  i.green {
+    background: #83C9B0;
+  }
+
+  i.yellow {
+    background: #F2C766;
+  }
+
+  i.red {
+    background: #E87573;
+  }
+
+  i.active {
+    opacity: 1;
+    box-shadow: 0 0 16px rgba(232, 117, 115, .74), 0 0 0 3px rgba(232, 117, 115, .16);
   }
 `;
 
@@ -60,6 +132,12 @@ const aiInsights = [
   { emotion: '신남', percent: 17, amount: '31,500원', color: '#b15b76', title: '기분이 들뜨면 지출도 들뜬다', desc: '신남 태그 날 하루 평균 지출 49,200원' }
 ];
 
+const aiQuickInsights = [
+  { label: '위험 루트', value: '우울함 → 새벽 쇼핑', note: '반복 감지', color: 'var(--sub)' },
+  { label: '팩트 리포트', value: '택시비 48,000원', note: '스트레스 핑계', color: '#E87573', type: 'fact' },
+  { label: '소비 위험도', value: '위험', note: '스트레스 누적', color: '#E87573', type: 'risk' },
+  { label: '맞춤 챌린지', value: '밤 10시 이후 0원', note: '12일 성공 · D-18', color: 'var(--sub)' }
+];
 const emotionDist = [
   ['스트레스', '43%', '바쁜 하루 끝의 충동', '80,000원'],
   ['외로움', '28%', '혼자인 밤의 위로', '52,000원'],
@@ -68,7 +146,6 @@ const emotionDist = [
 ];
 
 const monthly = [['1월', 350], ['2월', 392], ['3월', 445], ['4월', 418], ['5월', 502], ['6월', 473], ['7월', 487]];
-const times = [['아침', 12], ['점심', 24], ['저녁', 31], ['밤', 33]];
 const evidence = [
   ['6월 12일', '배달', '스트레스', '퇴근 후', '₩23,000'],
   ['6월 18일', '편의점', '스트레스', '밤', '₩8,400'],
@@ -78,264 +155,225 @@ const evidence = [
 export default function AnalysisPageDc({ state }) {
   const isDark = state?.mode === 'dark';
   const [flippedCards, setFlippedCards] = useState({});
-  const [activeChartTab, setActiveChartTab] = useState('category');
+  const [activeChartTab, setActiveChartTab] = useState('emotion');
 
   const toggleFlip = (emotion) => {
     setFlippedCards(prev => ({ ...prev, [emotion]: !prev[emotion] }));
   };
 
   const chartConfig = {
-    category: { 
-      label: '배달', percent: 43, icon: '🍔', color: '#4E7EF0',
+    category: {
+      label: '배달', percent: 43, color: 'var(--text)', helper: '가장 많이 쓴 곳', focus: '배달 소비가 예산 흐름을 가장 크게 만들었어요',
       segments: [
-        { name: '배달', percent: 43, amount: '82,000원', color: '#4E7EF0' },
-        { name: '카페', percent: 28, amount: '54,000원', color: '#86C9FF' },
-        { name: '쇼핑', percent: 21, amount: '39,000원', color: '#B4AAF2' },
-        { name: '편의점', percent: 8,  amount: '15,000원', color: '#E2E8FF' }
+        { name: '배달', percent: 43, amount: '82,000원', color: '#A68BEA' },
+        { name: '카페', percent: 28, amount: '54,000원', color: '#F28AB7' },
+        { name: '쇼핑', percent: 21, amount: '39,000원', color: '#F28AB7' },
+        { name: '편의점', percent: 8, amount: '15,000원', color: '#83C9B0' }
       ]
     },
-    time: { 
-      label: '밤', percent: 33, icon: '🌙', color: '#9E355B',
+    time: {
+      label: '밤', percent: 33, color: 'var(--text)', helper: '가장 몰린 시간', focus: '밤 시간대 소비가 반복되고 있어요',
       segments: [
-        { name: '밤', percent: 33, color: '#9E355B' },
-        { name: '저녁', percent: 31, color: '#D46187' },
-        { name: '점심', percent: 24, color: '#F49CB0' },
-        { name: '아침', percent: 12, color: '#FFD1DF' }
+        { name: '밤', percent: 33, color: '#A68BEA' },
+        { name: '저녁', percent: 31, color: '#B4AAF2' },
+        { name: '점심', percent: 24, color: '#76A7E8' },
+        { name: '아침', percent: 12, color: '#83C9B0' }
       ]
     },
-    emotion: { 
-      label: '스트레스', percent: 43, icon: getEmotion('스트레스').icon, color: '#5042B3',
+    emotion: {
+      label: '스트레스', percent: 43, color: '#A68BEA', helper: '핵심 소비 감정', focus: '스트레스가 이번 달 소비를 가장 많이 끌고 갔어요',
       segments: [
-        { name: '스트레스', percent: 43, color: '#5042B3' },
-        { name: '외로움', percent: 28, color: '#6A61C4' },
-        { name: '설렘', percent: 21, color: '#9E96EE' },
-        { name: '평온', percent: 8,  color: '#D3D6FF' }
+        { name: '스트레스', percent: 43, color: '#A68BEA' },
+        { name: '외로움', percent: 28, color: '#76A7E8' },
+        { name: '설렘', percent: 21, color: '#F28AB7' },
+        { name: '평온', percent: 8, color: '#83C9B0' }
       ]
     }
   };
   const activeChart = chartConfig[activeChartTab];
-
-  const getPolarCoord = (percent, radius) => {
-    const angleDeg = -90 + (percent * 3.6);
-    const angleRad = (angleDeg * Math.PI) / 180;
-    return { x: 18 + radius * Math.cos(angleRad), y: 18 + radius * Math.sin(angleRad) };
-  };
-
-  const points = times.map(([label, value], index) => {
-    const x = ((index + .5) / times.length) * 100;
-    const y = 90 - (value / 40) * 74;
-    return { label, value, x, y, peak: label === '밤' };
-  });
-  const curve = `M0,${points[0].y} L${points[0].x},${points[0].y} ` + points.slice(1).map((p, index) => {
-    const prev = points[index];
-    const mid = ((prev.x + p.x) / 2).toFixed(1);
-    return `C${mid},${prev.y.toFixed(1)} ${mid},${p.y.toFixed(1)} ${p.x.toFixed(1)},${p.y.toFixed(1)}`;
-  }).join(' ') + ` L100,${points.at(-1).y}`;
-  const area = `${curve} L100,90 L0,90 Z`;
+  const budgetItems = categoryData
+    .map(data => {
+      const emo = getEmotion(data.emotion);
+      const budget = data.prevAmount * 0.95;
+      const progress = (data.amount / budget) * 100;
+      return { ...data, emo, budget, progress, isOver: progress > 100 };
+    })
+    .sort((a, b) => Number(b.isOver) - Number(a.isOver) || b.progress - a.progress);
+  const overBudgetItem = budgetItems.find(item => item.isOver);
+  const budgetAverage = Math.round(budgetItems.reduce((sum, item) => sum + item.progress, 0) / budgetItems.length);
 
   return (
     <Page>
-      <div css={{ display: 'flex', justifyContent: 'flex-end' }}>
-        <div css={{ display: 'flex', alignItems: 'center', gap: 10, background: '#9E96EE18', padding: '9px 15px', borderRadius: 14 }}>
-          <div css={{ textAlign: 'right' }}><div css={{ fontSize: 11, color: '#6A61C4', fontWeight: 800 }}>감정소비 누수율</div><div css={{ fontSize: 19, fontWeight: 900, color: '#4A4299' }}>38%</div></div>
-          <span css={{ fontSize: 12, fontWeight: 900, color: '#2E9E7A', background: '#82E2C226', padding: '5px 9px', borderRadius: 99 }}>▼ 8%</span>
-        </div>
-      </div>
-
-      <KpiGrid>
-        {/* Card 1: 상관관계 트리 */}
-        <Card css={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <div css={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 900, color: '#7265E3' }}>
-            <span css={{ fontSize: 16 }}>🕸️</span> 위험한 감정 루트
-          </div>
-          <div css={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, flexWrap: 'wrap', marginTop: 'auto', marginBottom: 'auto' }}>
-            <span css={{ background: '#5b7db133', color: '#4B70A6', padding: '8px 14px', borderRadius: 8, fontSize: 16, fontWeight: 800 }}>우울함</span>
-            <span css={{ color: 'var(--sub)', fontSize: 14 }}>➔</span>
-            <span css={{ background: 'var(--line)', color: 'var(--text)', padding: '8px 14px', borderRadius: 8, fontSize: 16, fontWeight: 800 }}>새벽 2시 쇼핑</span>
-          </div>
-        </Card>
-
-        {/* Card 2: 팩트체크 리포트 */}
-        <Card css={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <div css={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 900, color: '#E74C3C' }}>
-            <span css={{ fontSize: 16 }}>🔍</span> 팩트폭행 리포트
-          </div>
-          <div css={{ fontSize: 13, color: 'var(--sub)', lineHeight: 1.4 }}>이번 달 가장 쓸모없는 소비 1위</div>
-          <div css={{ display: 'flex', alignItems: 'center', gap: 16, background: '#E74C3C1a', padding: '16px', borderRadius: 12, marginTop: 'auto' }}>
-            <div css={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: 48, height: 48, borderRadius: '50%', background: '#DE3B40', color: '#FFF', flexShrink: 0, boxShadow: '0 4px 10px rgba(0,0,0,0.2)' }}>
-              <span css={{ fontSize: 10, fontWeight: 900, lineHeight: 1 }}>TOP</span>
-              <span css={{ fontSize: 20, fontWeight: 900, lineHeight: 1, marginTop: 2 }}>1</span>
+      <InsightRail>
+        {aiQuickInsights.map(item => (
+          <InsightItem key={item.label}>
+            {item.type === 'risk' ? (
+              <RiskSignal aria-hidden="true">
+                <i className="green" />
+                <i className="yellow" />
+                <i className="red active" />
+              </RiskSignal>
+            ) : (
+              <span css={{
+                width: item.type === 'fact' ? 10 : 8,
+                height: item.type === 'fact' ? 40 : 34,
+                borderRadius: 99,
+                background: item.color,
+                opacity: item.type === 'fact' ? 1 : (isDark ? 0.86 : 0.72),
+                boxShadow: item.type === 'fact' ? '0 0 0 4px rgba(232,117,115,.12)' : `0 10px 22px -14px ${item.color}`
+              }} />
+            )}
+            <div css={{ minWidth: 0 }}>
+              <div css={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 10 }}>
+                <span css={{ color: 'var(--sub)', fontSize: 11, fontWeight: 900, whiteSpace: 'nowrap' }}>{item.label}</span>
+                <span css={{ color: item.type === 'fact' ? '#E87573' : item.color, fontSize: 11, fontWeight: 900, whiteSpace: 'nowrap' }}>{item.note}</span>
+              </div>
+              <div css={{
+                marginTop: 3,
+                color: item.type === 'fact' ? '#E87573' : 'var(--text)',
+                fontSize: item.type === 'fact' ? 14 : 13,
+                fontWeight: item.type === 'fact' ? 950 : 900,
+                lineHeight: 1.25,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap'
+              }}>{item.value}</div>
             </div>
-            <div css={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 4 }}>
-              <span css={{ background: '#E74C3C1a', color: '#E74C3C', fontSize: 11, fontWeight: 800, padding: '4px 10px', borderRadius: 99 }}>스트레스 핑계</span>
-              <div css={{ fontSize: 15, fontWeight: 900, color: 'var(--text)' }}>택시비</div>
-              <div css={{ fontSize: 24, fontWeight: 900, color: '#E74C3C', marginTop: 2 }}>48,000원</div>
-            </div>
-          </div>
-        </Card>
-
-        {/* Card 3: 소비 위험도 (신호등) */}
-        <Card css={{ display: 'flex', flexDirection: 'column', position: 'relative' }}>
-          <div css={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 900, color: '#F1C40F' }}>
-            <span css={{ fontSize: 16 }}>🚦</span> 소비 위험도
-          </div>
-          <div css={{ display: 'flex', gap: 16, margin: 'auto', background: isDark ? '#00000040' : '#222222', padding: '15px 23px', borderRadius: 6 }}>
-            <div css={{ width: 44, height: 44, borderRadius: '50%', background: '#3E9578', opacity: 0.2 }} />
-            <div css={{ width: 44, height: 44, borderRadius: '50%', background: '#F1C40F', opacity: 0.2 }} />
-            <div css={{ width: 44, height: 44, borderRadius: '50%', background: '#E74C3C', boxShadow: '0 0 16px #E74C3C' }} />
-          </div>
-          <div css={{ position: 'absolute', bottom: 20, right: 22, fontSize: 11, color: 'var(--sub)', textAlign: 'right', letterSpacing: '-0.02em' }}>
-            스트레스 누적으로 <b css={{ color: '#E74C3C' }}>위험</b> 상태
-          </div>
-        </Card>
-
-        {/* Card 4: 맞춤 챌린지 */}
-        <Card css={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          <div css={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 900, color: '#3E9578' }}>
-            <span css={{ fontSize: 16 }}>🎯</span> AI 맞춤 챌린지
-          </div>
-          <div css={{ fontSize: 14, fontWeight: 800, color: 'var(--text)', marginTop: 2 }}>밤 10시 이후 결제 0원</div>
-          <div css={{ marginTop: 'auto' }}>
-            <div css={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: 'var(--sub)', marginBottom: 4, fontWeight: 800 }}>
-              <span>12일 연속 성공!</span>
-              <span css={{ color: '#3E9578' }}>D-18</span>
-            </div>
-            <div css={{ width: '100%', height: 6, background: 'var(--line)', borderRadius: 99, overflow: 'hidden' }}>
-              <div css={{ width: '40%', height: '100%', background: '#3E9578', borderRadius: 99 }} />
-            </div>
-          </div>
-        </Card>
-      </KpiGrid>
-
+          </InsightItem>
+        ))}
+      </InsightRail>
       <Duo>
         <Card>
-          <div css={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <div css={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16, marginBottom: 18 }}>
             <div>
-              <h3 css={{ margin: '0 0 4px', fontSize: 16 }}>목표 예산 현황</h3>
-              <p css={{ margin: '0 0 22px', color: 'var(--sub)', fontSize: 12 }}>
-                저번달 대비 5% 절감 예산을 목표로 달리고 있어요
-              </p>
+              <h3 css={{ margin: '0 0 5px', fontSize: 16, fontWeight: 900 }}>목표 예산 현황</h3>
+              <p css={{ margin: 0, color: 'var(--sub)', fontSize: 12, lineHeight: 1.5 }}>지금 바로 조정해야 할 예산부터 보여줘요</p>
+            </div>
+            <div css={{ textAlign: 'right', flexShrink: 0 }}>
+              <div css={{ color: overBudgetItem ? '#E87573' : 'var(--text)', fontSize: 18, fontWeight: 950, lineHeight: 1 }}>{budgetAverage}%</div>
+              <div css={{ color: 'var(--sub)', fontSize: 11, fontWeight: 800, marginTop: 4 }}>평균 사용률</div>
             </div>
           </div>
 
-          <div css={{ display: 'grid', gap: 20 }}>{categoryData.map(data => {
-            const emo = getEmotion(data.emotion);
-            const budget = data.prevAmount * 0.95;
-            const progress = (data.amount / budget) * 100;
-            const isOver = progress > 100;
+          {overBudgetItem && (
+            <div css={{
+              display: 'grid',
+              gridTemplateColumns: '1fr auto',
+              alignItems: 'center',
+              gap: 14,
+              marginBottom: 18,
+              padding: '14px 0',
+              borderTop: '1px solid var(--line)',
+              borderBottom: '1px solid var(--line)'
+            }}>
+              <div css={{ minWidth: 0 }}>
+                <div css={{ color: '#E87573', fontSize: 11, fontWeight: 950, marginBottom: 5 }}>초과</div>
+                <div css={{ color: 'var(--text)', fontSize: 20, fontWeight: 950, lineHeight: 1.15 }}>{overBudgetItem.name} {Math.round(overBudgetItem.progress)}%</div>
+                <div css={{ color: 'var(--sub)', fontSize: 12, fontWeight: 750, marginTop: 6 }}>{overBudgetItem.emotion} 소비가 목표보다 빨라요</div>
+              </div>
+              <div css={{ textAlign: 'right', flexShrink: 0 }}>
+                <div css={{ color: '#E87573', fontSize: 20, fontWeight: 950 }}>{overBudgetItem.amount.toLocaleString()}원</div>
+                <div css={{ color: 'var(--sub)', fontSize: 11, fontWeight: 800, marginTop: 5 }}>목표 {overBudgetItem.budget.toLocaleString()}원</div>
+              </div>
+            </div>
+          )}
 
-            return <div key={data.name} css={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              {/* 1줄: 카테고리 정보 및 금액 */}
-              <div css={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-                <div css={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <b css={{ fontSize: 14 }}>{data.name}</b>
-                  <span css={{ fontSize: 11, fontWeight: 800, color: emo.text || emo.color, background: `${emo.color}26`, padding: '2px 8px', borderRadius: 6 }}>{data.emotion}</span>
-                </div>
-                <div css={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
-                  <span css={{ fontSize: 15, fontWeight: 900, color: isOver ? '#FF4757' : 'var(--text)' }}>{data.amount.toLocaleString()}원</span>
-                  <span css={{ fontSize: 11, fontWeight: 700, color: 'var(--sub)' }}>/ {budget.toLocaleString()}원</span>
+          <div css={{ display: 'grid', gap: 12 }}>{budgetItems.map(item => {
+            const displayProgress = Math.min(item.progress, 100);
+            const statusText = item.isOver ? '초과' : item.progress >= 90 ? '주의' : '안정';
+            const statusColor = item.isOver ? '#E87573' : 'var(--sub)';
+
+            return <div key={item.name} css={{ display: 'grid', gridTemplateColumns: 'minmax(76px, .52fr) 1fr minmax(82px, auto)', alignItems: 'center', gap: 12 }}>
+              <div css={{ minWidth: 0 }}>
+                <b css={{ display: 'block', fontSize: 13, color: 'var(--text)' }}>{item.name}</b>
+                <span css={{ display: 'inline-block', marginTop: 3, color: 'var(--sub)', fontSize: 10, fontWeight: 850 }}>{item.emotion}</span>
+              </div>
+
+              <div css={{ display: 'grid', gap: 5 }}>
+                <BarTrack css={{ height: 7, background: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(31,32,54,0.08)' }}>
+                  <div css={{
+                    width: `${displayProgress}%`,
+                    height: '100%',
+                    borderRadius: 99,
+                    background: item.isOver ? '#E87573' : 'var(--text)',
+                    opacity: item.isOver ? 0.95 : 0.28,
+                    transition: 'width 0.35s ease'
+                  }} />
+                </BarTrack>
+                <div css={{ display: 'flex', justifyContent: 'space-between', color: 'var(--sub)', fontSize: 10, fontWeight: 800 }}>
+                  <span>{Math.round(item.progress)}%</span>
+                  <span css={{ color: statusColor }}>{statusText}</span>
                 </div>
               </div>
 
-              {/* 2줄: 얇은 바 그래프 및 달성률 */}
-              <div css={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <BarTrack css={{ flex: 1, height: 8, background: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)' }}>
-                  <div css={{ 
-                    width: `${Math.min(progress, 100)}%`, 
-                    height: '100%', 
-                    borderRadius: 99, 
-                    background: isOver ? '#FF4757' : `linear-gradient(90deg, ${emo.color}9e, ${emo.color})`,
-                    transition: 'width 0.4s ease, background 0.4s ease'
-                  }} />
-                </BarTrack>
-                <div css={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', width: 38 }}>
-                  <span css={{ fontSize: 12, fontWeight: 800, color: isOver ? '#FF4757' : 'var(--sub)' }}>
-                    {Math.round(progress)}%
-                  </span>
-                </div>
+              <div css={{ textAlign: 'right' }}>
+                <div css={{ color: item.isOver ? '#E87573' : 'var(--text)', fontSize: 13, fontWeight: 950 }}>{item.amount.toLocaleString()}원</div>
+                <div css={{ color: 'var(--sub)', fontSize: 10, fontWeight: 800, marginTop: 4 }}>{item.budget.toLocaleString()}원</div>
               </div>
             </div>;
           })}</div>
         </Card>
 
         <Card css={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-          <h3 css={{ margin: '0 0 20px', fontSize: 16 }}>나의 소비 코어</h3>
-          
-          <div css={{ display: 'flex', flex: 1, gap: 16, alignItems: 'center' }}>
-            {/* 메인 원형 그래프 영역 (왼쪽) */}
-            <div css={{ flex: 1.5, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-              <div css={{ position: 'relative', width: '100%', maxWidth: 210, aspectRatio: '1/1', marginBottom: 12 }}>
-                <svg viewBox="-8 -8 52 52" css={{ width: '100%', height: '100%', overflow: 'visible' }}>
-                  {activeChart.segments.reduce((acc, seg, idx) => {
-                    const offset = acc.total;
-                    acc.total += seg.percent;
-                    acc.elements.push(
-                      <path 
-                        key={`path-${idx}`} 
-                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" 
-                        fill="none" 
-                        stroke={seg.color} 
-                        strokeWidth="4" 
-                        strokeDasharray={`${seg.percent}, 100`} 
-                        strokeDashoffset={`-${offset}`}
-                        strokeLinecap="round" 
-                        css={{ transition: 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)' }} 
-                      />
-                    );
-                    
-                    const midPercent = offset + seg.percent / 2;
-                    const { x, y } = getPolarCoord(midPercent, 22.5); // 반지름을 선보다 바깥으로
-                    const isLeft = x < 18;
-                    const textLabel = activeChartTab === 'category' ? seg.amount : `${seg.percent}%`;
-                    
-                    if (seg.percent > 4) {
-                      acc.elements.push(
-                        <text
-                          key={`txt-${idx}`}
-                          x={x} y={y}
-                          fill={seg.color}
-                          fontSize="2.4"
-                          fontWeight="800"
-                          textAnchor={isLeft ? 'end' : 'start'}
-                          alignmentBaseline="middle"
-                          css={{ transition: 'all 0.4s ease' }}
-                        >
-                          {seg.name} {textLabel}
-                        </text>
-                      );
-                    }
-                    return acc;
-                  }, { total: 0, elements: [] }).elements}
-                </svg>
-                <div css={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: activeChart.color, transition: 'color 0.4s ease' }}>
-                  <span css={{ fontSize: 38, fontWeight: 900, marginBottom: 2 }}>{activeChart.percent}%</span>
-                  <span css={{ fontSize: 24 }}>{activeChart.icon}</span>
-                </div>
+          <div css={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16, marginBottom: 18 }}>
+            <div>
+              <h3 css={{ margin: '0 0 5px', fontSize: 16, fontWeight: 900 }}>나의 소비 코어</h3>
+              <p css={{ margin: 0, color: 'var(--sub)', fontSize: 12 }}>이번 달 소비를 끌고 간 원인이에요</p>
+            </div>
+            <span css={{ color: activeChart.color, fontSize: 12, fontWeight: 950 }}>{activeChart.helper}</span>
+          </div>
+
+          <div css={{ display: 'grid', gridTemplateColumns: 'minmax(230px, .85fr) 1fr', flex: 1, gap: 24, alignItems: 'center' }}>
+            <div css={{ display: 'grid', justifyItems: 'center', gap: 12 }}>
+              <div css={{ color: activeChart.color, fontSize: 56, fontWeight: 950, lineHeight: .95 }}>{activeChart.percent}%</div>
+              <div css={{ color: 'var(--text)', fontSize: 20, fontWeight: 950 }}>{activeChart.label}</div>
+              <div css={{ maxWidth: 230, color: 'var(--sub)', fontSize: 12, fontWeight: 750, lineHeight: 1.55, textAlign: 'center' }}>{activeChart.focus}</div>
+              <div css={{ width: 'min(100%, 220px)', marginTop: 4 }}>
+                <BarTrack css={{ height: 8, background: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(31,32,54,0.08)' }}>
+                  <div css={{ width: `${activeChart.percent}%`, height: '100%', borderRadius: 99, background: activeChart.color, opacity: .86 }} />
+                </BarTrack>
               </div>
-              <span css={{ color: activeChart.color, fontSize: 16, fontWeight: 800, transition: 'color 0.4s ease' }}>1위는 '{activeChart.label}'</span>
             </div>
 
-            {/* 세로 탭 버튼 영역 (오른쪽) */}
-            <div css={{ display: 'flex', flexDirection: 'column', gap: 10, flex: 0.8 }}>
-              {[
-                { id: 'category', text: '가장 많이 쓴 곳' },
-                { id: 'time', text: '주로 쓴 시간' },
-                { id: 'emotion', text: '주된 감정' }
-              ].map(tab => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveChartTab(tab.id)}
-                  css={{
-                    padding: '14px 16px', fontSize: 13, fontWeight: 800, borderRadius: 12, cursor: 'pointer', textAlign: 'left',
-                    background: activeChartTab === tab.id ? 'var(--text)' : 'var(--line)',
-                    color: activeChartTab === tab.id ? 'var(--bg-1)' : 'var(--sub)',
-                    transition: 'all 0.3s', border: 'none', display: 'flex', justifyContent: 'space-between', alignItems: 'center'
-                  }}
-                >
-                  {activeChartTab === tab.id && <span css={{ opacity: 0.5, fontSize: 14 }}>◀</span>}
-                  {tab.text}
-                </button>
-              ))}
+            <div css={{ display: 'grid', gap: 14 }}>
+              <div css={{ display: 'grid', gap: 9 }}>
+                {activeChart.segments.map((seg, index) => {
+                  const isPrimary = index === 0;
+                  return <div key={seg.name} css={{ display: 'grid', gridTemplateColumns: 'auto 1fr auto', alignItems: 'center', gap: 9 }}>
+                    <span css={{ width: isPrimary ? 10 : 8, height: isPrimary ? 10 : 8, borderRadius: '50%', background: activeChartTab === 'emotion' ? seg.color : 'var(--text)', opacity: activeChartTab === 'emotion' ? (isPrimary ? 1 : .5) : (isPrimary ? .6 : .22) }} />
+                    <span css={{ color: isPrimary ? 'var(--text)' : 'var(--sub)', fontSize: isPrimary ? 14 : 12, fontWeight: isPrimary ? 950 : 850 }}>{seg.name}</span>
+                    <span css={{ color: isPrimary && activeChartTab === 'emotion' ? seg.color : 'var(--sub)', fontSize: isPrimary ? 14 : 12, fontWeight: 950 }}>{activeChartTab === 'category' ? seg.amount : `${seg.percent}%`}</span>
+                  </div>;
+                })}
+              </div>
+
+              <div css={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 6, marginTop: 6 }}>
+                {[
+                  { id: 'emotion', text: '감정' },
+                  { id: 'category', text: '사용처' },
+                  { id: 'time', text: '시간대' }
+                ].map(tab => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveChartTab(tab.id)}
+                    css={{
+                      height: 36,
+                      padding: '0 10px',
+                      fontSize: 12,
+                      fontWeight: 900,
+                      borderRadius: 10,
+                      cursor: 'pointer',
+                      textAlign: 'center',
+                      background: activeChartTab === tab.id ? 'rgba(255,255,255,.12)' : 'rgba(255,255,255,.04)',
+                      color: activeChartTab === tab.id ? 'var(--text)' : 'var(--sub)',
+                      border: activeChartTab === tab.id ? '1px solid rgba(255,255,255,.24)' : '1px solid var(--line)',
+                      transition: 'background 0.2s ease, border-color 0.2s ease, color 0.2s ease'
+                    }}
+                  >
+                    {tab.text}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         </Card>
@@ -343,18 +381,31 @@ export default function AnalysisPageDc({ state }) {
 
       <Duo>
         <Card>
-          <div css={{ display: 'flex', justifyContent: 'space-between' }}><h3 css={{ margin: 0, fontSize: 16 }}>월별 지출 추이</h3><span css={{ color: 'var(--sub)', fontSize: 12, fontWeight: 800 }}>최근 7개월</span></div>
-          <p css={{ color: 'var(--sub)', fontSize: 12 }}>지난달보다 <b css={{ color: '#3E9578' }}>2.6% 줄었어요</b></p>
-          <div css={{ display: 'flex', alignItems: 'flex-end', gap: 8, height: 165, marginTop: 12 }}>{monthly.map(([label, value], index) => {
-            const current = index === monthly.length - 1;
-            return <div key={label} css={{ flex: 1, height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end' }}>
-              <span css={{ color: current ? '#6A61C4' : 'var(--sub)', fontSize: 10, fontWeight: 800, marginBottom: 5, opacity: current ? 1 : 0.6 }}>{(value / 100).toFixed(1)}만</span>
-              <div css={{ width: '100%', height: `${value / 505 * 100}%`, minHeight: 6, borderRadius: 12, background: current ? '#4A4299' : 'var(--line)' }} />
-              <span css={{ color: current ? 'var(--text)' : 'var(--sub)', fontSize: 11, fontWeight: current ? 900 : 600, marginTop: 5 }}>{label}</span>
-            </div>;
-          })}</div>
+          <div css={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16, marginBottom: 16 }}>
+            <div>
+              <h3 css={{ margin: '0 0 5px', fontSize: 16, fontWeight: 900 }}>월별 지출 추이</h3>
+              <p css={{ margin: 0, color: 'var(--sub)', fontSize: 12 }}>최근 7개월 흐름만 담백하게 보여줘요</p>
+            </div>
+            <div css={{ textAlign: 'right', flexShrink: 0 }}>
+              <div css={{ color: 'var(--text)', fontSize: 18, fontWeight: 950 }}>487,000원</div>
+              <div css={{ color: 'var(--sub)', fontSize: 11, fontWeight: 850, marginTop: 4 }}>전월 대비 -2.6%</div>
+            </div>
+          </div>
+          <div css={{ display: 'grid', gap: 12 }}>
+            <div css={{ display: 'flex', alignItems: 'flex-end', gap: 10, height: 150 }}>{monthly.map(([label, value], index) => {
+              const current = index === monthly.length - 1;
+              return <div key={label} css={{ flex: 1, height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end', minWidth: 0 }}>
+                <span css={{ color: current ? 'var(--text)' : 'var(--sub)', fontSize: 10, fontWeight: current ? 900 : 750, marginBottom: 6, opacity: current ? 1 : 0.58 }}>{(value / 100).toFixed(1)}만</span>
+                <div css={{ width: '100%', height: `${value / 505 * 100}%`, minHeight: 8, borderRadius: 8, background: current ? 'var(--text)' : 'var(--line)', opacity: current ? 0.86 : 0.72 }} />
+                <span css={{ color: current ? 'var(--text)' : 'var(--sub)', fontSize: 11, fontWeight: current ? 900 : 650, marginTop: 7 }}>{label}</span>
+              </div>;
+            })}</div>
+            <div css={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 12, alignItems: 'center', paddingTop: 10, borderTop: '1px solid var(--line)', color: 'var(--sub)', fontSize: 12, fontWeight: 800 }}>
+              <span>5월 정점 이후 완만하게 내려왔어요</span>
+              <span css={{ color: 'var(--text)', fontWeight: 950 }}>안정 구간</span>
+            </div>
+          </div>
         </Card>
-
         <Card css={{ display: 'flex', flexDirection: 'column' }}>
           <div css={{ display: 'flex', alignItems: 'center', gap: 9, marginBottom: 6 }}><span css={{ width: 24, height: 24, borderRadius: 8, background: 'var(--ink)', color: 'var(--on-ink)', display: 'grid', placeItems: 'center', fontSize: 10, fontWeight: 900 }}>AI</span><b css={{ fontSize: 16 }}>감정소비 분석</b></div>
           <p css={{ color: 'var(--sub)', fontSize: 12, marginBottom: 20 }}>이번 달 지출에 가장 큰 영향을 미친 감정들이에요.</p>
@@ -374,7 +425,6 @@ export default function AnalysisPageDc({ state }) {
                      transformStyle: 'preserve-3d',
                      transform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)'
                    }}>
-                     {/* 앞면 (Front) */}
                      <div css={{
                        position: 'absolute', inset: 0, backfaceVisibility: 'hidden',
                        padding: '24px 20px', borderRadius: 16, 
@@ -388,7 +438,6 @@ export default function AnalysisPageDc({ state }) {
                        <span css={{ fontSize: 14, color: insight.color, fontWeight: 900 }}>{insight.amount}</span>
                      </div>
                      
-                     {/* 뒷면 (Back) */}
                      <div css={{
                        position: 'absolute', inset: 0, backfaceVisibility: 'hidden',
                        transform: 'rotateY(180deg)',
@@ -409,47 +458,62 @@ export default function AnalysisPageDc({ state }) {
         </Card>
       </Duo>
 
-      <Card css={{ display: 'flex', flexDirection: 'column', minHeight: 410 }}>
-        <div css={{ display: 'flex', flex: 1, gap: 40, alignItems: 'stretch' }}>
-          {/* 왼쪽: 패턴 요약 */}
-          <div css={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', paddingTop: 8, paddingLeft: 10, paddingRight: 10 }}>
-            {/* 상단 타이틀 영역 (왼쪽으로 이동) */}
+      <Card css={{ display: 'flex', flexDirection: 'column', minHeight: 390 }}>
+        <div css={{ display: 'grid', gridTemplateColumns: 'minmax(280px, .9fr) 1fr', gap: 34, alignItems: 'stretch' }}>
+          <div css={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
             <div css={{ display: 'flex', alignItems: 'center', gap: 9, marginBottom: 6 }}>
               <span css={{ width: 24, height: 24, borderRadius: 8, background: 'var(--ink)', color: 'var(--on-ink)', display: 'grid', placeItems: 'center', fontSize: 10, fontWeight: 900 }}>AI</span>
               <b css={{ fontSize: 16 }}>반복되는 감정소비 패턴</b>
             </div>
-            <p css={{ color: 'var(--sub)', fontSize: 13, margin: '0 0 45px', fontWeight: 600 }}>AI가 이번 달에 찾은 반복 조합이에요</p>
+            <p css={{ color: 'var(--sub)', fontSize: 12, margin: '0 0 28px', fontWeight: 700 }}>이번 달 가장 자주 반복된 조합이에요</p>
 
-            <div css={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', marginBottom: 30 }}>
-              <div css={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <span css={{ display: 'inline-flex', alignItems: 'center', gap: 7, fontWeight: 900, background: '#9E96EE22', color: '#4A4299', padding: '13px 18px', borderRadius: 14, fontSize: 15 }}><i css={{ width: 9, height: 9, borderRadius: '50%', background: '#9E96EE' }} />스트레스</span>
-                <span css={{ color: 'var(--sub)' }}>→</span><span css={{ fontWeight: 800, background: 'var(--card)', border: '1px solid var(--line)', padding: '13px 18px', borderRadius: 14, fontSize: 15 }}>배달</span>
-                <span css={{ color: 'var(--sub)' }}>→</span><span css={{ fontWeight: 800, background: 'var(--card)', border: '1px solid var(--line)', padding: '13px 18px', borderRadius: 14, fontSize: 15 }}>밤 10시 이후</span>
+            <div css={{ display: 'grid', gap: 18, marginTop: 8 }}>
+              <div css={{ display: 'grid', gridTemplateColumns: 'auto 1fr', gap: 18, alignItems: 'center' }}>
+                <div css={{ color: 'var(--text)', fontSize: 52, fontWeight: 950, lineHeight: 1 }}>7</div>
+                <div>
+                  <div css={{ color: 'var(--sub)', fontSize: 12, fontWeight: 850, marginBottom: 5 }}>반복 횟수</div>
+                  <div css={{ color: 'var(--text)', fontSize: 19, fontWeight: 950 }}>스트레스 소비가 밤에 몰렸어요</div>
+                </div>
               </div>
-              <div css={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
-                <span css={{ color: '#6A61C4', fontSize: 44, fontWeight: 900, lineHeight: 1 }}>7</span><span css={{ color: 'var(--sub)', fontSize: 16, fontWeight: 800 }}>번 반복</span>
+
+              <div css={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr auto 1fr', gap: 10, alignItems: 'center', padding: '16px 0', borderTop: '1px solid var(--line)', borderBottom: '1px solid var(--line)' }}>
+                <span css={{ minWidth: 0 }}>
+                  <span css={{ display: 'block', color: '#A68BEA', fontSize: 11, fontWeight: 950, marginBottom: 4 }}>감정</span>
+                  <b css={{ color: 'var(--text)', fontSize: 15 }}>스트레스</b>
+                </span>
+                <span css={{ color: 'var(--sub)', fontWeight: 900 }}>→</span>
+                <span css={{ minWidth: 0 }}>
+                  <span css={{ display: 'block', color: 'var(--sub)', fontSize: 11, fontWeight: 900, marginBottom: 4 }}>사용처</span>
+                  <b css={{ color: 'var(--text)', fontSize: 15 }}>배달</b>
+                </span>
+                <span css={{ color: 'var(--sub)', fontWeight: 900 }}>→</span>
+                <span css={{ minWidth: 0 }}>
+                  <span css={{ display: 'block', color: 'var(--sub)', fontSize: 11, fontWeight: 900, marginBottom: 4 }}>시간</span>
+                  <b css={{ color: 'var(--text)', fontSize: 15 }}>밤 10시 이후</b>
+                </span>
               </div>
+
+              <p css={{ margin: 0, color: 'var(--sub)', fontSize: 13, fontWeight: 750, lineHeight: 1.65 }}>스트레스 받은 밤, 배달로 마음을 달래고 있었어요. 이 조합만 먼저 알아채도 소비 흐름을 줄일 수 있어요.</p>
             </div>
-            <div css={{ background: '#9E96EE14', borderRadius: 16, padding: '20px 24px', fontWeight: 800, lineHeight: 1.6, fontSize: 14 }}>스트레스 받은 밤, 배달로 마음을 달래고 있었어요. 그 순간을 조금만 알아채도 충분해요.</div>
           </div>
 
-          {/* 가운데: 세로 구분선 */}
-          <div css={{ width: 1, background: 'var(--line)' }} />
-
-          {/* 오른쪽: 내역 리스트 (표) */}
-          <div css={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
-            <div css={{ border: '1px solid var(--line)', borderRadius: 16, overflow: 'hidden', background: 'var(--card)', display: 'flex', flexDirection: 'column', height: '100%' }}>
-              <div css={{ display: 'grid', gridTemplateColumns: '84px 1fr auto', gap: 14, padding: '11px 18px', fontSize: 11, color: 'var(--sub)', fontWeight: 900, borderBottom: '1px solid var(--line)' }}><span>날짜</span><span>내역</span><span>금액</span></div>
-              <div css={{ overflowY: 'auto', flex: 1, paddingBottom: 10 }}>
-                {evidence.map(([date, category, emotion, situation, amount], idx) => {
-                  const emo = getEmotion(emotion);
-                  return <div key={`${date}-${idx}`} css={{ display: 'grid', gridTemplateColumns: '84px 1fr auto', gap: 14, alignItems: 'center', padding: '16px 18px', borderBottom: '1px solid var(--line)' }}>
-                    <span css={{ color: 'var(--sub)', fontSize: 12, fontWeight: 800 }}>{date}</span>
-                    <div css={{ display: 'flex', alignItems: 'center', gap: 9, minWidth: 0 }}><span css={{ width: 8, height: 8, borderRadius: '50%', background: emo.color }} /><b>{category} <span css={{ color: 'var(--sub)', fontWeight: 600 }}>· {situation}</span></b><span css={{ color: emo.text || emo.color, background: `${emo.color}26`, borderRadius: 99, padding: '2px 8px', fontSize: 11, fontWeight: 800 }}>{emotion}</span></div>
-                    <b>{amount}</b>
-                  </div>;
-                })}
-              </div>
+          <div css={{ display: 'flex', flexDirection: 'column', minHeight: 0, borderLeft: '1px solid var(--line)', paddingLeft: 28 }}>
+            <div css={{ display: 'grid', gridTemplateColumns: '84px 1fr auto', gap: 14, padding: '0 0 12px', fontSize: 11, color: 'var(--sub)', fontWeight: 900, borderBottom: '1px solid var(--line)' }}>
+              <span>날짜</span><span>내역</span><span>금액</span>
+            </div>
+            <div css={{ overflowY: 'auto', flex: 1 }}>
+              {evidence.map(([date, category, emotion, situation, amount], idx) => {
+                const emo = getEmotion(emotion);
+                return <div key={`${date}-${idx}`} css={{ display: 'grid', gridTemplateColumns: '84px 1fr auto', gap: 14, alignItems: 'center', padding: '15px 0', borderBottom: '1px solid var(--line)' }}>
+                  <span css={{ color: 'var(--sub)', fontSize: 12, fontWeight: 800 }}>{date}</span>
+                  <div css={{ display: 'flex', alignItems: 'center', gap: 9, minWidth: 0 }}>
+                    <span css={{ width: 7, height: 7, borderRadius: '50%', background: emo.color, flexShrink: 0 }} />
+                    <b css={{ color: 'var(--text)', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{category} <span css={{ color: 'var(--sub)', fontWeight: 650 }}>· {situation}</span></b>
+                    <span css={{ color: emo.text || emo.color, fontSize: 11, fontWeight: 900, flexShrink: 0 }}>{emotion}</span>
+                  </div>
+                  <b css={{ color: 'var(--text)' }}>{amount}</b>
+                </div>;
+              })}
             </div>
           </div>
         </div>
@@ -457,3 +521,4 @@ export default function AnalysisPageDc({ state }) {
     </Page>
   );
 }
+
