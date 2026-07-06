@@ -208,7 +208,8 @@ export default function UniversePageDc() {
     <>
       <Global styles={globalStyles} />
       <Container ref={containerRef} style={isMobile ? { height: 'calc(100dvh - 150px)', padding: '0', borderRadius: 0, boxShadow: 'none', overflow: 'hidden' } : {}}>
-        <PageWrapper style={isMobile ? { width: '100%', height: '100%', borderRadius: '24px 24px 0 0', overflow: 'hidden' } : { transform: `scale(${scale})`, transformOrigin: 'center center' }}>
+        <div style={isMobile ? { width: '100%', height: '100%' } : { transform: `scale(${scale})`, transformOrigin: "center center" }}>
+          <PageWrapper style={isMobile ? { width: '100%', height: '100%', borderRadius: '24px 24px 0 0', overflow: 'hidden', transform: 'none' } : {}}>
 
         <div style={{ position: "absolute", inset: 0, opacity: parked && phase !== "flying" ? 0 : 1, pointerEvents: phase === "idle" ? "auto" : "none", transition: "opacity .45s ease" }}>
           <div style={{ position: "absolute", inset: 0, overflow: "hidden" }}>
@@ -356,7 +357,8 @@ export default function UniversePageDc() {
             eggCurv={((calc / 100) * 0.83).toFixed(2)}
           />
         )}
-      </PageWrapper>
+          </PageWrapper>
+        </div>
     </Container>
   </>
   );
