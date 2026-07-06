@@ -49,7 +49,8 @@ const Stage = styled.div`
 
   @media (max-width: 980px) {
     align-content: start;
-    padding-top: 10px;
+    padding-top: 0;
+    margin-top: -10px;
     order: 1;
   }
 `;
@@ -267,6 +268,10 @@ const Signal = styled(GlassCard)`
   min-height: 0;
   padding: clamp(13px, 1.3vw, 17px) clamp(18px, 1.6vw, 22px);
   border-radius: 24px;
+
+  @media (max-width: 980px) {
+    order: 5;
+  }
 `;
 
 const Goal = styled(GlassCard)`
@@ -277,6 +282,10 @@ const Goal = styled(GlassCard)`
   display: flex;
   flex-direction: column;
   justify-content: center;
+
+  @media (max-width: 980px) {
+    order: 4;
+  }
 `;
 
 const Bar = styled.div`
