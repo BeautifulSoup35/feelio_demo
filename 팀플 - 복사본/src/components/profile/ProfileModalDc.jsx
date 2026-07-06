@@ -304,6 +304,8 @@ function Back({ title, children }) {
 export default function ProfileModalDc({ state, actions, onClose }) {
   const [view, setView] = useState('profile');
   const [nickname, setNickname] = useState(cleanName(state.user.nickname));
+  const [editIndex, setEditIndex] = useState(-1);
+  const [goalForm, setGoalForm] = useState({ name: '', target: '', current: '', period: '' });
   const [noti, setNoti] = useState({ record: true, weekly: true, goal: false });
   const goal = state.goals[0] || { name: '제주도 여행', current: 0, target: 1 };
   const goalPct = percent(goal.current, goal.target);
@@ -313,7 +315,6 @@ export default function ProfileModalDc({ state, actions, onClose }) {
   const menu = [
     ['profileEdit', '프로필 수정', nickname],
     ['goals', '목표 관리', `${state.goals.length}개`],
-    ['tags', '태그 관리', ''],
     ['noti', '알림 설정', ''],
     ['aurora', '화면 · 오로라', visibleAurora.name],
     ['data', '데이터 관리', ''],
@@ -389,12 +390,23 @@ export default function ProfileModalDc({ state, actions, onClose }) {
 
       {view === 'goals' && (
         <Screen>
-          <Back title="목표 관리"><button type="button" onClick={() => setView('profile')}>‹</button><PillButton type="button" onClick={saveAndBack}>+ 추가</PillButton></Back>
+          <Back title="목표 관리">
+            <button type="button" onClick={() => setView('profile')}>‹</button>
+            <PillButton type="button" onClick={() => {
+              setGoalForm({ name: '', target: '', current: '', period: '' });
+              setEditIndex(-1);
+              setView('goalEdit');
+            }}>+ 추가</PillButton>
+          </Back>
           <div css={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {goalCards.map((item, index) => {
               const pct = percent(item.current, item.target);
               return (
-                <GoalCard key={`${item.name}-${index}`}>
+                <GoalCard 
+                  key={`${item.name}-${index}`}
+                  onClick={() => actions.setPrimaryGoal(index)}
+                  css={{ cursor: 'pointer', transition: 'background 0.2s', '&:hover': { background: 'rgba(255,255,255,0.08)' } }}
+                >
                   <div css={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
                     <span css={{ fontSize: 15, fontWeight: 700 }}>{item.name}</span>
                     {index === 0 && <span css={{ fontSize: 10.5, fontWeight: 700, color: '#3E9578', background: '#83C9B033', padding: '2px 8px', borderRadius: 99 }}>대표</span>}
@@ -406,9 +418,16 @@ export default function ProfileModalDc({ state, actions, onClose }) {
                     <span>{money(item.current)} / {money(item.target)}</span>
                     <span>{pct}%</span>
                   </div>
-                  <div css={{ display: 'flex', gap: 8, marginTop: 12 }}>
-                    <SmallAction type="button" onClick={saveAndBack}>수정</SmallAction>
-                    <SmallAction type="button" danger onClick={saveAndBack}>삭제</SmallAction>
+                  {item.period && <div css={{ fontSize: 12, color: 'var(--sub)', marginTop: 6, fontWeight: 700 }}>마감 날짜: {item.period}</div>}
+                  <div css={{ display: 'flex', gap: 8, marginTop: 12 }} onClick={e => e.stopPropagation()}>
+                    <SmallAction type="button" onClick={() => {
+                      setGoalForm({ name: item.name, target: item.target, current: item.current, period: item.period || '' });
+                      setEditIndex(index);
+                      setView('goalEdit');
+                    }}>수정</SmallAction>
+                    <SmallAction type="button" danger disabled={goalCards.length <= 1} onClick={() => {
+                      if (goalCards.length > 1) actions.removeGoal(index);
+                    }} css={{ opacity: goalCards.length <= 1 ? 0.3 : 1 }}>삭제</SmallAction>
                   </div>
                 </GoalCard>
               );
@@ -417,27 +436,28 @@ export default function ProfileModalDc({ state, actions, onClose }) {
         </Screen>
       )}
 
-      {view === 'tags' && (
+      {view === 'goalEdit' && (
         <Screen>
-          <Back title="태그 관리"><button type="button" onClick={() => setView('profile')}>‹</button><PillButton type="button" onClick={saveAndBack}>+ 추가</PillButton></Back>
-          <div css={{ fontSize: 12.5, fontWeight: 700, color: 'var(--sub)', marginBottom: 10 }}>감정 태그 · 기본</div>
-          <div css={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 18 }}>
-            {emotions.map(item => {
-              const emotion = getEmotion(item.name);
-              return <TagChip key={item.id} light={emotion.light} color={emotion.color}><i css={{ width: 9, height: 9, borderRadius: '50%', background: emotion.color }} />{item.name}<span css={{ fontSize: 10, opacity: .55 }}>잠금</span></TagChip>;
-            })}
-          </div>
-          <div css={{ fontSize: 12.5, fontWeight: 700, color: 'var(--sub)', marginBottom: 10 }}>상황 태그 · 내가 만든</div>
-          <div css={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {userTags.map(([name, color]) => (
-              <TagRow key={name}>
-                <span css={{ width: 12, height: 12, borderRadius: '50%', background: color }} />
-                <span css={{ flex: 1, fontSize: 14, fontWeight: 700 }}>{name}</span>
-                <button type="button" onClick={saveAndBack} css={{ border: 0, background: 'transparent', fontSize: 13, color: 'var(--sub)', cursor: 'pointer', fontWeight: 700 }}>수정</button>
-                <button type="button" onClick={saveAndBack} css={{ border: 0, background: 'transparent', fontSize: 13, color: '#E87573', cursor: 'pointer', fontWeight: 700 }}>삭제</button>
-              </TagRow>
-            ))}
-          </div>
+          <Back title={editIndex === -1 ? "새 목표 추가" : "목표 수정"}>
+            <button type="button" onClick={() => setView('goals')}>‹</button>
+          </Back>
+          <FieldLabel>목표 이름</FieldLabel>
+          <Field placeholder="예: 맥북 프로 구매" value={goalForm.name} onChange={e => setGoalForm({...goalForm, name: e.target.value})} />
+          <FieldLabel>목표 금액 (원)</FieldLabel>
+          <Field type="number" placeholder="예: 3000000" value={goalForm.target || ''} onChange={e => setGoalForm({...goalForm, target: Number(e.target.value) || 0})} />
+          <FieldLabel>현재 모은 돈 (원)</FieldLabel>
+          <Field type="number" placeholder="예: 500000" value={goalForm.current || ''} onChange={e => setGoalForm({...goalForm, current: Number(e.target.value) || 0})} />
+          <FieldLabel>마감 날짜</FieldLabel>
+          <Field type="date" value={goalForm.period} onChange={e => setGoalForm({...goalForm, period: e.target.value})} />
+          <PrimaryButton type="button" onClick={() => {
+            if (!goalForm.name || !goalForm.target) return;
+            if (editIndex === -1) {
+              actions.addGoal(goalForm);
+            } else {
+              actions.updateGoal(editIndex, goalForm);
+            }
+            setView('goals');
+          }}>저장</PrimaryButton>
         </Screen>
       )}
 

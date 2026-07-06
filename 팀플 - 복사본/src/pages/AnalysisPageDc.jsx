@@ -136,7 +136,7 @@ const aiQuickInsights = [
   { label: '위험 루트', value: '우울함 → 새벽 쇼핑', note: '반복 감지', color: 'var(--sub)' },
   { label: '팩트 리포트', value: '택시비 48,000원', note: '스트레스 핑계', color: '#E87573', type: 'fact' },
   { label: '소비 위험도', value: '위험', note: '스트레스 누적', color: '#E87573', type: 'risk' },
-  { label: '맞춤 챌린지', value: '밤 10시 이후 0원', note: '12일 성공 · D-18', color: 'var(--sub)' }
+  { label: 'AI 맞춤 챌린지', value: '밤 10시 이후 0원', note: '12일 성공 · D-18', color: 'var(--sub)' }
 ];
 const emotionDist = [
   ['스트레스', '43%', '바쁜 하루 끝의 충동', '80,000원'],
@@ -156,6 +156,7 @@ export default function AnalysisPageDc({ state }) {
   const isDark = state?.mode === 'dark';
   const [flippedCards, setFlippedCards] = useState({});
   const [activeChartTab, setActiveChartTab] = useState('emotion');
+  const [patternFlipped, setPatternFlipped] = useState(false);
 
   const toggleFlip = (emotion) => {
     setFlippedCards(prev => ({ ...prev, [emotion]: !prev[emotion] }));
@@ -201,6 +202,37 @@ export default function AnalysisPageDc({ state }) {
     .sort((a, b) => Number(b.isOver) - Number(a.isOver) || b.progress - a.progress);
   const overBudgetItem = budgetItems.find(item => item.isOver);
   const budgetAverage = Math.round(budgetItems.reduce((sum, item) => sum + item.progress, 0) / budgetItems.length);
+
+  const renderTabs = (isMobile) => (
+    <div css={{ 
+      display: isMobile ? 'none' : 'grid', 
+      gridTemplateColumns: 'repeat(3, 1fr)', 
+      gap: 6, 
+      marginTop: isMobile ? 12 : 6, 
+      width: isMobile ? '100%' : 'auto',
+      '@media (max-width: 600px)': { display: isMobile ? 'grid' : 'none' }
+    }}>
+      {[
+        { id: 'emotion', text: '감정' },
+        { id: 'category', text: '사용처' },
+        { id: 'time', text: '시간대' }
+      ].map(tab => (
+        <button
+          key={tab.id}
+          onClick={() => setActiveChartTab(tab.id)}
+          css={{
+            height: 36, padding: '0 10px', fontSize: 12, fontWeight: 900, borderRadius: 10, cursor: 'pointer', textAlign: 'center',
+            background: activeChartTab === tab.id ? 'rgba(255,255,255,.12)' : 'rgba(255,255,255,.04)',
+            color: activeChartTab === tab.id ? 'var(--text)' : 'var(--sub)',
+            border: activeChartTab === tab.id ? '1px solid rgba(255,255,255,.24)' : '1px solid var(--line)',
+            transition: 'all 0.2s ease'
+          }}
+        >
+          {tab.text}
+        </button>
+      ))}
+    </div>
+  );
 
   return (
     <Page>
@@ -323,16 +355,24 @@ export default function AnalysisPageDc({ state }) {
             <span css={{ color: activeChart.color, fontSize: 12, fontWeight: 950 }}>{activeChart.helper}</span>
           </div>
 
-          <div css={{ display: 'grid', gridTemplateColumns: 'minmax(230px, .85fr) 1fr', flex: 1, gap: 24, alignItems: 'center' }}>
+          <div css={{ 
+            display: 'grid', 
+            gridTemplateColumns: 'minmax(230px, .85fr) 1fr', 
+            flex: 1, 
+            gap: 24, 
+            alignItems: 'center',
+            '@media (max-width: 600px)': { gridTemplateColumns: '1fr', gap: 20 }
+          }}>
             <div css={{ display: 'grid', justifyItems: 'center', gap: 12 }}>
-              <div css={{ color: activeChart.color, fontSize: 56, fontWeight: 950, lineHeight: .95 }}>{activeChart.percent}%</div>
-              <div css={{ color: 'var(--text)', fontSize: 20, fontWeight: 950 }}>{activeChart.label}</div>
+              <div css={{ color: activeChart.color, fontSize: 'clamp(46px, 8vw, 56px)', fontWeight: 950, lineHeight: .95 }}>{activeChart.percent}%</div>
+              <div css={{ color: 'var(--text)', fontSize: 'clamp(18px, 4vw, 20px)', fontWeight: 950 }}>{activeChart.label}</div>
               <div css={{ maxWidth: 230, color: 'var(--sub)', fontSize: 12, fontWeight: 750, lineHeight: 1.55, textAlign: 'center' }}>{activeChart.focus}</div>
               <div css={{ width: 'min(100%, 220px)', marginTop: 4 }}>
                 <BarTrack css={{ height: 8, background: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(31,32,54,0.08)' }}>
                   <div css={{ width: `${activeChart.percent}%`, height: '100%', borderRadius: 99, background: activeChart.color, opacity: .86 }} />
                 </BarTrack>
               </div>
+              {renderTabs(true)}
             </div>
 
             <div css={{ display: 'grid', gap: 14 }}>
@@ -346,34 +386,7 @@ export default function AnalysisPageDc({ state }) {
                   </div>;
                 })}
               </div>
-
-              <div css={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 6, marginTop: 6 }}>
-                {[
-                  { id: 'emotion', text: '감정' },
-                  { id: 'category', text: '사용처' },
-                  { id: 'time', text: '시간대' }
-                ].map(tab => (
-                  <button
-                    key={tab.id}
-                    onClick={() => setActiveChartTab(tab.id)}
-                    css={{
-                      height: 36,
-                      padding: '0 10px',
-                      fontSize: 12,
-                      fontWeight: 900,
-                      borderRadius: 10,
-                      cursor: 'pointer',
-                      textAlign: 'center',
-                      background: activeChartTab === tab.id ? 'rgba(255,255,255,.12)' : 'rgba(255,255,255,.04)',
-                      color: activeChartTab === tab.id ? 'var(--text)' : 'var(--sub)',
-                      border: activeChartTab === tab.id ? '1px solid rgba(255,255,255,.24)' : '1px solid var(--line)',
-                      transition: 'background 0.2s ease, border-color 0.2s ease, color 0.2s ease'
-                    }}
-                  >
-                    {tab.text}
-                  </button>
-                ))}
-              </div>
+              {renderTabs(false)}
             </div>
           </div>
         </Card>
@@ -410,13 +423,17 @@ export default function AnalysisPageDc({ state }) {
           <div css={{ display: 'flex', alignItems: 'center', gap: 9, marginBottom: 6 }}><span css={{ width: 24, height: 24, borderRadius: 8, background: 'var(--ink)', color: 'var(--on-ink)', display: 'grid', placeItems: 'center', fontSize: 10, fontWeight: 900 }}>AI</span><b css={{ fontSize: 16 }}>감정소비 분석</b></div>
           <p css={{ color: 'var(--sub)', fontSize: 12, marginBottom: 20 }}>이번 달 지출에 가장 큰 영향을 미친 감정들이에요.</p>
           
-          <div css={{ display: 'flex', gap: 12, flex: 1 }}>
+          <div css={{ 
+            display: 'flex', 
+            gap: 12, 
+            flex: 1
+          }}>
             {aiInsights.map(insight => {
                const isFlipped = flippedCards[insight.emotion];
                return (
                  <div 
                    key={insight.emotion}
-                   css={{ flex: 1, perspective: 1200, minHeight: 210, cursor: 'pointer' }}
+                   css={{ flex: 1, perspective: 1200, minHeight: 180, cursor: 'pointer' }}
                    onClick={() => toggleFlip(insight.emotion)}
                  >
                    <div css={{
@@ -431,11 +448,12 @@ export default function AnalysisPageDc({ state }) {
                        border: `1px solid ${insight.color + '40'}`, 
                        background: 'var(--card)',
                        display: 'flex', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'center', gap: 3,
-                       boxShadow: '0 4px 12px rgba(0,0,0,0.03)'
+                       boxShadow: '0 4px 12px rgba(0,0,0,0.03)',
+                       '@media (max-width: 600px)': { padding: '16px 12px' }
                      }}>
-                       <span css={{ fontSize: 16, color: 'var(--sub)', fontWeight: 800 }}>{insight.emotion}</span>
-                       <b css={{ fontSize: 36, color: 'var(--text)', lineHeight: 1 }}>{insight.percent}%</b>
-                       <span css={{ fontSize: 14, color: insight.color, fontWeight: 900 }}>{insight.amount}</span>
+                       <span css={{ fontSize: 'clamp(13px, 3vw, 16px)', color: 'var(--sub)', fontWeight: 800 }}>{insight.emotion}</span>
+                       <b css={{ fontSize: 'clamp(24px, 5.5vw, 36px)', color: 'var(--text)', lineHeight: 1 }}>{insight.percent}%</b>
+                       <span css={{ fontSize: 'clamp(11px, 2.5vw, 14px)', color: insight.color, fontWeight: 900 }}>{insight.amount}</span>
                      </div>
                      
                      <div css={{
@@ -445,10 +463,11 @@ export default function AnalysisPageDc({ state }) {
                        border: `1.5px solid ${insight.color}`, 
                        background: insight.color + '15',
                        display: 'flex', flexDirection: 'column', justifyContent: 'center',
-                       boxShadow: `0 8px 24px ${insight.color}20`
+                       boxShadow: `0 8px 24px ${insight.color}20`,
+                       '@media (max-width: 600px)': { padding: '16px 10px' }
                      }}>
-                       <div css={{ fontSize: 16, fontWeight: 900, marginBottom: 12, color: 'var(--text)', wordBreak: 'keep-all', lineHeight: 1.3 }}>{insight.title}</div>
-                       <div css={{ fontSize: 13, color: 'var(--sub)', lineHeight: 1.5, wordBreak: 'keep-all' }}>{insight.desc}</div>
+                       <div css={{ fontSize: 'clamp(12px, 3.2vw, 16px)', fontWeight: 900, marginBottom: 'clamp(6px, 2vw, 12px)', color: 'var(--text)', wordBreak: 'keep-all', lineHeight: 1.3 }}>{insight.title}</div>
+                       <div css={{ fontSize: 'clamp(10px, 2.5vw, 13px)', color: 'var(--sub)', lineHeight: 1.45, wordBreak: 'keep-all' }}>{insight.desc}</div>
                      </div>
                    </div>
                  </div>
@@ -458,9 +477,37 @@ export default function AnalysisPageDc({ state }) {
         </Card>
       </Duo>
 
-      <Card css={{ display: 'flex', flexDirection: 'column', minHeight: 390 }}>
-        <div css={{ display: 'grid', gridTemplateColumns: 'minmax(280px, .9fr) 1fr', gap: 34, alignItems: 'stretch' }}>
-          <div css={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+      <Card 
+        css={{ 
+          display: 'flex', flexDirection: 'column', minHeight: 390,
+          '@media (max-width: 900px)': { perspective: 1200, cursor: 'pointer', padding: 0 }
+        }}
+        onClick={() => {
+          if (window.innerWidth <= 900) {
+            setPatternFlipped(!patternFlipped);
+          }
+        }}
+      >
+        <div css={{ 
+          display: 'grid', gridTemplateColumns: 'minmax(280px, .9fr) 1fr', gap: 34, alignItems: 'stretch',
+          '@media (max-width: 900px)': {
+            display: 'block',
+            position: 'relative',
+            width: '100%',
+            height: '100%',
+            transition: 'transform 0.7s cubic-bezier(0.4, 0, 0.2, 1)',
+            transformStyle: 'preserve-3d',
+            transform: patternFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)'
+          }
+        }}>
+          <div css={{ 
+            display: 'flex', flexDirection: 'column', minWidth: 0,
+            '@media (max-width: 900px)': {
+              backfaceVisibility: 'hidden',
+              padding: 24,
+              minHeight: 390
+            }
+          }}>
             <div css={{ display: 'flex', alignItems: 'center', gap: 9, marginBottom: 6 }}>
               <span css={{ width: 24, height: 24, borderRadius: 8, background: 'var(--ink)', color: 'var(--on-ink)', display: 'grid', placeItems: 'center', fontSize: 10, fontWeight: 900 }}>AI</span>
               <b css={{ fontSize: 16 }}>반복되는 감정소비 패턴</b>
@@ -495,13 +542,27 @@ export default function AnalysisPageDc({ state }) {
 
               <p css={{ margin: 0, color: 'var(--sub)', fontSize: 13, fontWeight: 750, lineHeight: 1.65 }}>스트레스 받은 밤, 배달로 마음을 달래고 있었어요. 이 조합만 먼저 알아채도 소비 흐름을 줄일 수 있어요.</p>
             </div>
+            
+            <div css={{ display: 'none', '@media (max-width: 900px)': { display: 'block', textAlign: 'center', marginTop: 24, fontSize: 12, color: 'var(--sub)', fontWeight: 800 } }}>
+              터치하여 소비 내역 보기 ↺
+            </div>
           </div>
 
-          <div css={{ display: 'flex', flexDirection: 'column', minHeight: 0, borderLeft: '1px solid var(--line)', paddingLeft: 28 }}>
+          <div css={{ 
+            display: 'flex', flexDirection: 'column', minHeight: 0, borderLeft: '1px solid var(--line)', paddingLeft: 28,
+            '@media (max-width: 900px)': {
+              position: 'absolute', inset: 0,
+              backfaceVisibility: 'hidden',
+              transform: 'rotateY(180deg)',
+              padding: 24,
+              borderLeft: 'none',
+              background: 'var(--card)'
+            }
+          }}>
             <div css={{ display: 'grid', gridTemplateColumns: '84px 1fr auto', gap: 14, padding: '0 0 12px', fontSize: 11, color: 'var(--sub)', fontWeight: 900, borderBottom: '1px solid var(--line)' }}>
               <span>날짜</span><span>내역</span><span>금액</span>
             </div>
-            <div css={{ overflowY: 'auto', flex: 1 }}>
+            <div css={{ overflowY: 'auto', flex: 1, paddingBottom: 16 }}>
               {evidence.map(([date, category, emotion, situation, amount], idx) => {
                 const emo = getEmotion(emotion);
                 return <div key={`${date}-${idx}`} css={{ display: 'grid', gridTemplateColumns: '84px 1fr auto', gap: 14, alignItems: 'center', padding: '15px 0', borderBottom: '1px solid var(--line)' }}>
@@ -509,11 +570,15 @@ export default function AnalysisPageDc({ state }) {
                   <div css={{ display: 'flex', alignItems: 'center', gap: 9, minWidth: 0 }}>
                     <span css={{ width: 7, height: 7, borderRadius: '50%', background: emo.color, flexShrink: 0 }} />
                     <b css={{ color: 'var(--text)', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{category} <span css={{ color: 'var(--sub)', fontWeight: 650 }}>· {situation}</span></b>
-                    <span css={{ color: emo.text || emo.color, fontSize: 11, fontWeight: 900, flexShrink: 0 }}>{emotion}</span>
+                    <span css={{ display: 'none', '@media (min-width: 901px)': { display: 'inline' }, color: emo.text || emo.color, fontSize: 11, fontWeight: 900, flexShrink: 0 }}>{emotion}</span>
                   </div>
                   <b css={{ color: 'var(--text)' }}>{amount}</b>
                 </div>;
               })}
+            </div>
+            
+            <div css={{ display: 'none', '@media (max-width: 900px)': { display: 'block', textAlign: 'center', marginTop: 12, fontSize: 12, color: 'var(--sub)', fontWeight: 800 } }}>
+              돌아가기 ↺
             </div>
           </div>
         </div>

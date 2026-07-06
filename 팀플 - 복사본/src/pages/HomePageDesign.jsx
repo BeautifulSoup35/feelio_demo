@@ -14,6 +14,7 @@ const Grid = styled.div`
   grid-template-columns: minmax(0, 1fr) minmax(370px, .76fr);
   gap: clamp(8px, 1vw, 16px);
   align-items: stretch;
+  padding-bottom: clamp(20px, 4vh, 40px);
 
   @media (max-width: 1180px) {
     grid-template-columns: minmax(0, 1fr) minmax(350px, .76fr);
@@ -21,15 +22,23 @@ const Grid = styled.div`
 
   @media (max-width: 980px) {
     grid-template-columns: 1fr;
+    gap: 19px;
     min-height: auto;
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 30px;
   }
 `;
 
 const Left = styled.div`
   min-height: 0;
   display: grid;
-  grid-template-rows: minmax(360px, 1fr) clamp(190px, 27vh, 260px);
+  grid-template-rows: minmax(280px, 1fr) auto;
   gap: clamp(14px, 1.4vw, 18px);
+
+  @media (max-width: 980px) {
+    display: contents;
+  }
 `;
 
 const Stage = styled.div`
@@ -37,6 +46,12 @@ const Stage = styled.div`
   display: grid;
   place-items: center;
   text-align: center;
+
+  @media (max-width: 980px) {
+    align-content: start;
+    padding-top: 10px;
+    order: 1;
+  }
 `;
 
 const BlobHalo = styled.div`
@@ -65,8 +80,33 @@ const BlobHalo = styled.div`
 const Ridge = styled(GlassCard)`
   min-height: 0;
   overflow: hidden;
-  padding: clamp(18px, 1.6vw, 22px) clamp(20px, 1.8vw, 26px) 0;
+  padding: ${({ expanded }) => expanded ? 'clamp(18px, 1.6vw, 22px) clamp(20px, 1.8vw, 26px) 0' : '22px'};
   border-radius: 26px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  @media (min-width: 981px) {
+    cursor: default;
+    padding: 16px clamp(16px, 1.5vw, 26px) 0;
+  }
+
+  @media (max-width: 980px) {
+    order: 3;
+  }
+`;
+
+const AccordionSummary = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: ${({ expanded }) => expanded ? '14px' : '0'};
+  font-size: 14.5px;
+  font-weight: 900;
+  
+  @media (min-width: 981px) {
+    cursor: default;
+    padding-bottom: 14px; /* 데스크탑에선 항상 펼쳐진 상태 기준 여백 */
+  }
 `;
 
 const Right = styled.div`
@@ -75,23 +115,37 @@ const Right = styled.div`
   max-width: clamp(370px, 29vw, 420px);
   justify-self: start;
   display: grid;
-  grid-template-rows: auto clamp(124px, 15vh, 148px) clamp(142px, 17vh, 168px);
+  grid-template-rows: auto auto clamp(142px, 17vh, 168px);
   gap: clamp(12px, 1.4vw, 16px);
   padding-top: clamp(14px, 3vh, 34px);
 
   @media (max-width: 980px) {
     padding-top: 0;
+    display: contents;
   }
 `;
 
-const Calendar = styled.div`
+const Calendar = styled(GlassCard)`
   width: 100%;
   max-width: none;
-  padding: 2px 2px 4px;
+  padding: ${({ expanded }) => expanded ? '18px 20px 22px' : '22px'};
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  @media (min-width: 981px) {
+    background: transparent;
+    box-shadow: none;
+    border: none;
+    padding: 0;
+    cursor: default;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
 
   @media (max-width: 980px) {
     max-width: none;
     margin: 0 auto;
+    order: 2;
   }
 `;
 
@@ -438,6 +492,8 @@ export default function HomePageDesign({ state, onRoute, selectedDate, onSelectD
   const selected = selectedDate || new Date(2026, 6, 1);
   const [visibleMonth, setVisibleMonth] = useState(() => new Date(selected.getFullYear(), selected.getMonth(), 1));
   const lastClickTimeRef = useRef({});
+  const [isRidgeExpanded, setIsRidgeExpanded] = useState(false);
+  const [isCalendarExpanded, setIsCalendarExpanded] = useState(false);
 
   useEffect(() => {
     setVisibleMonth(prev => {
@@ -497,7 +553,7 @@ export default function HomePageDesign({ state, onRoute, selectedDate, onSelectD
                   : <EmptyEmotionBlob size={280} dark={dark} />}
               </div>
             </BlobHalo>
-            <div css={{ fontSize: 12, color: 'var(--sub)', fontWeight: 800, marginTop: 2 }}>
+            <div css={{ fontSize: 12, color: 'var(--sub)', fontWeight: 800, marginTop: 12 }}>
               {!hasAnyTransactions ? '아직 감정을 기다리는 중' : hasDailyEmotion ? '선택한 날에 가장 오래 머문 마음' : '선택한 날에는 감정 기록이 없어요'}
             </div>
             <div css={{ fontSize: 24, color: hasAnyTransactions ? topMeta.color : (dark ? '#9B8CFF' : '#7C6BE0'), fontWeight: 900, letterSpacing: '-.02em', marginTop: 2 }}>
@@ -506,31 +562,46 @@ export default function HomePageDesign({ state, onRoute, selectedDate, onSelectD
           </div>
         </Stage>
 
-        <Ridge>
+        <Ridge expanded={isRidgeExpanded} onClick={() => setIsRidgeExpanded(!isRidgeExpanded)}>
           {hasEnoughRidgeData ? (
             <>
-              <div css={{ fontSize: 14.5, fontWeight: 900 }}>감정 능선</div>
-              <div css={{ fontSize: 12, color: 'var(--sub)', marginTop: 2 }}>이번 달 감정이 흘러온 결</div>
-              <div css={{ height: 150, position: 'relative', margin: '6px -22px 0' }}>
-                <svg viewBox="0 0 600 170" width="100%" height="100%" preserveAspectRatio="none" css={{ display: 'block', position: 'absolute', inset: 0 }}>
-                  <defs>
-                    <linearGradient id="ridgeFadeDesign" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0" stopColor="#fff" stopOpacity=".35" />
-                      <stop offset="42%" stopColor="#fff" />
-                      <stop offset="100%" stopColor="#fff" stopOpacity="0" />
-                    </linearGradient>
-                    <mask id="ridgeMaskDesign"><rect width="600" height="170" fill="url(#ridgeFadeDesign)" /></mask>
-                  </defs>
-                  <g mask="url(#ridgeMaskDesign)" filter="blur(2.5px)">
-                    {ridgeData.map(([name, value], index) => {
-                      const cx = 20 + slot * (index + .5);
-                      const height = 34 + (value / 38) * 120;
-                      return <path key={name} d={ridgePath(cx, slot * 1.15, height)} fill={getEmotion(name).color} opacity=".5" css={{ mixBlendMode: dark ? 'screen' : 'multiply' }} />;
-                    })}
-                  </g>
-                </svg>
+              <AccordionSummary expanded={isRidgeExpanded}>
+                <div css={{ display: 'flex', alignItems: 'center', gap: 9 }}>
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#A68BEA" strokeWidth="1.9"><path d="M22 12h-4l-3 9L9 3l-3 9H2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                  <span css={{ fontSize: 14.5, fontWeight: 900 }}>감정 능선</span>
+                  <span css={{ fontSize: 12, color: 'var(--sub)', fontWeight: 500, marginLeft: 2 }}>이번 달 감정이 흘러온 결</span>
+                </div>
+                <div css={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  {!isRidgeExpanded && (
+                    <span css={{ color: 'var(--sub)', fontSize: 12, fontWeight: 800, '@media (min-width: 981px)': { display: 'none' } }}>
+                      가장 높은 감정: <b css={{ color: getEmotion(ridgePeak[0]).color }}>{ridgePeak[0]}</b>
+                    </span>
+                  )}
+                  <span css={{ color: 'var(--sub)', fontSize: 16, '@media (min-width: 981px)': { display: 'none' } }}>{isRidgeExpanded ? '▴' : '▾'}</span>
+                </div>
+              </AccordionSummary>
+              <div css={{ display: isRidgeExpanded ? 'block' : 'none', '@media (min-width: 981px)': { display: 'block' } }}>
+                <div css={{ height: 150, position: 'relative', margin: '0', overflow: 'hidden' }}>
+                  <svg viewBox="0 0 600 170" width="100%" height="100%" preserveAspectRatio="none" css={{ display: 'block', position: 'absolute', inset: 0 }}>
+                    <defs>
+                      <linearGradient id="ridgeFadeDesign" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0" stopColor="#fff" stopOpacity=".35" />
+                        <stop offset="42%" stopColor="#fff" />
+                        <stop offset="100%" stopColor="#fff" stopOpacity="0" />
+                      </linearGradient>
+                      <mask id="ridgeMaskDesign"><rect width="600" height="170" fill="url(#ridgeFadeDesign)" /></mask>
+                    </defs>
+                    <g mask="url(#ridgeMaskDesign)" filter="blur(2.5px)">
+                      {ridgeData.map(([name, value], index) => {
+                        const cx = 20 + slot * (index + .5);
+                        const height = 34 + (value / 38) * 120;
+                        return <path key={name} d={ridgePath(cx, slot * 1.15, height)} fill={getEmotion(name).color} opacity=".5" css={{ mixBlendMode: dark ? 'screen' : 'multiply' }} />;
+                      })}
+                    </g>
+                  </svg>
+                </div>
+                <div css={{ fontSize: 12.5, color: 'var(--sub)', padding: '8px 22px 14px' }}>이번 달은 <b css={{ color: getEmotion(ridgePeak[0]).color }}>{ridgePeak[0]}</b>이 가장 높이 솟았어요</div>
               </div>
-              <div css={{ fontSize: 12.5, color: 'var(--sub)', padding: '8px 0 14px' }}>이번 달은 <b css={{ color: getEmotion(ridgePeak[0]).color }}>{ridgePeak[0]}</b>이 가장 높이 솟았어요</div>
             </>
           ) : (
             <EmptyRidge dark={dark} />
@@ -539,22 +610,31 @@ export default function HomePageDesign({ state, onRoute, selectedDate, onSelectD
       </Left>
 
       <Right>
-        <Calendar>
-          <MonthBar>
-            <MonthButton type="button" onClick={() => moveMonth(-1)} aria-label="이전 달">‹</MonthButton>
-            <strong>{monthLabel}</strong>
-            <MonthButton type="button" onClick={() => moveMonth(1)} aria-label="다음 달">›</MonthButton>
-          </MonthBar>
-          <Week>{['일', '월', '화', '수', '목', '금', '토'].map(day => <span key={day}>{day}</span>)}</Week>
-          <PebbleGrid>
-            {days.map(item => {
-              if (item.empty) return <Pebble key={item.id} empty disabled aria-hidden="true" />;
-              const color = item.emotion ? getEmotion(item.emotion).color : undefined;
-              const dateKey = `${visibleMonth.getFullYear()}-${String(visibleMonth.getMonth() + 1).padStart(2, '0')}-${String(item.day).padStart(2, '0')}`;
-              return <Pebble key={item.id} color={color} strong={item.strong} selected={dateKey === selectedDayKey} today={item.today} dark={dark} onClick={() => selectDay(item.day, dateKey)}>{item.day}</Pebble>;
-            })}
-          </PebbleGrid>
-          <Legend>{['스트레스', '외로움', '평온', '뿌듯함'].map(name => <span key={name}><i style={{ background: getEmotion(name).color }} />{name}</span>)}</Legend>
+        <Calendar expanded={isCalendarExpanded} onClick={() => setIsCalendarExpanded(!isCalendarExpanded)}>
+          <AccordionSummary expanded={isCalendarExpanded}>
+            <div css={{ display: 'flex', alignItems: 'center', gap: 9 }}>
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#76A7E8" strokeWidth="1.9"><rect x="3" y="4" width="18" height="18" rx="2" ry="2" strokeLinecap="round" strokeLinejoin="round" /><line x1="16" y1="2" x2="16" y2="6" strokeLinecap="round" strokeLinejoin="round" /><line x1="8" y1="2" x2="8" y2="6" strokeLinecap="round" strokeLinejoin="round" /><line x1="3" y1="10" x2="21" y2="10" strokeLinecap="round" strokeLinejoin="round" /></svg>
+              <span>{monthLabel} 캘린더</span>
+            </div>
+            <span css={{ color: 'var(--sub)', fontSize: 16, '@media (min-width: 981px)': { display: 'none' } }}>{isCalendarExpanded ? '▴' : '▾'}</span>
+          </AccordionSummary>
+          <div onClick={e => e.stopPropagation()} css={{ cursor: 'default', display: isCalendarExpanded ? 'block' : 'none', '@media (min-width: 981px)': { display: 'block' } }}>
+            <MonthBar>
+              <MonthButton type="button" onClick={() => moveMonth(-1)} aria-label="이전 달">‹</MonthButton>
+              <strong>{monthLabel}</strong>
+              <MonthButton type="button" onClick={() => moveMonth(1)} aria-label="다음 달">›</MonthButton>
+            </MonthBar>
+            <Week>{['일', '월', '화', '수', '목', '금', '토'].map(day => <span key={day}>{day}</span>)}</Week>
+            <PebbleGrid>
+              {days.map(item => {
+                if (item.empty) return <Pebble key={item.id} empty disabled aria-hidden="true" />;
+                const color = item.emotion ? getEmotion(item.emotion).color : undefined;
+                const dateKey = `${visibleMonth.getFullYear()}-${String(visibleMonth.getMonth() + 1).padStart(2, '0')}-${String(item.day).padStart(2, '0')}`;
+                return <Pebble key={item.id} color={color} strong={item.strong} selected={dateKey === selectedDayKey} today={item.today} dark={dark} onClick={() => selectDay(item.day, dateKey)}>{item.day}</Pebble>;
+              })}
+            </PebbleGrid>
+            <Legend>{['스트레스', '외로움', '평온', '뿌듯함'].map(name => <span key={name}><i style={{ background: getEmotion(name).color }} />{name}</span>)}</Legend>
+          </div>
         </Calendar>
 
         <Goal onClick={() => onRoute('universe')}>

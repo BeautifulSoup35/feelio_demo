@@ -61,6 +61,37 @@ export function useFeelioStore() {
     updateUser(userPatch) {
       setState(prev => ({ ...prev, user: { ...prev.user, ...userPatch } }));
     },
+    addGoal(goal) {
+      setState(prev => ({
+        ...prev,
+        goals: [{ id: `g-${Date.now()}`, ...goal }, ...prev.goals],
+        toast: '목표가 추가되었어요'
+      }));
+    },
+    updateGoal(index, patch) {
+      setState(prev => {
+        const newGoals = [...prev.goals];
+        newGoals[index] = { ...newGoals[index], ...patch };
+        return { ...prev, goals: newGoals, toast: '목표가 수정되었어요' };
+      });
+    },
+    removeGoal(index) {
+      setState(prev => {
+        if (prev.goals.length <= 1) return { ...prev, toast: '최소 1개의 목표는 있어야 해요' };
+        const newGoals = [...prev.goals];
+        newGoals.splice(index, 1);
+        return { ...prev, goals: newGoals, toast: '목표가 삭제되었어요' };
+      });
+    },
+    setPrimaryGoal(index) {
+      setState(prev => {
+        if (index === 0 || !prev.goals[index]) return prev;
+        const newGoals = [...prev.goals];
+        const [targetGoal] = newGoals.splice(index, 1);
+        newGoals.unshift(targetGoal);
+        return { ...prev, goals: newGoals, toast: '대표 목표로 변경되었어요' };
+      });
+    },
     addTransaction(transaction) {
       setState(prev => ({
         ...prev,
