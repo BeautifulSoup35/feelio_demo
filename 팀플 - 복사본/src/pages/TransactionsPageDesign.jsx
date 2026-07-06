@@ -135,7 +135,14 @@ const ControlGrid = styled.div`
   }
 
   @media (max-width: 560px) {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 8px;
+    & > *:nth-of-type(1), & > *:nth-of-type(2) {
+      grid-column: span 3;
+    }
+    & > *:nth-of-type(3), & > *:nth-of-type(4), & > *:nth-of-type(5) {
+      grid-column: span 2;
+    }
   }
 `;
 

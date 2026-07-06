@@ -1,13 +1,13 @@
 /** @jsxImportSource @emotion/react */
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import styled from '@emotion/styled';
 import { EmotionBlob } from '../components/common/EmotionBlob.jsx';
 import { GlassCard } from '../components/common/GlassCard.jsx';
 import { getEmotion } from '../data/emotions.js';
 
 const emotions = ['신남', '설렘', '뿌듯함', '스트레스', '외로움', '화남', '평온', '무덤덤'];
-const categories = ['배달', '카페', '교통', '쇼핑', '문화', '건강', '급여', '행복'];
-const situations = ['퇴근 후', '혼자 있음', '친구와', '보상', '습관', '이동 중', '아침', '밤'];
+const defaultCategories = ['배달', '카페', '교통', '쇼핑', '문화', '건강', '급여', '행복'];
+const defaultSituations = ['퇴근 후', '혼자 있음', '친구와', '보상', '습관', '이동 중', '아침', '밤'];
 
 const Page = styled.div`
   width: min(100%, 1080px);
@@ -101,7 +101,8 @@ const BlobGrid = styled.div`
   margin-top: 18px;
 
   @media (max-width: 560px) {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px 4px;
   }
 `;
 
@@ -158,6 +159,15 @@ const SaveButton = styled.button`
 `;
 
 export default function RecordPageDc({ actions, onSaved }) {
+  const [customCategories, setCustomCategories] = useState(defaultCategories);
+  const [isEditingCategory, setIsEditingCategory] = useState(false);
+  const [customSituations, setCustomSituations] = useState(defaultSituations);
+  const [isEditingSituation, setIsEditingSituation] = useState(false);
+  const [addingTag, setAddingTag] = useState(null);
+  const [addingText, setAddingText] = useState('');
+
+  const dragItemRef = useRef(null);
+  const dragOverItemRef = useRef(null);
   const [form, setForm] = useState({
     type: 'expense',
     amount: '',
@@ -169,6 +179,76 @@ export default function RecordPageDc({ actions, onSaved }) {
   });
   const selected = getEmotion(form.emotion || '스트레스');
   const canSave = form.amount && form.emotion && form.category;
+
+  const startAdding = (type) => {
+    setAddingTag(type);
+    setAddingText('');
+  };
+
+  const handleAddSubmit = (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    const name = addingText.trim();
+    if (!name) {
+      setAddingTag(null);
+      return;
+    }
+
+    if (addingTag === 'category') {
+      if (customCategories.includes(name)) { alert('이미 있는 카테고리입니다.'); return; }
+      setCustomCategories([...customCategories, name.slice(0, 5)]);
+    } else if (addingTag === 'situation') {
+      if (customSituations.includes(name)) { alert('이미 있는 태그입니다.'); return; }
+      setCustomSituations([...customSituations, name.slice(0, 5)]);
+    }
+    setAddingTag(null);
+  };
+
+  const handleRemoveCategory = (cat) => {
+    setCustomCategories(customCategories.filter(c => c !== cat));
+    if (form.category === cat) setField('category', null);
+  };
+
+  const handleDragStart = (e, index) => {
+    dragItemRef.current = index;
+    if (e.dataTransfer) e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleDragEnter = (index) => {
+    dragOverItemRef.current = index;
+  };
+
+  const handleDropCategory = () => {
+    if (dragItemRef.current === null || dragOverItemRef.current === null) return;
+    if (dragItemRef.current !== dragOverItemRef.current) {
+      const newCats = [...customCategories];
+      const [dragItem] = newCats.splice(dragItemRef.current, 1);
+      newCats.splice(dragOverItemRef.current, 0, dragItem);
+      setCustomCategories(newCats);
+    }
+    dragItemRef.current = null;
+    dragOverItemRef.current = null;
+  };
+
+  const handleDropSituation = () => {
+    if (dragItemRef.current === null || dragOverItemRef.current === null) return;
+    if (dragItemRef.current !== dragOverItemRef.current) {
+      const newSits = [...customSituations];
+      const [dragItem] = newSits.splice(dragItemRef.current, 1);
+      newSits.splice(dragOverItemRef.current, 0, dragItem);
+      setCustomSituations(newSits);
+    }
+    dragItemRef.current = null;
+    dragOverItemRef.current = null;
+  };
+
+
+
+  const handleRemoveSituation = (sit) => {
+    setCustomSituations(customSituations.filter(s => s !== sit));
+    if (form.situation.includes(sit)) {
+      setForm(prev => ({ ...prev, situation: prev.situation.filter(item => item !== sit) }));
+    }
+  };
 
   const setField = (key, value) => setForm(prev => ({ ...prev, [key]: value }));
   const toggleSituation = (value) => setForm(prev => ({
@@ -241,15 +321,117 @@ export default function RecordPageDc({ actions, onSaved }) {
           </section>
         </MainPanel>
 
-        <Side>
-          <SideCard>
-            <h3 css={{ margin: '0 0 13px', fontSize: 13 }}>어디에 썼어요 <span css={{ color: 'var(--sub)', fontWeight: 600 }}>· 필수</span></h3>
-            <ChipRow>{categories.map(item => <Chip key={item} color={selected.color} active={form.category === item} onClick={() => setField('category', item)}>{item}</Chip>)}</ChipRow>
+        <Side css={{ flex: 1 }}>
+          <SideCard css={{ flex: 1 }}>
+            <div css={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 13 }}>
+              <h3 css={{ margin: 0, fontSize: 13 }}>어디에 썼어요 <span css={{ color: 'var(--sub)', fontWeight: 600 }}>· 필수</span></h3>
+              <button type="button" onClick={() => setIsEditingCategory(!isEditingCategory)} css={{ background: 'transparent', border: 0, color: isEditingCategory ? 'var(--text)' : 'var(--sub)', cursor: 'pointer', fontSize: 16 }}>✎</button>
+            </div>
+            <ChipRow>
+              {customCategories.map((item, index) => (
+                isEditingCategory ? (
+                  <Chip 
+                    key={item} color={selected.color} active 
+                    draggable 
+                    onDragStart={(e) => handleDragStart(e, index)}
+                    onDragEnter={() => handleDragEnter(index)}
+                    onDragEnd={handleDropCategory}
+                    onDragOver={(e) => e.preventDefault()}
+                    css={{ display: 'flex', alignItems: 'center', gap: 4, padding: '6px 12px', cursor: 'grab', '&:active': { cursor: 'grabbing' } }}
+                  >
+                    <span>{item}</span>
+                    <span onClick={() => handleRemoveCategory(item)} css={{ cursor: 'pointer', color: '#E87573', fontWeight: 900, marginLeft: 4 }}>×</span>
+                  </Chip>
+                ) : (
+                  <Chip key={item} color={selected.color} active={form.category === item} onClick={() => setField('category', item)}>{item}</Chip>
+                )
+              ))}
+              {!isEditingCategory && addingTag !== 'category' && <Chip color={selected.color} onClick={() => startAdding('category')}>+</Chip>}
+              {addingTag === 'category' && (
+                <form onSubmit={handleAddSubmit} css={{ display: 'inline-block', margin: 0 }}>
+                  <input
+                    autoFocus
+                    value={addingText}
+                    onChange={e => setAddingText(e.target.value)}
+                    onBlur={handleAddSubmit}
+                    maxLength={5}
+                    placeholder="입력..."
+                    css={{
+                      width: 64,
+                      boxSizing: 'border-box',
+                      background: 'transparent',
+                      border: `1.5px solid ${selected.color}`,
+                      color: 'var(--text)',
+                      borderRadius: 999,
+                      padding: '9px 16px',
+                      fontSize: 13,
+                      fontWeight: 800,
+                      outline: 'none',
+                      fontFamily: 'inherit',
+                      textAlign: 'center',
+                      transition: 'all 0.2s',
+                      '&:focus': { width: 84, background: `${selected.color}26` }
+                    }}
+                  />
+                </form>
+              )}
+            </ChipRow>
           </SideCard>
 
-          <SideCard css={{ flex: 1 }}>
-            <h3 css={{ margin: '0 0 13px', fontSize: 13 }}>어떤 상황이었어요 <span css={{ color: 'var(--sub)', fontWeight: 600 }}>· 선택</span></h3>
-            <ChipRow>{situations.map(item => <Chip key={item} color={selected.color} active={form.situation.includes(item)} onClick={() => toggleSituation(item)}>{item}</Chip>)}</ChipRow>
+          <SideCard>
+            <div css={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 13 }}>
+              <h3 css={{ margin: 0, fontSize: 13 }}>어떤 상황이었어요 <span css={{ color: 'var(--sub)', fontWeight: 600 }}>· 선택</span></h3>
+              <button type="button" onClick={() => setIsEditingSituation(!isEditingSituation)} css={{ background: 'transparent', border: 0, color: isEditingSituation ? 'var(--text)' : 'var(--sub)', cursor: 'pointer', fontSize: 16 }}>✎</button>
+            </div>
+            <ChipRow>
+              {customSituations.map((item, index) => (
+                isEditingSituation ? (
+                  <Chip 
+                    key={item} color={selected.color} active 
+                    draggable 
+                    onDragStart={(e) => handleDragStart(e, index)}
+                    onDragEnter={() => handleDragEnter(index)}
+                    onDragEnd={handleDropSituation}
+                    onDragOver={(e) => e.preventDefault()}
+                    css={{ display: 'flex', alignItems: 'center', gap: 4, padding: '6px 12px', cursor: 'grab', '&:active': { cursor: 'grabbing' } }}
+                  >
+                    <span>{item}</span>
+                    <span onClick={() => handleRemoveSituation(item)} css={{ cursor: 'pointer', color: '#E87573', fontWeight: 900, marginLeft: 4 }}>×</span>
+                  </Chip>
+                ) : (
+                  <Chip key={item} color={selected.color} active={form.situation.includes(item)} onClick={() => toggleSituation(item)}>{item}</Chip>
+                )
+              ))}
+              {!isEditingSituation && addingTag !== 'situation' && <Chip color={selected.color} onClick={() => startAdding('situation')}>+</Chip>}
+              {addingTag === 'situation' && (
+                <form onSubmit={handleAddSubmit} css={{ display: 'inline-block', margin: 0 }}>
+                  <input
+                    autoFocus
+                    value={addingText}
+                    onChange={e => setAddingText(e.target.value)}
+                    onBlur={handleAddSubmit}
+                    maxLength={5}
+                    placeholder="입력..."
+                    css={{
+                      width: 64,
+                      boxSizing: 'border-box',
+                      background: 'transparent',
+                      border: `1.5px solid ${selected.color}`,
+                      color: 'var(--text)',
+                      borderRadius: 999,
+                      padding: '9px 16px',
+                      fontSize: 13,
+                      fontWeight: 800,
+                      outline: 'none',
+                      fontFamily: 'inherit',
+                      textAlign: 'center',
+                      transition: 'all 0.2s',
+                      '&:focus': { width: 84, background: `${selected.color}26` }
+                    }}
+                  />
+                </form>
+              )}
+            </ChipRow>
             <textarea
               value={form.memo}
               onChange={event => setField('memo', event.target.value)}
