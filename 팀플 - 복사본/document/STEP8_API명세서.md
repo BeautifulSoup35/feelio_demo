@@ -1,351 +1,215 @@
 # STEP 8. API 명세서
 
 **프로젝트명:** Feelio
-**작성일:** 2026-07-06
-**작성 기준:** 저장소에 백엔드 코드(Controller·DTO·Service)가 존재하지 않으므로, **현재 코드 기준으로 확인되는 API는 0건**이다. 본 문서는 ① 그 사실을 명시하고, ② 실제 운영 서비스를 전제로, STEP 6~7의 12테이블 구조(마스터 코드 테이블 분리, 상황 N:M, 소셜 계정 분리)와 1:1로 연결되는 API 전체를 **"추가 필요 API" 설계 초안**으로 정리한다.
+**작성일:** 2026-07-06 (수정됨)
+**작성 기준:** 현재 저장소에 백엔드 코드가 존재하지 않아 프론트엔드 로컬 상태 및 localStorage 기반으로 동작 중입니다. 본 문서는 백엔드(Spring Boot) 개발 착수 시 기준이 되는 **API 설계 초안**입니다.
+**제거 확정:** 커스텀 태그 관리(FUNC-024) 및 감정소비 누수율 관련 API는 STEP 5의 확정 정책에 따라 본 명세에서 제외되었습니다.
 
 ---
 
-## 1. 현재 상태 (현재 코드 기준)
+## 1. 수정 요약 및 기능명세서 반영 내역 (2026-07-06 업데이트)
 
-| 구분 | 내용 |
-|---|---|
-| 구현된 API | **없음** — 백엔드 프로젝트 미생성 (Spring Boot + MySQL + MyBatis로 구축 예정, 팀 결정) |
-| 현재 데이터 처리 | 프론트 로컬 상태 함수(`src/stores/useFeelioStoreDc.js`) + localStorage |
-| 본 문서의 성격 | 백엔드 개발 착수 시 기준이 되는 **API 설계 초안**. 전 항목 구현 상태 = "추가 필요 (미구현)" |
+**핵심 변경 사항:**
+기존 정상 흐름(Happy Path) 위주였던 API 명세에 유효성 검증(Validation), 예외 상황(Edge Case), 에러 코드 매핑, 보안 정책(XSS 방어)을 대폭 추가했습니다.
+- **추가된 명세**: 온보딩 목표 금액 최소값(100원), 기록 등록 시 메모 글자 수 제한(500자) 및 빈 값(Null) 처리, 상황 태그 N:M 복수 선택 처리 로직.
+- **변경된 명세**: 소셜 로그인 API 응답에 profileImageUrl 추가, 감정 동률 시 우선순위 로직(최근 기록 우선).
+- **제외된 API**: 사용자 커스텀 태그 관리 (삭제).
 
-### 현재 로컬 함수 → 대체 API 매핑
+| 기능 식별자 | 기능명 | STEP5_기능명세서 변경 내용 | STEP8_API명세서 반영 방식 | 반영 상태 |
+|---|---|---|---|---|
+| FUNC-001 | 소셜 로그인 | 제공자로부터 프로필 이미지 수신 및 저장 | `/api/auth/login` 응답 객체에 `profileImageUrl` 추가 | 완료 |
+| FUNC-005 | 온보딩 목표 설정 | 목표 금액 최소값(100원 이상), 기간 필수 저장 | `/api/goals` POST 요청 시 `targetAmount` 유효성 검증 추가 | 완료 |
+| FUNC-008 | 기록 등록 | 메모 500자 제한, 상황 태그 N:M 복수 선택, XSS 방어 | `/api/transactions` POST 검증 룰 명시, `situationIds` 배열 처리 로직 추가 | 완료 |
+| FUNC-011 | 기록 상세 조회 | 데이터 삭제 및 매칭 실패 시 404 에러 처리 보완 | `/api/transactions/{id}` 실패 응답 404 조건 구체화 | 완료 |
+| FUNC-015 | 대표 감정 표시 | 감정 동률 시 최근 기록 우선 | `/api/summary/calendar` 집계 쿼리 정렬 기준 명시 | 완료 |
+| FUNC-017 | 감정 능선 | 8개 감정 전체를 능선 축으로 사용 | `/api/summary/emotions` 응답 배열 8개 고정 반환 | 완료 |
+| FUNC-024 | 태그 관리 | 메뉴 숨김 및 범위 제외 확정 | 커스텀 태그 CRUD API 전체 삭제 | 완료 |
 
-| 현재 로컬 함수 | 대체할 API | 관련 기능 |
-|---|---|---|
-| `login(provider)` | POST /api/auth/login | FUNC-001 |
-| `logout()` | POST /api/auth/logout | FUNC-002 |
-| `updateUser(patch)` | PATCH /api/users/me | FUNC-003 |
-| (없음 — 탈퇴) | DELETE /api/users/me | FUNC-004 |
-| `completeOnboarding(goal)` | POST /api/goals + PATCH /api/users/me/onboarding | FUNC-005 |
-| (없음 — 목표 CRUD) | GET·POST·PUT·DELETE /api/goals | FUNC-006·007 |
-| `addTransaction(t)` | POST /api/transactions | FUNC-008 |
-| `updateTransaction(id, patch)` | PUT /api/transactions/{id} | FUNC-009 |
-| `removeTransaction(id)` | DELETE /api/transactions/{id} | FUNC-010 |
-| (로컬 필터링) | GET /api/transactions | FUNC-012~014 |
-| (로컬 집계) | GET /api/summary/calendar, /api/summary/emotions | FUNC-015~017 |
-| (하드코딩) | GET /api/analysis/monthly, GET /api/universe/simulation | FUNC-018~022 |
-| `toggleMode()` / `setAurora()` | PATCH /api/users/me/settings | FUNC-023 |
-| `resetData()` | DELETE /api/transactions | FUNC-026 |
-| (프론트 상수 `emotions.js` 등) | GET /api/meta (감정·카테고리·상황 마스터) | FUNC-008 (기록 입력 폼) |
+---
 
-## 2. 공통 규격 (초안)
+## 2. 공통 규격
 
 | 항목 | 내용 |
 |---|---|
 | Base URL | `/api` |
-| 인증 | 소셜 로그인 성공 시 서버 발급 **accessToken(JWT) 가정** — Authorization: Bearer {accessToken}. 인증 방식(JWT vs 세션)은 백엔드 착수 시 팀 확정 필요 |
-| 데이터 격리 | 인증 주체의 user_id 기준으로만 조회·변경 (REQ-N-005). 클라이언트가 보낸 userId는 신뢰하지 않음 |
-| 표기 | JSON camelCase ↔ DB snake_case 매핑 (예: occurredAt ↔ occurred_at) |
+| 인증 | **Bearer JWT** (소셜 로그인 성공 시 서버에서 발급한 accessToken) |
+| 데이터 격리 | 토큰에 포함된 user_id 기준으로만 데이터 조회 및 변경 수행 |
+| 명명 규칙 | 클라이언트 요청/응답은 JSON `camelCase`, DB 컬럼은 `snake_case` 매핑 |
 | 공통 응답 | `{ "status": 200, "message": "success", "body": { ... } }` |
-| 공통 에러 | `{ "status": 4xx/5xx, "message": "에러 설명", "body": null }` |
+| 실패 응답 | `{ "status": 400, "message": "에러 사유", "body": null }` |
 
-### 공통 Status Code
+**공통 Status Code:**
+- **200 OK**: 조회, 수정, 삭제 성공
+- **201 Created**: 생성 성공 (기록, 목표 등)
+- **400 Bad Request**: 유효성 검증 실패 (예: 금액 ≤ 0, 메모 길이 초과, 필수값 누락)
+- **401 Unauthorized**: JWT 토큰 없음, 만료 또는 유효하지 않음
+- **403 Forbidden**: 타인 리소스 접근 시도
+- **404 Not Found**: 존재하지 않는 ID (삭제된 기록 등) 조회 요청 시
+- **500 Internal Server Error**: 서버 장애
 
-| 코드 | 의미 | 대표 상황 |
-|---|---|---|
-| 200 | 성공 | 조회·수정·삭제 성공 |
-| 201 | 생성 성공 | 기록·목표 생성 |
-| 400 | 잘못된 요청 | 필수 값 누락(금액·감정·카테고리), 감정 8종 외 값, amount ≤ 0 |
-| 401 | 인증 실패 | 토큰 없음·만료 |
-| 403 | 권한 없음 | 타인 리소스 접근 |
-| 404 | 없음 | 존재하지 않는 기록·목표 ID |
-| 500 | 서버 오류 | — |
+---
 
-## 3. API 목록 (전체 — 추가 필요 API)
+## 3. 핵심 API 상세 명세
 
-| Method | URL | 기능 | 인증 | Request 요약 | Response 요약 | 관련 기능 | 구현 상태 |
-|---|---|---|---|---|---|---|---|
-| POST | /api/auth/login | 소셜 로그인 (토큰 교환) | 불필요 | provider, providerToken | accessToken, 사용자 정보(프로필 이미지 포함) | FUNC-001 | 추가 필요 |
-| POST | /api/auth/logout | 로그아웃 | 필요 | — | 성공 여부 | FUNC-002 | 추가 필요 |
-| GET | /api/users/me | 내 정보 조회 | 필요 | — | 사용자 정보 | FUNC-003 | 추가 필요 |
-| PATCH | /api/users/me | 프로필 수정 | 필요 | nickname | 갱신된 사용자 정보 | FUNC-003 | 추가 필요 |
-| DELETE | /api/users/me | 회원탈퇴 | 필요 | — | 성공 여부 | FUNC-004 | 추가 필요 |
-| PATCH | /api/users/me/onboarding | 온보딩 완료 처리 | 필요 | — | onboardingDone | FUNC-005 | 추가 필요 |
-| PATCH | /api/users/me/settings | 테마 설정 변경 | 필요 | themeMode, auroraTheme | 갱신된 설정 | FUNC-023 | 추가 필요 |
-| GET | /api/meta | 감정·카테고리·상황 마스터 조회 | 필요 | — | 마스터 목록(색상·정렬 포함) | FUNC-008 | 추가 필요 |
-| GET | /api/transactions | 기록 목록 조회 | 필요 | year, month, day, emotionId, categoryId, query, sort | 기록 목록 | FUNC-012~014 | 추가 필요 |
-| POST | /api/transactions | 기록 등록 | 필요 | type, amount, categoryId, emotionId, situationIds[], memo, occurredAt | 생성된 기록 | FUNC-008 | 추가 필요 |
-| GET | /api/transactions/{transactionId} | 기록 상세 조회 | 필요 | — | 기록 상세 | FUNC-011 | 추가 필요 |
-| PUT | /api/transactions/{transactionId} | 기록 수정 | 필요 | 등록과 동일 필드 | 수정된 기록 | FUNC-009 | 추가 필요 |
-| DELETE | /api/transactions/{transactionId} | 기록 삭제 | 필요 | — | 성공 여부 | FUNC-010 | 추가 필요 |
-| DELETE | /api/transactions | 전체 기록 초기화 | 필요 | — | 삭제 건수 | FUNC-026 | 추가 필요 |
-| GET | /api/goals | 목표 목록 조회 | 필요 | — | 목표 목록(대표 목표 포함) | FUNC-006 | 추가 필요 |
-| POST | /api/goals | 목표 생성 | 필요 | name, targetAmount, currentAmount, dueDate, isMain | 생성된 목표 | FUNC-005·007 | 추가 필요 |
-| PUT | /api/goals/{goalId} | 목표 수정 | 필요 | 생성과 동일 필드 | 수정된 목표 | FUNC-007 | 추가 필요 |
-| DELETE | /api/goals/{goalId} | 목표 삭제 | 필요 | — | 성공 여부 | FUNC-007 | 추가 필요 |
-| GET | /api/summary/calendar | 월별 캘린더 요약 (날짜별 대표 감정) | 필요 | year, month | 날짜별 대표 감정·건수 | FUNC-015·016 | 추가 필요 |
-| GET | /api/summary/emotions | 월별 감정 분포 (능선·신호) | 필요 | year, month | 감정별 건수·금액 | FUNC-017·018 | 추가 필요 |
-| GET | /api/analysis/monthly | 월간 분석 (카테고리·시간대·감정·인사이트) | 필요 | year, month | 분석 집계 + 인사이트 문장 | FUNC-019~021 | 추가 필요 (3순위) |
-| GET | /api/universe/simulation | 평행우주 시뮬레이션 | 필요 | goalId(선택) | 두 미래 시나리오 수치·문장 | FUNC-022 | 추가 필요 (3순위) |
+본 문서에서는 핵심 트랜잭션인 '기록 등록', '목록 조회', '소셜 로그인', '목표 생성' API를 상세 양식으로 전개하며, 나머지 API도 동일한 규격을 따릅니다.
 
-> 누수율 관련 API는 제거 확정 정책에 따라 존재하지 않는다. 알림·백업·챌린지 API는 4순위로 본 초안에서 제외 (필요 시 별도 정의).
+### [API-01] 기록 등록 (Transactions Create)
 
-## 4. API 상세 (핵심 API)
+**1. 기본 정보**
+- **기능명**: 기록 등록 (지출/수입)
+- **설명**: 사용자가 새로운 지출 또는 수입 기록을 생성합니다.
+- **요청 주소**: `POST /api/transactions`
+- **인증 필요 여부**: 필요 (Bearer JWT)
+- **권한 조건**: 로그인한 일반 사용자 (본인 데이터만 생성 가능)
+- **처리 우선순위**: 1순위 (핵심 기능)
 
-### 4-1. POST /api/auth/login — 소셜 로그인
+**2. 요청 정보 (Body)**
+| 필드명 | 자료형 | 필수 | 허용값 | 설명 / 예시 | 유효성 검증 규칙 |
+|---|---|---|---|---|---|
+| `type` | String | Y | EXPENSE, INCOME | 거래 유형 | Enum 값 검증 |
+| `amount` | Integer | Y | - | 거래 금액 (예: 18600) | 0 초과 양의 정수 (Min: 1) |
+| `categoryId` | Integer | Y | - | 카테고리 식별자 | 마스터 DB 존재 여부 확인 |
+| `emotionId` | Integer | Y | 1~8 | 감정 식별자 | 마스터 DB 존재 여부 확인 |
+| `situationIds` | Array | N | - | 상황 태그 식별자 배열 | 빈 배열(`[]`) 허용, 최대 5개 제한 |
+| `memo` | String | N | null | 메모 내용 (예: 달달한 라떼) | 최대 500자, XSS 살균 필수 |
+| `occurredAt` | String | Y | - | 발생 일시 (ISO 8601) | 올바른 날짜 포맷 (예: 2026-07-01T21:30:00) |
 
-- 인증: 불필요 | 관련 기능: FUNC-001 | 관련 테이블: `users`
-
-Request Body:
-
+**3. 정상 응답 예시 (201 Created)**
 ```json
 {
-  "provider": "GOOGLE",
-  "providerToken": "소셜 SDK/OAuth 콜백으로 받은 토큰"
+  "status": 201,
+  "message": "기록이 성공적으로 등록되었습니다.",
+  "body": {
+    "transactionId": 10,
+    "type": "EXPENSE",
+    "amount": 18600,
+    "category": { "categoryId": 3, "name": "카페" },
+    "emotion": { "emotionId": 4, "name": "스트레스", "color": "#5042B3" },
+    "situations": [
+      { "situationId": 1, "name": "퇴근 후" },
+      { "situationId": 2, "name": "혼자 있음" }
+    ],
+    "memo": "달달한 라떼와 케이크",
+    "occurredAt": "2026-07-01T21:30:00"
+  }
 }
 ```
 
-처리: providerToken 검증 → 제공자에서 프로필(식별자·이메일·닉네임·**프로필 이미지**) 수신 → `(provider, provider_user_id)`로 조회, 없으면 가입 → accessToken 발급.
+**4. 실패 응답 예시 (400 Bad Request)**
+- `INVALID_AMOUNT`: amount가 0 이하로 입력된 경우 → "1원 이상의 금액을 입력해 주세요."
+- `MEMO_LENGTH_EXCEEDED`: memo 길이가 500자를 초과한 경우 → "메모는 최대 500자까지 입력 가능합니다."
+- `INVALID_REFERENCE`: 없는 카테고리/감정 ID 전송 시 → "유효하지 않은 선택값입니다. 다시 시도해 주세요."
 
-Response Body (200):
+**5. 처리 흐름 및 검증 룰**
+- **입력값 검증**: 금액(>0), 메모 길이(≤500). 메모에 포함된 HTML/Script 태그는 XSS 방어 필터 적용(이스케이프/살균).
+- **데이터베이스 트랜잭션**: `transactions` 테이블에 기본 정보 INSERT (memo 누락 시 NULL 저장). `situationIds` 존재 시 반환된 transactionId로 `transaction_situations` 조인 테이블에 복수 행 삽입(단일 트랜잭션). 미선택 태그는 무시.
 
+---
+
+### [API-02] 소셜 로그인 (Auth Login)
+
+**1. 기본 정보**
+- **요청 주소**: `POST /api/auth/login`
+- **인증 필요 여부**: 불필요
+
+**2. 요청 정보 (Body)**
+- `provider` (String, 필수): GOOGLE, KAKAO, NAVER
+- `providerToken` (String, 필수): 소셜 SDK/OAuth 콜백 수신 토큰
+
+**3. 정상 응답 예시 (200 OK)**
 ```json
 {
   "status": 200,
   "message": "로그인 성공",
   "body": {
-    "accessToken": "jwt-access-token",
-    "refreshToken": "jwt-refresh-token",
+    "accessToken": "eyJhbG...",
+    "refreshToken": "dGhpcy...",
     "user": {
       "userId": 1,
       "nickname": "서연",
       "email": "user@example.com",
-      "profileImageUrl": "https://.../photo.jpg",
+      "profileImageUrl": "https://url.to/photo.jpg", 
       "provider": "GOOGLE",
-      "onboardingDone": false,
-      "themeMode": "LIGHT",
-      "auroraTheme": "블루"
+      "onboardingDone": false
     }
   }
 }
 ```
 
-처리 참고: `social_accounts`에서 `(provider, provider_user_id)`로 조회 → 없으면 `users` + `social_accounts` 생성, 이때 `notification_settings` 기본 행과 약관 동의 이력(`terms_agreements`)도 함께 생성. 리프레시 토큰은 해시하여 `refresh_tokens`에 저장.
+---
 
-예외: 400 (지원하지 않는 provider), 401 (providerToken 검증 실패)
+### [API-03] 기록 목록 조회 (Transactions List)
 
-### 4-2. GET /api/meta — 마스터 목록 조회
+**1. 기본 정보**
+- **요청 주소**: `GET /api/transactions`
+- **처리 흐름**: 클라이언트는 Array 형태로만 받으며, 일/월/감정별 묶음 처리는 프론트 로컬 로직에서 수행.
 
-- 인증: 필요 | 관련 기능: FUNC-008(기록 입력 폼) | 관련 테이블: `emotions`, `categories`, `situations`
-- 기록 입력·필터 UI가 감정·카테고리·상황 목록과 색상·정렬을 서버에서 받아 렌더링한다 (프론트 하드코딩 대체).
+**2. 요청 정보 (Query Parameters)**
+- `year` (Integer, 필수): 조회 기준 연도 (예: 2026)
+- `month` (Integer, 선택): 조회 기준 월. 생략 시 연 전체 조회.
+- `emotionId` (String, 선택): 콤마로 구분된 복수 ID 허용 (예: 4,5)
+- `queryString` (String, 선택): 메모 또는 카테고리 검색어 (예: 커피)
+- `sort` (String, 선택): 정렬 기준. 기본값 `date_desc`. (예: `amount_desc`)
 
-Response Body (200):
+---
 
-```json
-{
-  "status": 200,
-  "message": "success",
-  "body": {
-    "emotions": [
-      { "emotionId": 1, "name": "스트레스", "color": "#5042B3", "sortOrder": 4 }
-    ],
-    "categories": [
-      { "categoryId": 3, "name": "카페", "type": "EXPENSE", "sortOrder": 3 }
-    ],
-    "situations": [
-      { "situationId": 1, "name": "퇴근 후", "sortOrder": 1 }
-    ]
-  }
-}
-```
+### [API-04] 목표 생성 (Goals Create)
 
-> `is_active=true`인 마스터만 반환. 응답은 캐시 가능(자주 바뀌지 않음).
+**1. 기본 정보**
+- **요청 주소**: `POST /api/goals`
+- **상태 전이**: `isMain: true` 로 새 목표 생성 시 서버 트랜잭션을 통해 기존 사용자의 대표 목표 상태를 강제로 `false`로 업데이트(Toggle) 해야 함.
 
-### 4-3. GET /api/transactions — 기록 목록 조회
+**2. 요청 정보 및 유효성 검증 규칙**
+- `name` (String, 필수): 최대 20자
+- `targetAmount` (Integer, 필수): **최소값 100 이상** (극단값 0원 분석 오류 방지)
+- `currentAmount` (Integer, 필수): 0 이상, targetAmount 이하
+- `dueDate` (String, 필수): YYYY-MM-DD 형식, 내일 이후
+- `isMain` (Boolean, 필수)
 
-- 인증: 필요 | 관련 기능: FUNC-012~014 | 관련 테이블: `transactions` (+ emotions·categories·transaction_situations 조인), 인덱스 `(user_id, occurred_at)`·`(user_id, emotion_id)`
+---
 
-Request Parameter:
+## 4. 보조 API 목록 요약 (추가 필요)
 
-| 파라미터 | 필수 | 설명 |
-|---|---|---|
-| year | Y | 조회 연도 |
-| month | N | 조회 월 (없으면 연 전체) |
-| day | N | 조회 일 |
-| emotionId | N | 감정 필터 (콤마 구분 복수: `4,5`) |
-| categoryId | N | 카테고리 필터 (콤마 구분 복수) |
-| query | N | 메모·카테고리 검색어 |
-| sort | N | date_desc(기본) / date_asc / category_asc / category_desc / amount_desc / amount_asc |
+위 핵심 API 외 나머지 API의 엔드포인트 목록입니다. (상세 내용은 위 공통 규격을 따름)
 
-Response Body (200):
+- **`POST /api/auth/logout`**: 로그아웃 (토큰 무효화)
+- **`GET /api/users/me`**: 내 정보 조회
+- **`PATCH /api/users/me`**: 프로필 수정 (nickname)
+- **`DELETE /api/users/me`**: 회원탈퇴 및 사용자 데이터 삭제
+- **`PATCH /api/users/me/onboarding`**: 온보딩 완료 처리
+- **`PATCH /api/users/me/settings`**: 테마 설정(다크모드, 오로라) 변경
+- **`GET /api/meta`**: 감정, 카테고리, 상황 마스터 목록 및 색상 조회
+- **`GET /api/transactions/{id}`**: 단일 기록 상세 조회 (삭제 시 404 에러)
+- **`PUT /api/transactions/{id}`**: 기록 수정
+- **`DELETE /api/transactions/{id}`**: 기록 삭제
+- **`DELETE /api/transactions`**: 전체 기록 초기화
+- **`GET /api/summary/calendar`**: 월별 캘린더 요약 (동률 감정 시 최근 기록 우선)
+- **`GET /api/summary/emotions`**: 월별 감정 분포 능선 (8개 감정 데이터 고정 반환)
+- **`GET /api/analysis/monthly`** (3순위): 월간 소비 인사이트 분석
+- **`GET /api/universe/simulation`** (3순위): 평행우주 시뮬레이션 계산 결과
 
-```json
-{
-  "status": 200,
-  "message": "success",
-  "body": {
-    "transactions": [
-      {
-        "transactionId": 10,
-        "type": "EXPENSE",
-        "amount": 18600,
-        "category": { "categoryId": 3, "name": "카페" },
-        "emotion": { "emotionId": 4, "name": "스트레스", "color": "#5042B3" },
-        "situations": [
-          { "situationId": 1, "name": "퇴근 후" },
-          { "situationId": 2, "name": "혼자 있음" }
-        ],
-        "memo": "달달한 라떼와 케이크",
-        "occurredAt": "2026-07-01T21:30:00"
-      }
-    ],
-    "totalIncome": 2600000,
-    "totalExpense": 320000
-  }
-}
-```
+---
 
-> 감정·카테고리는 객체로, 상황은 배열로 반환한다 (N:M). 일별/월별/감정별 그룹핑은 프론트에서 수행하고, 서버는 필터·정렬된 평면 목록과 기간 합계를 반환한다.
+## 5. 기존 명세서 대비 누락/충돌 점검 결과
 
-예외: 400 (year 누락), 401
+**1. 요청/응답값 충돌 점검 (해결됨)**
+- `POST /api/transactions` 스키마: 기존 단일 식별자로 암시되었던 상황 태그 속성을 `situationIds` 배열화로 수정하고 메모(memo) 정책(길이, 널 처리) 명시를 보완.
+- `POST /api/auth/login` 응답: 소셜 계정 프로필 이미지 적용 정책을 반영하여 `profileImageUrl` 필드 추가.
+- `POST /api/goals` 요청: 극단값(0원) 입력 방지를 위해 `targetAmount` 검증 규칙 추가(Min: 100).
+- 에러 처리 세분화: 400, 401, 403, 404 에러를 상황에 맞게 분리하여 프론트엔드가 정확한 다이얼로그를 표출하도록 에러 매핑 구체화.
 
-### 4-4. POST /api/transactions — 기록 등록
+**2. 누락 및 삭제 점검**
+- **STEP 5에는 있으나 STEP 8에 없는 기능 (정상)**: 커스텀 태그 관리(FUNC-024)는 범위 제외로 확정되어 의도적으로 삭제됨. 알림 설정(FUNC-025)은 후순위 보류.
+- **STEP 8에는 있으나 STEP 5에 없는 기능 (없음)**: 요구사항과 1:1 매핑 원칙 준수.
 
-- 인증: 필요 | 관련 기능: FUNC-008 | 관련 테이블: `transactions` (+ `transaction_situations`)
+---
 
-Request Body:
+## 6. 최종 검토 및 향후 확정 필요 사항
 
-```json
-{
-  "type": "EXPENSE",
-  "amount": 18600,
-  "categoryId": 3,
-  "emotionId": 4,
-  "situationIds": [1, 2],
-  "memo": "달달한 라떼와 케이크",
-  "occurredAt": "2026-07-01T21:30:00"
-}
-```
-
-검증 (STEP 5 정책 반영): `amount > 0`·`emotionId`·`categoryId`·`occurredAt` 필수. `situationIds`는 **복수 허용, 생략 시 빈 배열**(N:M — situation 미부착). `memo`는 생략 시 **NULL 저장** (기본 문자열 저장 금지). 서버는 기록 저장 후 `situationIds` 각 항목을 `transaction_situations`에 삽입 (단일 트랜잭션).
-
-Response Body (201): 생성된 기록 (transactionId 포함, 4-3과 동일 구조 — emotion·category 객체, situations 배열)
-
-예외: 400 (필수 누락, 존재하지 않는 emotionId·categoryId·situationId, amount ≤ 0), 401
-
-### 4-5. PUT /api/transactions/{transactionId} — 기록 수정
-
-- 인증: 필요 | 관련 기능: FUNC-009 | Request Body: 4-4와 동일 필드
-- situationIds 전달 시 기존 조인 행을 교체(전량 삭제 후 재삽입, 단일 트랜잭션)
-- 예외: 400, 401, 403 (타인 기록), 404 (기록 없음)
-
-### 4-6. DELETE /api/transactions/{transactionId} — 기록 삭제
-
-- 인증: 필요 | 관련 기능: FUNC-010
-- 관련 조인(`transaction_situations`)은 FK CASCADE로 함께 삭제
-- Response (200): `{ "deleted": true }` | 예외: 401, 403, 404
-- 참고: 삭제 확인은 프론트 다이얼로그에서 수행 (정책 #5)
-
-### 4-7. GET /api/goals · POST /api/goals · PUT /api/goals/{goalId} · DELETE /api/goals/{goalId}
-
-- 인증: 필요 | 관련 기능: FUNC-005~007 | 관련 테이블: `goals`
-
-목표 객체:
-
-```json
-{
-  "goalId": 1,
-  "name": "제주도 여행",
-  "targetAmount": 2000000,
-  "currentAmount": 0,
-  "startDate": "2026-07-06",
-  "dueDate": "2026-10-31",
-  "isMain": true,
-  "status": "ACTIVE"
-}
-```
-
-- POST: 온보딩 완료 시 `isMain: true`로 생성 (기간 선택값 → startDate + 기간으로 dueDate 계산, STEP 7 보완 #3)
-- `isMain: true`로 생성·수정 시 기존 대표 목표는 서버가 트랜잭션으로 해제 (STEP 7 보완 #4)
-- 예외: 400 (targetAmount ≤ 0), 401, 403, 404
-
-### 4-8. PATCH /api/users/me/onboarding — 온보딩 완료 처리
-
-- 인증: 필요 | 관련 기능: FUNC-005 | 관련 컬럼: `users.onboarding_done`
-- Request Body 없음 → `onboarding_done = true` 설정 (로그아웃과 무관하게 보존 — 정책 #7)
-- Response (200): `{ "onboardingDone": true }`
-
-### 4-8. GET /api/summary/calendar — 월별 캘린더 요약
-
-- 인증: 필요 | 관련 기능: FUNC-015·016 | Query: year(Y), month(Y)
-
-Response Body (200):
-
-```json
-{
-  "status": 200,
-  "message": "success",
-  "body": [
-    {
-      "date": "2026-07-01",
-      "dominantEmotion": "스트레스",
-      "transactionCount": 2,
-      "totalExpense": 50600
-    }
-  ]
-}
-```
-
-> 대표 감정 동률 규칙: **최근 기록 우선** (STEP 6 보완 #6의 명시 규칙 — 팀 확정 필요 표기)
-
-### 4-9. GET /api/summary/emotions — 월별 감정 분포
-
-- 인증: 필요 | 관련 기능: FUNC-017·018 | Query: year(Y), month(Y)
-
-Response Body (200):
-
-```json
-{
-  "status": 200,
-  "message": "success",
-  "body": {
-    "emotions": [
-      { "emotion": "스트레스", "count": 6, "amount": 140600 },
-      { "emotion": "외로움", "count": 4, "amount": 78400 }
-    ],
-    "prevMonth": [
-      { "emotion": "스트레스", "count": 4, "amount": 98000 }
-    ]
-  }
-}
-```
-
-> 감정 능선은 8종 전체를 축으로 사용 (정책 #4). prevMonth는 홈 AI 감정 신호의 증감 계산용.
-
-### 4-10. GET /api/analysis/monthly — 월간 분석 (3순위)
-
-- 인증: 필요 | 관련 기능: FUNC-019~021 | Query: year(Y), month(Y)
-- Response 구성(초안): 카테고리별 집계(금액·비중·전월 대비), 시간대별 집계(아침/점심/저녁/밤), 감정별 집계, 인사이트 문장 목록(룰 기반 생성 → LLM 확장)
-- 상세 스키마는 AI 분석 화면의 실데이터 전환 설계 시 확정 — **확인 필요**
-
-### 4-11. GET /api/universe/simulation — 평행우주 시뮬레이션 (3순위)
-
-- 인증: 필요 | 관련 기능: FUNC-022 | Query: goalId(N — 없으면 대표 목표)
-- Response 구성(초안): 현재 우주(월간 감정소비 추정액, 목표 지연 개월), 다른 우주(절감 가능액, 목표 단축), 내레이션 문장 목록
-- 계산 로직은 `src/utils/planetScoring.mjs` 활용 여부 포함 설계 시 확정 — **확인 필요**
-
-## 5. 구현 우선순위 (백엔드 착수 시)
-
-| 차수 | API | 근거 |
-|---|---|---|
-| 1차 | auth/login·logout·토큰 갱신, meta(마스터), users/me(조회·수정·온보딩), transactions CRUD·목록 | 핵심 루프(기록→조회)와 데이터 영구 저장 (REQ-F-034). meta는 기록 입력 폼의 선행 조건 |
-| 2차 | goals CRUD, summary/calendar, summary/emotions, users/me/settings, notification_settings | 홈 회고·목표 화면의 실데이터화 |
-| 3차 | analysis/monthly, universe/simulation, users/me 탈퇴, transactions 전체 초기화 | 분석 실데이터화(3순위 요구사항) 및 계정 정리 기능 |
-
-> 인증 보조 API: `POST /api/auth/token/refresh`(리프레시 토큰으로 액세스 토큰 재발급)는 1차에 포함. `refresh_tokens` 테이블과 연결된다.
-
-## 6. 확인·확정 필요 항목
-
-| # | 항목 | 내용 |
-|---|---|---|
-| 1 | 인증 방식 | JWT 가정으로 작성 — 세션 방식과 비교해 팀 확정 필요 |
-| 2 | 소셜 토큰 교환 방식 | 프론트 SDK 토큰 전달 vs 서버 리다이렉트 콜백 — OAuth 연동 설계 시 확정 |
-| 3 | 대표 감정 동률 규칙 | "최근 기록 우선"으로 초안 명시 — 팀 확정 필요 |
-| 4 | 분석·시뮬레이션 응답 스키마 | 실데이터 전환 설계 시 상세 확정 (4-10·4-11) |
-| 5 | 4순위 API | 알림·백업·챌린지 API는 본 초안 제외 — 기능 확정 시 별도 정의 |
+- [x] 변경 기능 수정 (상황 태그 N:M 조인 테이블 저장 등 적용)
+- [x] 삭제 기능 정리 (커스텀 태그 관리 API 배제)
+- [x] 요청/응답값 상세화 및 오류 응답 분리 (400, 401, 404의 상황별 분리)
+- [x] 유효성 검증 규칙 정리 (XSS 필터, 메모 길이 500자, 금액 하한선 100원 등)
+- [ ] **백엔드 팀 협의(확인 필요 사항)**: 
+  1. 인증 토큰 전달 방식 결정 (프론트 SDK 직접 전달 vs 백엔드 OAuth 리다이렉트 콜백).
+  2. XSS 필터링을 프론트엔드에서 1차로 수행할지, 백엔드 전역 미들웨어로 일괄 처리할지 아키텍처 확정 필요.
