@@ -45,6 +45,8 @@ const globalStyles = css`
 const Container = styled.div`
   position: relative;
   width: 100%;
+  max-width: 1420px;
+  margin: 0 auto;
   height: calc(100vh - 100px);
   display: flex;
   align-items: center;
@@ -115,10 +117,10 @@ export default function UniversePageDc() {
   useEffect(() => {
     const ob = new ResizeObserver(entries => {
       for (let entry of entries) {
-        const { width, height } = entry.contentRect;
+        const { width } = entry.contentRect;
         const scaleW = width / 1160;
-        const scaleH = height / 660;
-        setScale(Math.min(scaleW, scaleH));
+        // 세로 높이 제약을 풀고, 무조건 가로 너비(1420px)에 맞춰 꽉 차게 스케일업 하도록 수정
+        setScale(scaleW);
       }
     });
     if (containerRef.current) ob.observe(containerRef.current);
@@ -206,7 +208,7 @@ export default function UniversePageDc() {
     <>
       <Global styles={globalStyles} />
       <Container ref={containerRef} style={isMobile ? { height: 'calc(100dvh - 150px)', padding: '0', borderRadius: 0, boxShadow: 'none', overflow: 'hidden' } : {}}>
-        <PageWrapper style={isMobile ? { width: '100%', height: '100%', borderRadius: '24px 24px 0 0', overflow: 'hidden' } : {}}>
+        <PageWrapper style={isMobile ? { width: '100%', height: '100%', borderRadius: '24px 24px 0 0', overflow: 'hidden' } : { transform: `scale(${scale})`, transformOrigin: 'center center' }}>
 
         <div style={{ position: "absolute", inset: 0, opacity: parked && phase !== "flying" ? 0 : 1, pointerEvents: phase === "idle" ? "auto" : "none", transition: "opacity .45s ease" }}>
           <div style={{ position: "absolute", inset: 0, overflow: "hidden" }}>
