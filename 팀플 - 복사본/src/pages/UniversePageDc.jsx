@@ -6,6 +6,21 @@ import UniversePlanet from '../components/UniversePlanet';
 import SpaceBlob from '../components/SpaceBlob';
 import UniverseConsole from '../components/UniverseConsole';
 import UniverseEasterEgg from '../components/UniverseEasterEgg';
+import { theme } from '../styles/theme.js';
+
+const uiType = (weight, size, lineHeight) => ({
+  fontFamily: theme.fonts.sans,
+  fontWeight: weight,
+  fontSize: size,
+  ...(lineHeight ? { lineHeight } : {})
+});
+
+const monoType = (weight, size, lineHeight) => ({
+  fontFamily: theme.fonts.mono,
+  fontWeight: weight,
+  fontSize: size,
+  ...(lineHeight ? { lineHeight } : {})
+});
 
 const globalStyles = css`
   html, body {
@@ -61,7 +76,7 @@ const PageWrapper = styled.div`
   overflow: hidden;
   background: radial-gradient(135% 100% at 50% -10%,#23263e 0%,#14161f 44%,#0a0c14 100%);
   box-shadow: 0 44px 100px -34px rgba(20,16,30,.72),0 0 0 1px rgba(255,255,255,.06);
-  font-family: system-ui, -apple-system, sans-serif;
+  font-family: ${theme.fonts.sans};
   animation: pu-unfold 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards, pu-flicker 1.2s ease-out forwards;
 `;
 
@@ -222,22 +237,22 @@ export default function UniversePageDc() {
           <div style={{ position: "absolute", left: isMobile ? 24 : 48, top: isMobile ? 24 : 48, zIndex: 10, display: "flex", flexDirection: "column", gap: 6, opacity: phase === "idle" ? 1 : 0, transition: "opacity .3s ease", pointerEvents: "none" }}>
             {isMobile ? (
               <>
-                <div style={{ font: "600 10px ui-monospace,Menlo,monospace", letterSpacing: ".1em", color: "#ECEBF0", opacity: 0.7 }}>PARALLEL UNIVERSE</div>
-                <div style={{ font: "800 22px/1.2 system-ui", color: "#fff", letterSpacing: "-.02em" }}>미래는 지금 갈라지고 있어요</div>
-                <div style={{ font: "400 12px system-ui", color: "#8A837A", marginTop: 2 }}>두 우주 중 하나를 눌러 항해를 시작해요.</div>
+                <div style={{ ...monoType(theme.fontWeights.semibold, 10), letterSpacing: ".1em", color: "#ECEBF0", opacity: 0.7 }}>PARALLEL UNIVERSE</div>
+                <div style={{ ...uiType(theme.fontWeights.extrabold, 22, 1.2), color: "#fff", letterSpacing: "-.02em" }}>미래는 지금 갈라지고 있어요</div>
+                <div style={{ ...uiType(theme.fontWeights.regular, 12), color: "#8A837A", marginTop: 2 }}>두 우주 중 하나를 눌러 항해를 시작해요.</div>
               </>
             ) : (
               <>
-                <div style={{ font: "600 12px ui-monospace,Menlo,monospace", letterSpacing: ".1em", color: "#ECEBF0" }}>2026년 7월 6일 월요일</div>
-                <div style={{ font: "800 28px/1 system-ui", color: "#fff", letterSpacing: "-.02em" }}>평행우주 ☾</div>
+                <div style={{ ...monoType(theme.fontWeights.semibold, 12), letterSpacing: ".1em", color: "#ECEBF0" }}>2026년 7월 6일 월요일</div>
+                <div style={{ ...uiType(theme.fontWeights.extrabold, 28, 1), color: "#fff", letterSpacing: "-.02em" }}>평행우주 ☾</div>
               </>
             )}
           </div>
 
         {(phase === "flying" || phase === "departing") && (
           <div style={{ position: "absolute", left: isMobile ? 24 : 48, top: isMobile ? 24 : 48, zIndex: 10, animation: "pu-welldraw .6s ease both" }}>
-            <div style={{ font: `600 ${isMobile ? 10 : 12}px ui-monospace,Menlo,monospace`, letterSpacing: ".1em", color: "#ECEBF0" }}>VOYAGE LOG</div>
-            <div style={{ font: `800 ${isMobile ? 20 : 28}px/1 system-ui`, color: "#fff", letterSpacing: "-.02em", marginTop: 6 }}>{from === "current" ? U_DATA.current.title : U_DATA.reduced.title} 우주로<br/>진입하고 있어요</div>
+            <div style={{ ...monoType(theme.fontWeights.semibold, isMobile ? 10 : 12), letterSpacing: ".1em", color: "#ECEBF0" }}>VOYAGE LOG</div>
+            <div style={{ ...uiType(theme.fontWeights.extrabold, isMobile ? 20 : 28, 1), color: "#fff", letterSpacing: "-.02em", marginTop: 6 }}>{from === "current" ? U_DATA.current.title : U_DATA.reduced.title} 우주로<br/>진입하고 있어요</div>
           </div>
         )}
 
@@ -252,7 +267,7 @@ export default function UniversePageDc() {
               {selected === "current" && <div style={{ position: "absolute", left: "50%", top: "50%", width: isMobile ? 140 : 222, height: isMobile ? 140 : 222, borderRadius: "50%", background: "radial-gradient(circle,rgba(158,150,238,.6),transparent 62%)", filter: "blur(14px)", animation: "pu-selglow 1.7s ease-in-out infinite" }}></div>}
             </div>
             <div style={{ position: "absolute", left: "50%", top: isMobile ? 105 : 170, transform: "translateX(-50%)", whiteSpace: "nowrap", textAlign: "center", opacity: parked ? 0 : 1, transition: "opacity .3s ease" }}>
-              <div style={{ font: "600 13px system-ui", color: "#ECEBF0" }}>지금처럼 소비한 나</div>
+              <div style={{ ...uiType(theme.fontWeights.semibold, 13), color: "#ECEBF0" }}>지금처럼 소비한 나</div>
             </div>
           </div>
 
@@ -264,7 +279,7 @@ export default function UniversePageDc() {
               {egg && <div style={{ position: "absolute", left: "50%", top: "50%", width: isMobile ? 150 : 230, height: isMobile ? 150 : 230, borderRadius: "50%", background: "radial-gradient(circle,rgba(130,226,194,.6),transparent 62%)", filter: "blur(15px)", animation: "pu-selglow 1.1s ease-in-out infinite" }}></div>}
             </div>
             <div style={{ position: "absolute", left: "50%", top: isMobile ? 115 : 170, transform: "translateX(-50%)", whiteSpace: "nowrap", textAlign: "center", opacity: parked ? 0 : 1, transition: "opacity .3s ease" }}>
-              <div style={{ font: "600 13px system-ui", color: "#ECEBF0" }}>감정소비를 줄인 나</div>
+              <div style={{ ...uiType(theme.fontWeights.semibold, 13), color: "#ECEBF0" }}>감정소비를 줄인 나</div>
             </div>
           </div>
         </div>
@@ -308,8 +323,8 @@ export default function UniversePageDc() {
               <UniversePlanet tone={otherKey === "reduced" ? "calm" : "stress"} size={isMobile ? 140 : 212} />
               {phase === "result" && (
                 <div style={{ textAlign: "center" }}>
-                  <div style={{ font: "600 12.5px system-ui", color: "#ECEBF0" }}>{other && other.title}</div>
-                  <div style={{ font: "400 10.5px system-ui", color: "#9a97a8", marginTop: 6 }}>눌러서 이 우주로 이동</div>
+                  <div style={{ ...uiType(theme.fontWeights.semibold, 12.5), color: "#ECEBF0" }}>{other && other.title}</div>
+                  <div style={{ ...uiType(theme.fontWeights.regular, 10.5), color: "#9a97a8", marginTop: 6 }}>눌러서 이 우주로 이동</div>
                 </div>
               )}
             </div>
@@ -323,26 +338,26 @@ export default function UniversePageDc() {
                 {isMobile && <div style={{ width: 16, height: 16, background: "rgba(255,255,255,.94)", transform: "rotate(45deg)", marginBottom: -12, borderRadius: 3, alignSelf: "center", position: "relative", zIndex: 1 }}></div>}
                 
                 <div style={{ width: isMobile ? "100%" : "auto", maxWidth: 400, padding: isMobile ? "20px" : "18px 22px", borderRadius: 20, background: "rgba(255,255,255,.94)", boxShadow: "0 18px 44px -18px rgba(0,0,0,.6)", animation: "pu-pop .5s ease .15s both", position: "relative", zIndex: 2 }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 7, font: "600 10.5px system-ui", letterSpacing: ".03em", color: u.accent }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 7, ...uiType(theme.fontWeights.semibold, 10.5), letterSpacing: ".03em", color: u.accent }}>
                     <span style={{ width: 7, height: 7, borderRadius: "50%", background: u.accent }}></span>{u.tag} · {u.title}
                   </div>
-                  <div style={{ font: "400 11px system-ui", color: "#8A837A", marginTop: 14 }}>{u.metricLabel}</div>
+                  <div style={{ ...uiType(theme.fontWeights.regular, 11), color: "#8A837A", marginTop: 14 }}>{u.metricLabel}</div>
                   <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginTop: 3 }}>
-                    <span style={{ font: "800 40px/1 system-ui", color: u.accent, letterSpacing: "-.02em" }}>{u.metric}</span>
-                    <span style={{ font: "700 15px system-ui", color: u.accent }}>{u.metric.includes("-") ? "▼" : "▲"}</span>
+                    <span style={{ ...uiType(theme.fontWeights.extrabold, 40, 1), color: u.accent, letterSpacing: "-.02em" }}>{u.metric}</span>
+                    <span style={{ ...uiType(theme.fontWeights.bold, 15), color: u.accent }}>{u.metric.includes("-") ? "▼" : "▲"}</span>
                   </div>
                   <div style={{ height: 1, background: "rgba(50,42,32,.09)", margin: "15px 0" }}></div>
-                  <div style={{ font: "400 13px/1.6 system-ui", color: "#3A352F" }}>{u.narratives[narrativeIndex]}</div>
+                  <div style={{ ...uiType(theme.fontWeights.regular, 13, 1.6), color: "#3A352F" }}>{u.narratives[narrativeIndex]}</div>
                   <div style={{ display: "flex", gap: 8, marginTop: 16 }}>
-                    <span style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "7px 12px", borderRadius: 11, background: "rgba(50,42,32,.055)", font: "600 11px system-ui", color: "#5c564e" }}>🎯 {u.goalNote}</span>
-                    <span style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "7px 12px", borderRadius: 11, background: "rgba(50,42,32,.055)", font: "600 11px system-ui", color: "#5c564e" }}><span style={{ width: 8, height: 8, borderRadius: "50%", background: u.accent }}></span>{u.emotionTag}</span>
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "7px 12px", borderRadius: 11, background: "rgba(50,42,32,.055)", ...uiType(theme.fontWeights.semibold, 11), color: "#5c564e" }}>🎯 {u.goalNote}</span>
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "7px 12px", borderRadius: 11, background: "rgba(50,42,32,.055)", ...uiType(theme.fontWeights.semibold, 11), color: "#5c564e" }}><span style={{ width: 8, height: 8, borderRadius: "50%", background: u.accent }}></span>{u.emotionTag}</span>
                   </div>
                 </div>
               </div>
             )}
 
             {phase === "result" && (
-              <button onClick={reset} style={{ position: "absolute", right: 34, bottom: 28, zIndex: 3, display: "inline-flex", alignItems: "center", gap: 9, padding: "7px 8px 7px 16px", borderRadius: 24, border: "1px solid rgba(255,255,255,.14)", background: "rgba(255,255,255,.06)", color: "#c9c6d4", font: "600 12px system-ui", cursor: "pointer", backdropFilter: "blur(8px)" }}>
+              <button onClick={reset} style={{ position: "absolute", right: 34, bottom: 28, zIndex: 3, display: "inline-flex", alignItems: "center", gap: 9, padding: "7px 8px 7px 16px", borderRadius: 24, border: "1px solid rgba(255,255,255,.14)", background: "rgba(255,255,255,.06)", color: "#c9c6d4", ...uiType(theme.fontWeights.semibold, 12), cursor: "pointer", backdropFilter: "blur(8px)" }}>
                 콘솔로 돌아가기 <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 26, height: 26, borderRadius: "50%", background: "rgba(255,255,255,.12)", fontSize: 13 }}>↩</span>
               </button>
             )}

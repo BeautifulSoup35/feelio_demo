@@ -11,6 +11,18 @@ export const emotionPalette = {
 
 export const theme = {
   font: "Inter, 'Pretendard', 'Pretendard Variable', -apple-system, BlinkMacSystemFont, system-ui, sans-serif",
+  fonts: {
+    sans: "Inter, 'Pretendard', 'Pretendard Variable', -apple-system, BlinkMacSystemFont, system-ui, sans-serif",
+    mono: "ui-monospace, Menlo, Monaco, Consolas, 'Liberation Mono', monospace"
+  },
+  fontWeights: {
+    regular: 400,
+    medium: 500,
+    semibold: 600,
+    bold: 700,
+    extrabold: 800,
+    black: 900
+  },
   shadow: '0 20px 50px -36px rgba(70,55,44,.28)',
   darkShadow: '0 26px 62px -30px rgba(0,0,0,.60)',
   emotions: emotionPalette,
